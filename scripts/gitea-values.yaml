@@ -1,0 +1,30 @@
+# gitea-values.yaml -- Helm values for Gitea deployment in M1 Substrate.
+#
+# Used by: helm install gitea gitea-charts/gitea --values <this file>
+# See: M1 Technical Specification Section 6.2
+
+gitea:
+  admin:
+    existingSecret: gitea-admin-secret
+  config:
+    server:
+      ROOT_URL: http://localhost:3002/
+      HTTP_PORT: 3000
+    service:
+      DISABLE_REGISTRATION: true
+persistence:
+  enabled: true
+  size: 5Gi
+postgresql-ha:
+  enabled: false
+postgresql:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 5Gi
+memcached:
+  enabled: true
+service:
+  http:
+    type: ClusterIP
+    port: 3000

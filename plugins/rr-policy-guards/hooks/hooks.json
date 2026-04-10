@@ -1,0 +1,17 @@
+{
+  "description": "Policy guards for the Rational Reserve platform. Currently blocks emoji characters in file-write tool invocations.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/nnos/Projects/developer-portal/plugins/rr-policy-guards/bin/rr-emoji-guard",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "rr-policy-guards",
+  "version": "0.1.0",
+  "description": "Pre-tool-use policy hooks for the Rational Reserve platform: currently includes an emoji guard that blocks emoji characters in file writes. The brew guard will be added in M1 to block supply-chain-risky brew commands.",
+  "author": {
+    "name": "Rational Reserve platform build",
+    "email": "platform@local"
+  },
+  "repository": "/Users/nnos/Projects/developer-portal",
+  "license": "MIT"
+}
