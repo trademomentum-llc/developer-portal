@@ -1,0 +1,31 @@
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: developer-portal
+  description: Self-hosted Internal Developer Platform (IDP) -- M1 Substrate
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+spec:
+  owner: gitea_admin
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: rr-policy-guards
+  description: PreToolUse policy hooks -- emoji guard, bash guard, brew guard
+spec:
+  type: library
+  lifecycle: production
+  owner: gitea_admin
+  system: developer-portal
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage-app
+  description: Backstage frontend and backend -- the portal UI
+spec:
+  type: website
+  lifecycle: experimental
+  owner: gitea_admin
+  system: developer-portal
