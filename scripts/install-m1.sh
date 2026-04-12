@@ -70,24 +70,22 @@ task_1_yarn() {
 }
 
 # ---------------------------------------------------------------------------
-# Task 2: Create k3d cluster
+# Task 2: Verify openchoreo-cluster and switch context
 # ---------------------------------------------------------------------------
-task_2_k3d() {
-    if skip task-2; then info "task 2: k3d cluster already done, skipping"; return 0; fi
-    info "task 2: creating k3d cluster"
+task_2_cluster() {
+    if skip task-2; then info "task 2: cluster already verified, skipping"; return 0; fi
+    info "task 2: verifying openchoreo-cluster"
 
-    if k3d cluster list 2>/dev/null | grep -q m1-substrate; then
-        info "task 2: cluster m1-substrate already exists"
-    else
-        k3d cluster create m1-substrate \
-            --servers 1 \
-            --agents 2 \
-            --wait || fail "k3d cluster create failed"
+    if ! k3d cluster list 2>/dev/null | grep -q openchoreo; then
+        fail "openchoreo-cluster not found. Run 'make quick-start.dev' in ~/Projects/openchoreo first."
     fi
 
-    kubectl cluster-info || fail "kubectl cannot reach cluster"
+    info "task 2: switching kubectl context to k3d-openchoreo"
+    kubectl config use-context k3d-openchoreo || fail "failed to switch context"
+
+    kubectl cluster-info || fail "kubectl cannot reach openchoreo-cluster"
     done_ task-2
-    info "task 2: k3d cluster ready"
+    info "task 2: openchoreo-cluster ready"
 }
 
 # ---------------------------------------------------------------------------
@@ -152,11 +150,40 @@ task_4_gitea_portforward() {
 }
 
 # ---------------------------------------------------------------------------
-# Task 5: Create demo repo in Gitea
+# Task 5: Port-forward OpenChoreo API
 # ---------------------------------------------------------------------------
-task_5_demo_repo() {
-    if skip task-5; then info "task 5: demo repo already done, skipping"; return 0; fi
-    info "task 5: creating demo repo"
+task_5_oc_api_portforward() {
+    if skip task-5; then info "task 5: oc-api port-forward already done, skipping"; return 0; fi
+    info "task 5: starting OpenChoreo API port-forward"
+
+    # Try the Service directly; fall back to the gateway LoadBalancer
+    if kubectl get svc openchoreo-api -n openchoreo-control-plane >/dev/null 2>&1; then
+        kubectl port-forward -n openchoreo-control-plane svc/openchoreo-api 9090:8080 &
+        OC_PF_PID=$!
+        echo "$OC_PF_PID" > "$HOME/.rational-reserve/m1-oc-api-portforward.pid"
+
+        for i in $(seq 1 30); do
+            if curl -s -o /dev/null http://localhost:9090; then
+                break
+            fi
+            sleep 1
+        done
+
+        curl -s -o /dev/null http://localhost:9090 || fail "OpenChoreo API not reachable on port 9090"
+    else
+        info "task 5: openchoreo-api Service not found, using gateway at 172.20.0.3:8080"
+    fi
+
+    done_ task-5
+    info "task 5: OpenChoreo API reachable"
+}
+
+# ---------------------------------------------------------------------------
+# Task 6: Create demo repo in Gitea
+# ---------------------------------------------------------------------------
+task_6_demo_repo() {
+    if skip task-6; then info "task 6: demo repo already done, skipping"; return 0; fi
+    info "task 6: creating demo repo"
 
     GITEA_ADMIN_PASSWORD=$(cat "$HOME/.rational-reserve/m1-gitea-admin-password")
 
@@ -191,16 +218,16 @@ spec:
         -d "{\"message\": \"M1 seed catalog entry\", \"content\": \"${CATALOG_B64}\", \"branch\": \"main\"}" \
         || fail "catalog-info.yaml push failed"
 
-    done_ task-5
-    info "task 5: demo repo created with catalog-info.yaml"
+    done_ task-6
+    info "task 6: demo repo created with catalog-info.yaml"
 }
 
 # ---------------------------------------------------------------------------
-# Task 6: Scaffold Backstage
+# Task 7: Scaffold Backstage
 # ---------------------------------------------------------------------------
-task_6_backstage_scaffold() {
-    if skip task-6; then info "task 6: backstage scaffold already done, skipping"; return 0; fi
-    info "task 6: scaffolding Backstage"
+task_7_backstage_scaffold() {
+    if skip task-7; then info "task 7: backstage scaffold already done, skipping"; return 0; fi
+    info "task 7: scaffolding Backstage"
 
     if [ ! -d "$ROOT/backstage" ]; then
         cd "$ROOT"
@@ -211,36 +238,36 @@ task_6_backstage_scaffold() {
     cd "$ROOT/backstage"
     yarn install || fail "yarn install failed"
 
-    done_ task-6
-    info "task 6: Backstage scaffolded and dependencies installed"
+    done_ task-7
+    info "task 7: Backstage scaffolded and dependencies installed"
 }
 
 # ---------------------------------------------------------------------------
-# Task 7: Wire Backstage to Gitea
+# Task 8: Wire Backstage to Gitea
 # ---------------------------------------------------------------------------
-task_7_backstage_config() {
-    if skip task-7; then info "task 7: backstage config already done, skipping"; return 0; fi
-    info "task 7: wiring Backstage to Gitea"
+task_8_backstage_config() {
+    if skip task-8; then info "task 8: backstage config already done, skipping"; return 0; fi
+    info "task 8: wiring Backstage to Gitea"
 
     cd "$ROOT/backstage/packages/backend"
     yarn add @backstage/plugin-catalog-backend-module-gitea \
         || fail "gitea plugin install failed"
 
-    info "task 7: patching app-config.yaml -- manual step may be needed"
+    info "task 8: patching app-config.yaml -- manual step may be needed"
     # The app-config.yaml patch and backend index.ts registration are
     # environment-specific. The implementation plan handles the exact patches
     # after the scaffold produces its files.
 
-    done_ task-7
-    info "task 7: Backstage wired to Gitea"
+    done_ task-8
+    info "task 8: Backstage wired to Gitea"
 }
 
 # ---------------------------------------------------------------------------
-# Task 8: Start Backstage and verify
+# Task 9: Start Backstage and verify
 # ---------------------------------------------------------------------------
-task_8_backstage_run() {
-    if skip task-8; then info "task 8: backstage already verified, skipping"; return 0; fi
-    info "task 8: starting Backstage"
+task_9_backstage_run() {
+    if skip task-9; then info "task 9: backstage already verified, skipping"; return 0; fi
+    info "task 9: starting Backstage"
 
     cd "$ROOT/backstage"
     GITEA_ADMIN_PASSWORD=$(cat "$HOME/.rational-reserve/m1-gitea-admin-password")
@@ -260,8 +287,8 @@ task_8_backstage_run() {
 
     curl -s -o /dev/null http://localhost:3000 || fail "Backstage not reachable on port 3000"
 
-    done_ task-8
-    info "task 8: Backstage running at http://localhost:3000"
+    done_ task-9
+    info "task 9: Backstage running at http://localhost:3000"
 }
 
 # ---------------------------------------------------------------------------
@@ -270,16 +297,18 @@ task_8_backstage_run() {
 main() {
     task_0_guards
     task_1_yarn
-    task_2_k3d
+    task_2_cluster
     task_3_gitea
     task_4_gitea_portforward
-    task_5_demo_repo
-    task_6_backstage_scaffold
-    task_7_backstage_config
-    task_8_backstage_run
+    task_5_oc_api_portforward
+    task_6_demo_repo
+    task_7_backstage_scaffold
+    task_8_backstage_config
+    task_9_backstage_run
     info "M1 complete."
-    info "  Backstage: http://localhost:3000"
-    info "  Gitea:     http://localhost:3002"
+    info "  Backstage:       http://localhost:3000"
+    info "  Gitea:           http://localhost:3002"
+    info "  OpenChoreo API:  http://localhost:9090"
 }
 
 main "$@"

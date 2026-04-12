@@ -30,10 +30,14 @@
 | P1.3 k3d cluster + Gitea helm install | BLOCKED | Docker daemon (Colima) |
 | P1.4 Create demo Gitea repo | BLOCKED | Gitea running |
 | P1.8 Verify Backstage + Gitea integration | BLOCKED | Everything running |
-| P1.10 README | BLOCKED | After verification |
-| P1.11 Done-definition checklist | BLOCKED | After verification |
+| P1.9 README | BLOCKED | After verification |
+| P1.10 Done-definition checklist | BLOCKED | After verification |
 
 Colima is being killed by an integrity monitor. User is working on it.
+
+Note: M1 now uses the existing `openchoreo-cluster` (not creating a new m1-substrate
+cluster). Install script has been updated accordingly. The Docker dependency is still
+needed because Gitea runs in-cluster and the cluster uses the Colima Docker daemon.
 
 ---
 

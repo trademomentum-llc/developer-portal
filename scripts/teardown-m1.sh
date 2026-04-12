@@ -28,6 +28,7 @@ fi
 
 # Kill any remaining port-forwards
 pkill -f "kubectl port-forward.*gitea-http" 2>/dev/null || true
+pkill -f "kubectl port-forward.*openchoreo-api" 2>/dev/null || true
 info "stray port-forwards cleaned"
 
 # Uninstall Gitea helm release
@@ -40,11 +41,9 @@ fi
 kubectl delete namespace gitea --ignore-not-found 2>/dev/null || true
 info "gitea namespace deleted"
 
-# Delete k3d cluster
-if command -v k3d >/dev/null && k3d cluster list 2>/dev/null | grep -q m1-substrate; then
-    k3d cluster delete m1-substrate 2>/dev/null || true
-    info "k3d cluster m1-substrate deleted"
-fi
+# NOTE: We do NOT delete the openchoreo-cluster. It is shared with
+# ~/Projects/openchoreo/ and managed independently.
+# If you want to tear it down, do so from the openchoreo project.
 
 # Clear progress checkpoints (so reinstall starts fresh)
 rm -rf "$HOME/.rational-reserve/m1-progress"

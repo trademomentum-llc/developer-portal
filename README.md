@@ -7,6 +7,7 @@ Self-hosted Internal Developer Platform (IDP) built on k3d, Gitea, and Backstage
 - Docker (via Colima): `colima start --cpu 4 --memory 8`
 - k3d, kubectl, helm, node, yarn (brew-installable)
 - Go 1.21+ (for building policy guard hooks)
+- OpenChoreo cluster must be running (see `~/Projects/openchoreo/`)
 
 ## Install
 
@@ -22,7 +23,8 @@ Resumes from the last completed task. Use `--fresh` to start over.
 |---------|-----|-------|
 | Backstage | http://localhost:3000 | Frontend + backend |
 | Gitea | http://localhost:3002 | Git hosting, admin: gitea_admin |
-| k3d cluster | -- | Name: m1-substrate |
+| OpenChoreo API | http://localhost:9090 | Port-forwarded from openchoreo-cluster |
+| k3d cluster | -- | Name: openchoreo-cluster (shared) |
 
 ## Teardown
 
