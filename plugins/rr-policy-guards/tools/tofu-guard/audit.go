@@ -1,4 +1,17 @@
-// Package main: rr-tofu-guard audit log writer. JSONL, mode 0600.
+// Package main: rr-tofu-guard audit log writer.
+//
+// Format: JSONL (one JSON object per line), file mode 0600, parent dir 0700.
+// Default path: $HOME/.rational-reserve/logs/tofu-guard.jsonl
+// Override path via RR_TOFU_GUARD_AUDIT_LOG env var.
+//
+// Error handling: INTENTIONALLY BEST-EFFORT. Every I/O failure (bad home dir,
+// bad mkdir, bad open, bad write) is silently swallowed and logAudit returns.
+// Rationale: policy enforcement must never depend on a working audit
+// subsystem. The guard's exit code still blocks or allows correctly; only
+// the forensic record is lost. The tradeoff is deliberate and mirrors the
+// pattern established by rr-brew-guard/audit.go. If you need guaranteed
+// audit delivery, add a stderr fallback line on error (see tech debt
+// guard-1 in TODO.md for the full discussion).
 package main
 
 import (
