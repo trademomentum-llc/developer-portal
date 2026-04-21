@@ -1,0 +1,29 @@
+---
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: c2scoreschemavalid
+spec:
+  crd:
+    spec:
+      names: { kind: C2ScoreSchemaValid }
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package constraints.m2.c2
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Component"
+          input.review.object.metadata.annotations["pipeline.m2/score-valid"] != "true"
+          msg := "Component missing pipeline.m2/score-valid=true annotation"
+        }
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: C2ScoreSchemaValid
+metadata:
+  name: c2-enforce
+spec:
+  match:
+    kinds:
+      - apiGroups: ["core.choreo.dev"]
+        kinds: ["Component"]

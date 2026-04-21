@@ -1,0 +1,30 @@
+---
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: c1platformaddonsmainprotected
+spec:
+  crd:
+    spec:
+      names: { kind: C1PlatformAddonsMainProtected }
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package constraints.m2.c1
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "GitRepository"
+          endswith(input.review.object.spec.url, "/openchoreo/platform-addons")
+          input.review.object.spec.ref.branch != "main"
+          msg := "platform-addons GitRepository must reference the main branch"
+        }
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: C1PlatformAddonsMainProtected
+metadata:
+  name: c1-enforce
+spec:
+  match:
+    kinds:
+      - apiGroups: ["source.toolkit.fluxcd.io"]
+        kinds: ["GitRepository"]
