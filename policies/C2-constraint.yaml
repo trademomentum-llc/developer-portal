@@ -14,7 +14,8 @@ spec:
 
         violation[{"msg": msg}] {
           input.review.kind.kind == "Component"
-          input.review.object.metadata.annotations["pipeline.m2/score-valid"] != "true"
+          anns := object.get(input.review.object.metadata, "annotations", {})
+          object.get(anns, "pipeline.m2/score-valid", "") != "true"
           msg := "Component missing pipeline.m2/score-valid=true annotation"
         }
 ---
