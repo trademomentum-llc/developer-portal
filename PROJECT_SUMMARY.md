@@ -4,7 +4,7 @@
 > state. For "what to do next" see TODO.md. For "where we stopped and what
 > changed mid-session" see SESSION_HANDOFF.md.
 
-**Snapshot date:** 2026-04-21
+**Snapshot date:** 2026-04-21 (late -- reflects 35 commits ahead of origin)
 
 ---
 
@@ -63,7 +63,8 @@ state store all working. Integration into the portal is deferred to M7.
 ## 3. developer-portal (current focus)
 
 **Source:** `~/Projects/developer-portal/`. git repository, branch `main`,
-27 commits ahead of `origin/main` and not pushed.
+35 commits ahead of `origin/main` and not pushed (2 M1 follow-ons + 25 M2
+plan commits + 8 post-handoff commits for tech debt fixes + doc updates).
 
 **Role:** The umbrella for the full self-hosted IDP build.
 

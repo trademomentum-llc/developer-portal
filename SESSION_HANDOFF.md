@@ -4,10 +4,12 @@
 > what is now committed that was not before, what is still outstanding, and
 > exactly what to do first.
 
-**Last session ended:** 2026-04-21
+**Last session ended:** 2026-04-21 (late)
 **Reason for handoff:** Context window running out mid-M2 execution. User
 requested handoff docs written while context still healthy, then we keep
-pushing until we cannot.
+pushing until we cannot. Initial handoff doc was written at commit
+`e260ce8`; eight more fix commits landed afterward (`5e1e088` through
+`54a49a6`) before this final update.
 
 ---
 
@@ -32,14 +34,23 @@ everything once the remote situation is resolved (see Section 6).
 ## 2. Git state at handoff
 
 - **Branch:** `main`
-- **Local HEAD:** `45fa8a8 docs: README M2 section`
-- **Ahead of origin/main by:** 27 commits (the 2 M1 follow-ons + 25 M2 commits)
+- **Local HEAD:** `54a49a6 docs: TODO -- mark score-2 + guard-3 done; guard-1 partial`
+- **Ahead of origin/main by:** 35 commits (2 M1 follow-ons + 25 M2 plan commits + 8 post-handoff commits: handoff docs, tech debt fixes, TODO updates)
 - **Working tree:** clean except for `.remember/` (untracked, tooling
   artifact -- leave alone)
 
-Recent commit log (most-recent first, M2 only):
+Recent commit log (most-recent first):
 
 ```
+54a49a6  docs: TODO -- mark score-2 + guard-3 done; guard-1 partial
+ec2b9a6  docs: rr-tofu-guard audit.go document intentional error swallow (guard-1)
+d4373e6  fix: merge-tofu-hook pushes into existing Bash matcher (guard-3)
+55ce5a7  test: score2openchoreo add 5 Convert coverage tests (score-2)
+5cd620c  docs: TODO -- mark 4 post-M2 tech debt items done
+0983b63  fix: score2openchoreo lowercase error strings (Go idiom)
+680f40d  docs: policies/README -- correct opa test invocation
+5e1e088  fix: add scripts/lib helpers and move smoke script shebangs to line 1
+e260ce8  docs: session handoff + M2 status snapshot
 45fa8a8  docs: README M2 section
 cc56870  feat: backstage proxy for /api/proxy/gitea-actions
 d3e9fb9  feat: M2 install, teardown, and per-tool smoke scripts
@@ -105,6 +116,27 @@ Chronological overview:
 10. **Backstage proxy entry** (Task 23) -- `/api/proxy/gitea-actions` added
     in `backstage/app-config.yaml`.
 11. **README M2 section** (Task 24) -- 112-word M2 section appended.
+
+---
+
+## 3a. Tech debt addressed AFTER initial handoff
+
+Eight additional commits landed after `e260ce8` wrote the initial handoff,
+addressing a subset of the tech debt list in Section 5:
+
+| Commit | Item | Description |
+|---|---|---|
+| `5e1e088` | inst-1, inst-2 | Created `scripts/lib/{colors,wait-for,confirm}.sh` (install-m2.sh was sourcing colors.sh that did not exist). Moved shebangs to line 1 in 7 smoke scripts. |
+| `680f40d` | gk-1 | `policies/README.md` updated to show the correct `opa test --v0-compatible policies/*.rego -v` invocation. |
+| `0983b63` | score-4 | Lowercased error strings in `convert.go` to Go idiom. |
+| `55ce5a7` | score-2 | Added 5 new `convert_test.go` tests (multi-container sort, multi-variable sort, environment resource, missing-reference error, annotations-to-labels). All pass. Total package tests: 11 -> 16. |
+| `d4373e6` | guard-3 | `merge-tofu-hook-into-settings.sh` now pushes into an existing Bash matcher's hooks array instead of appending a duplicate matcher. Verified with three test inputs (empty, existing-other, existing-Bash). |
+| `ec2b9a6` | guard-1 (partial) | `audit.go` in rr-tofu-guard documents the intentional I/O-error swallow semantics. brew-guard + bash-guard + emoji-guard still need the same comment. |
+| `5cd620c`, `54a49a6` | -- | TODO.md bookkeeping to reflect the above. |
+
+Remaining tech debt (see Section 5 for the full list): guard-1 still open
+on 3 of 4 guards; guard-2, guard-4, guard-5 open; score-1, score-3, score-5
+open.
 
 ---
 
