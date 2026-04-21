@@ -22,7 +22,7 @@ type ToolInputPayload struct {
 func main() {
 	var input ToolInput
 	if err := json.NewDecoder(os.Stdin).Decode(&input); err != nil {
-		logAudit("block", "unparseable-input", "", input.SessionID)
+		logAudit("block", "unparseable-input: "+err.Error(), "", "")
 		fmt.Fprintln(os.Stderr, "tofu-guard: unable to parse PreToolUse input")
 		os.Exit(2)
 	}
