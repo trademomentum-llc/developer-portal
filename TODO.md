@@ -58,9 +58,9 @@ Track these before declaring M2 complete. None are blocking Tasks 21-22.
 
 | ID | Item | Status |
 |---|---|---|
-| guard-1 | Document or surface silently-swallowed audit I/O errors in all three guards | open |
+| guard-1 | Document or surface silently-swallowed audit I/O errors (documented in tofu-guard; brew-guard + emoji-guard + bash-guard still open) | PARTIAL commit ec2b9a6 |
 | guard-2 | Pick ONE registration path for rr-tofu-guard (plugin hooks.json OR settings.json); currently double-registered and audit-logs duplicate | open |
-| guard-3 | Fix merge-tofu-hook-into-settings.sh jq filter to push into existing Bash matcher instead of appending a new one | open |
+| guard-3 | Fix merge-tofu-hook-into-settings.sh jq filter to push into existing Bash matcher instead of appending a new one | DONE commit d4373e6 |
 | guard-4 | Investigate overmatch: `wc -w` heredoc containing word `tofu` was blocked; narrow the match | open |
 | guard-5 | Backport corrected remove-script filter into the plan doc (commit 074c87b vs plan lines 684-690) | open |
 
@@ -69,7 +69,7 @@ Track these before declaring M2 complete. None are blocking Tasks 21-22.
 | ID | Item | Status |
 |---|---|---|
 | score-1 | Decide and implement inline `${resources.X.Y}` substitution OR error loudly on partial matches | open |
-| score-2 | Add tests for: multi-container sort order, multi-variable sort order, `environment` resource branch, missing-resource error, annotations-to-labels mapping | open |
+| score-2 | Add tests for: multi-container sort order, multi-variable sort order, `environment` resource branch, missing-resource error, annotations-to-labels mapping | DONE commit 55ce5a7 |
 | score-3 | Document secret-name fallback "X-secret" convention | open |
 | score-4 | Lowercase error strings (Go idiom) | DONE commit 0983b63 |
 | score-5 | Pin score.schema.json to a git SHA instead of the moving `main` branch | open |
