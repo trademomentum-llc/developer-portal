@@ -50,3 +50,18 @@ All hooks are Go binaries in `plugins/rr-policy-guards/bin/`.
 - `plugins/rr-policy-guards/` -- Policy guard hooks (Go)
 - `scripts/` -- Install, teardown, and helper scripts
 - `backstage/` -- Backstage app (scaffolded, wired to Gitea)
+
+## M2 -- IaC + CD loop
+
+M2 lands Flux (cluster add-ons drift correction), Gatekeeper (three pipeline
+constraints), and the Gitea Actions runner. The developer path: push to
+`openchoreo/hello-m2`, CI validates Score, runs `tofu plan` + Infracost,
+builds and pushes the image to Gitea's OCI registry, renders an OpenChoreo
+Component via `score2openchoreo`, and commits it to
+`openchoreo/platform-config/environments/dev/`. OpenChoreo reconciles the
+Component into a running pod. Promote to staging by committing the same
+Component into `environments/staging/`. All three M2 repos live under the
+Gitea `openchoreo` organization. Run `scripts/install-m2.sh` to set up,
+`scripts/teardown-m2.sh` to remove, `scripts/smoke-m2.sh` to verify.
+Direct `tofu apply` from a Bash tool use is blocked by `rr-tofu-guard`;
+use the install script.
