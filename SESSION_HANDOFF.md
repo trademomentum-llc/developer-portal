@@ -1,207 +1,310 @@
 # SESSION HANDOFF
 
 > Read this file FIRST in the next session. It tells you where we stopped,
-> what is now active that was not before, what the user's standing
-> preferences are, and exactly what to do first.
+> what is now committed that was not before, what is still outstanding, and
+> exactly what to do first.
 
-**Last session ended:** 2026-04-09 ~20:20
-**Reason for handoff:** User asked for handoff files and a session restart so
-that the new emoji guard PreToolUse hook becomes active.
+**Last session ended:** 2026-04-21
+**Reason for handoff:** Context window running out mid-M2 execution. User
+requested handoff docs written while context still healthy, then we keep
+pushing until we cannot.
 
 ---
 
 ## 1. The single most important thing
 
-A new PreToolUse hook is registered in `~/.claude/settings.json`. It became
-active at session start (this session). It is called `rr-emoji-guard` and it
-will reject any `Write`, `Edit`, or `MultiEdit` tool invocation whose content
-contains a single non-ASCII byte.
+**M2 codegen is complete and committed on `main`.** 22 of 24 Task 10 tasks
+landed via the `superpowers:subagent-driven-development` flow. The two
+remaining tasks (21, 22) are **live cluster mutations** that the operator
+runs by invoking `scripts/install-m2.sh` manually -- they were deliberately
+deferred to a human-driven execution, not subagent-driven, because:
 
-The user's rule is absolute and not negotiable: **plain ASCII in all files.**
-No emojis. No box-drawing characters (do not use anything in U+2500 family).
-No em dashes (use `--`). No smart quotes (use straight `'` and `"`). No
-Unicode arrows (use `->`, `<-`, `<->`). No section signs (write `Section 4.2`).
-No check marks or cross marks (use words: `passes`, `fails`, `ok`, `blocked`,
-`missing`).
+- `tofu apply` against the real cluster takes 15 to 20 minutes
+- `scripts/install-m2.sh` modifies openbao kv, Gitea repos, and helm releases
+- The operator wanted to confirm cluster state before committing to it
 
-The previous session violated this rule by accident roughly 2,564 times across
-68 files, was caught by the user, and had to do a bulk Python fix to make
-everything ASCII again. Do not repeat that. If you find yourself reaching for
-a typographic dash or a fancy arrow, stop and use ASCII.
-
-The hook lives at:
-`/Users/nnos/Projects/developer-portal/plugins/rr-policy-guards/bin/rr-emoji-guard`
-
-Source is at:
-`/Users/nnos/Projects/developer-portal/plugins/rr-policy-guards/tools/emoji-guard/`
-
-The hook source is Go, stdlib only, with full unit and integration tests
-(all passing). It blocks on exit code 2 with a clear stderr message naming
-the line, column, code point, and category. There is an emergency bypass:
-`RR_EMOJI_GUARD_BYPASS=1` allows one command through, logged.
-
-Audit log: `~/.rational-reserve/logs/emoji-guard.jsonl` (JSONL, append-only).
+The full M2 source tree, specs, implementation plan, 27 commits, and all
+tests are on `main` at or before commit `45fa8a8`. A `git push` will send
+everything once the remote situation is resolved (see Section 6).
 
 ---
 
-## 2. User's standing preferences (all in persistent memory)
+## 2. Git state at handoff
 
-These are saved at `~/.claude/projects/-Users-nnos-Projects/memory/` and the
-agent will see them automatically. Brief recap:
+- **Branch:** `main`
+- **Local HEAD:** `45fa8a8 docs: README M2 section`
+- **Ahead of origin/main by:** 27 commits (the 2 M1 follow-ons + 25 M2 commits)
+- **Working tree:** clean except for `.remember/` (untracked, tooling
+  artifact -- leave alone)
 
-1. **Plain ASCII in all files.** Already covered above.
-2. **Deterministic / compiled languages preferred.** Use Go for new tools,
-   scripts, hooks, and services. Reach for an interpreted language only when
-   the ecosystem forces it (e.g., Backstage is TypeScript because Backstage is
-   TypeScript). Document any interpretation decision explicitly.
-3. **Three-document plan format.** Every non-trivial plan must be written as
-   three separate markdown documents BEFORE any implementation: a Requirements
-   Document, a Design Specification, and a Technical Specification. Implementation
-   Plan (TDD bite-sized tasks) is a fourth document, produced after the user
-   approves the first three.
-4. **brew install requires the security pre-check hook.** This hook is NOT
-   built yet. The plan calls it `rr-brew-guard` and it should be added to
-   the same `plugins/rr-policy-guards/` plugin as a sibling of `rr-emoji-guard`.
-   The `security-guidance` plugin the user has installed does NOT do this
-   despite the user's earlier assumption -- it only checks file content
-   patterns, not Bash commands.
+Recent commit log (most-recent first, M2 only):
 
----
-
-## 3. Where we stopped
-
-The session was working on three layered things:
-
-**Layer 0: Check-tools.sh fix in openchoreo (DONE)**
-The user has openchoreo at `/Users/nnos/Projects/openchoreo/`. We unblocked
-its preflight script `check-tools.sh` so that all installed tool versions
-now pass. The script exits 0 with all green checks.
-
-**Layer 1: Rational Reserve v0.1 + v0.2 build (DONE in earlier turns)**
-The user had us build a "Rational Reserve" military-hierarchy AI swarm
-orchestration system from scratch in `/Users/nnos/Projects/rational-reserve/`.
-We built it in Python (interpreted -- BEFORE the deterministic preference
-was stated). It is functionally complete: 65 tests pass, end-to-end smoke
-test works. State persists across daemon restarts.
-
-NOTE: Now that the deterministic preference is in memory, a Go rewrite of
-RR is a legitimate future candidate. Do not initiate it; surface the option
-if the user asks.
-
-**Layer 2: developer-portal IDP build (BLOCKED on user spec review)**
-This is the umbrella platform engineering project. The user wants a full
-self-hosted IDP based on the Platform Engineering reference architecture in
-`/Users/nnos/Downloads/platform.pptx`. Decomposed into 7 milestones M1-M7.
-M1 is "the Substrate": k3d cluster + OpenChoreo + Gitea + Backstage skeleton.
-
-We wrote all three M1 spec documents to:
-`/Users/nnos/Projects/developer-portal/docs/specs/m1-substrate/`
-- `requirements.md`
-- `design-specification.md`
-- `technical-specification.md`
-
-These specs are awaiting the user's review and approval. Once approved, the
-NEXT step is to invoke `superpowers:writing-plans` to produce the TDD
-implementation plan (the fourth document), then begin building.
-
-Two open questions in the spec review (detailed in the specs themselves):
-- Backstage running on host vs in cluster -- I argued for host
-- OpenChoreo crossing three planes as load-bearing -- the user already
-  confirmed this is intentional
+```
+45fa8a8  docs: README M2 section
+cc56870  feat: backstage proxy for /api/proxy/gitea-actions
+d3e9fb9  feat: M2 install, teardown, and per-tool smoke scripts
+de3f383  feat: canonical CI workflow + runner helper scripts
+6718753  feat: seed-repos content for platform-addons, platform-config, hello-m2
+59fee9b  feat: gitea + openbao seed scripts
+ae49185  feat: tofu modules/external-secrets-wiring
+7d71da3  feat: tofu modules/openchoreo-environments
+844175a  feat: tofu modules/gitea-runner
+700d2ef  feat: tofu modules/gatekeeper
+fecb218  feat: tofu modules/flux
+aa0a0f1  feat: tofu root module scaffolding
+0514a2a  fix: C-2 Rego handles missing annotations correctly
+ae3f073  feat: Gatekeeper policies C-1 C-2 C-3 with Rego tests
+e0f067d  feat: score2openchoreo CLI + main + golden-file tests
+18d2e72  feat: score2openchoreo schema validator + fixtures
+c2d1359  feat: score2openchoreo Convert function with table tests
+f7e756f  feat: score2openchoreo module + shared types
+0ee5acc  fix: rr-tofu-guard remove script defensive null handling
+074c87b  feat: register rr-tofu-guard as PreToolUse hook
+e89194a  fix: rr-tofu-guard add missing test paths and audit error detail
+7a59b01  feat: rr-tofu-guard main + integration tests + build
+aa74333  feat: rr-tofu-guard audit log writer
+9a435bf  feat: implement rr-tofu-guard parser
+e86ef88  test: failing parser_test for rr-tofu-guard
+3392c3e  M2 IaC + CD Loop -- implementation plan
+41db8f0  M2 IaC + CD Loop -- initial spec package
+```
 
 ---
 
-## 4. What to do first in the new session
+## 3. What was built in this session
+
+Chronological overview:
+
+1. **M2 spec package** -- three-doc spec (requirements, design, technical)
+   in `docs/specs/m2-iac-cd/` committed as `41db8f0`.
+2. **M2 implementation plan** -- 24-task TDD plan in
+   `docs/superpowers/plans/2026-04-20-m2-iac-cd.md` committed as `3392c3e`.
+3. **rr-tofu-guard** (Tasks 1-5) -- new PreToolUse hook that blocks direct
+   `tofu apply`/`destroy`/`import` from Bash tool uses. Go, stdlib only,
+   28 sub-tests pass, binary at
+   `plugins/rr-policy-guards/bin/rr-tofu-guard`. Registered in
+   `~/.claude/settings.json` and is ACTIVE.
+4. **score2openchoreo** (Tasks 6-9) -- new Go converter from Score YAML to
+   OpenChoreo Component CRDs. Two deps (yaml.v3, jsonschema/v5). 11 tests
+   (6 Convert + 2 schema + 3 golden-file) pass. Binary at
+   `tools/score2openchoreo/bin/score2openchoreo` (rebuilt on demand).
+5. **Gatekeeper policies** (Task 10) -- C-1 (platform-addons main-protected),
+   C-2 (Score schema annotation gate), C-3 (Infracost delta threshold).
+   6/6 Rego tests pass via `opa test --v0-compatible policies/*.rego`.
+6. **OpenTofu root + 5 modules** (Tasks 11-16) -- root module in `iac/`,
+   modules for flux, gatekeeper, gitea-runner, openchoreo-environments,
+   external-secrets-wiring. 33 HCL/README files total.
+7. **Seed scripts + seed-repos content** (Tasks 17-18) -- openbao seed,
+   Gitea org + repo + branch-protection seed, push helper, delete helper,
+   and the content for `platform-addons/`, `platform-config/`, `hello-m2/`.
+8. **Canonical CI workflow + runner helpers** (Task 19) --
+   `iac/templates/ci.yaml` plus `scripts/ci/post-infracost-comment.sh` and
+   `scripts/ci/commit-to-platform-config.sh`.
+9. **Install/teardown/smoke scripts** (Task 20) -- `install-m2.sh`,
+   `teardown-m2.sh`, `smoke-m2.sh` + 7 per-tool smoke scripts.
+10. **Backstage proxy entry** (Task 23) -- `/api/proxy/gitea-actions` added
+    in `backstage/app-config.yaml`.
+11. **README M2 section** (Task 24) -- 112-word M2 section appended.
+
+---
+
+## 4. What is NOT yet done
+
+**Task 21 -- Run `scripts/install-m2.sh` end-to-end.** This is a live 15 to
+20 minute cluster mutation. The operator runs it manually when ready. It:
+
+- Builds rr-tofu-guard and registers the hook (already done)
+- Installs host tools (tofu, flux, infracost, score-k8s) via brew
+- Seeds openbao kv paths (prompts for runner registration token)
+- Seeds the three Gitea repos under `openchoreo` org
+- Builds score2openchoreo
+- Runs `tofu init && tofu apply -auto-approve` in `iac/` with
+  `RR_TOFU_GUARD_BYPASS=1` exported (so the install can run the blocked
+  apply legitimately)
+- Waits for Flux to reconcile `platform-addons`
+- Runs `scripts/smoke-m2.sh`
+
+**Task 22 -- First pipeline run on hello-m2.** Depends on Task 21 leaving
+the cluster healthy. Verifies the pipeline renders a Component, commits it
+to platform-config, and OpenChoreo deploys it.
+
+Both tasks live in
+`docs/superpowers/plans/2026-04-20-m2-iac-cd.md` under Task 21 and Task 22.
+
+---
+
+## 5. Tech debt captured for post-M2 cleanup
+
+Issues surfaced by the subagent-driven reviews during this session. None
+block Tasks 21 or 22, but they should land before M2 is declared "shipped"
+for real workloads:
+
+### Guards (rr-policy-guards)
+
+- **I-1 class**: `rr-brew-guard/audit.go`, `rr-tofu-guard/audit.go`, and
+  likely `rr-emoji-guard`'s equivalent all silently swallow I/O errors in
+  the audit writer. Add a stderr fallback line OR a file-header comment
+  explaining the intentional swallow semantics. Mirrors brew-guard's own
+  header.
+- **I-2**: `rr-tofu-guard` is registered BOTH in the plugin's
+  `hooks.json` (via `${CLAUDE_PLUGIN_ROOT}`) AND in `~/.claude/settings.json`
+  (via absolute path). The hook fires twice per Bash call; audit log
+  double-writes. Pick one registration path (plugin is preferred) and
+  remove the other.
+- **I-3**: The `merge-tofu-hook-into-settings.sh` jq filter appends a new
+  `{matcher: Bash}` entry instead of pushing into an existing one. If
+  another guard already claims the Bash matcher, there will be two. The
+  corrected filter is sketched in Task 5's code review (in the
+  subagent-driven-development skill's review output).
+- **Tokenizer overmatch observed in the wild**: a `wc -w` heredoc that
+  contained the literal word `tofu` was blocked because the guard
+  inspected the containing string (not the actual `tofu` command). This
+  suggests either a shellMeta false positive or the tokenizer treating
+  a substring wrongly. Reproduce and narrow.
+- **Plan text fix**: the plan's `remove-tofu-hook-from-settings.sh` filter
+  (plan lines 684-690) is the original buggy version; the corrected
+  filter that shipped (commit `074c87b`) should be backported into the
+  plan so replays do not regress.
+
+### score2openchoreo
+
+- **Strict-anchored regex**: the `resourceRefPattern` only matches a Score
+  variable that is ENTIRELY a resource reference. Inline substitution
+  like `"prefix-${resources.db.password}"` silently passes through
+  unexpanded. Either support inline or emit an error when a value
+  contains `${resources.` without full-matching.
+- **Test coverage gaps**: no test verifies multi-container sort order,
+  multi-variable sort order, the `environment` resource branch, missing-
+  resource errors, nor the annotations-to-labels mapping.
+- **Secret-name fallback `"X-secret"`** is a magic suffix with no
+  documenting comment.
+- **Error strings capitalized**: `"Environment required"` etc. violate Go
+  convention; `staticcheck` would flag them.
+
+### Gatekeeper policies
+
+- **Plan's `opa test policies/` command**: in opa 1.15.2 this fails
+  because of Rego v0 vs v1 defaults and because it loads the constraint
+  YAMLs as data. The correct invocation is
+  `opa test --v0-compatible policies/*.rego -v`. Update the
+  `policies/README.md` accordingly (it was written verbatim from the
+  plan and still shows the old command).
+
+### install-m2.sh
+
+- It sources `scripts/lib/colors.sh` which was an M1 artifact. Verify
+  that lib exists at install time; create it if missing. Otherwise the
+  first install will fail at the `source` line.
+- Per-tool smoke scripts place the shebang on line 2 (line 1 is a
+  comment). They are chmod +x but will not execute via shebang
+  discovery. Works when invoked via `bash scripts/smoke-*.sh` or via
+  `smoke-m2.sh` which invokes each by path (and smoke-m2.sh itself has
+  the shebang on line 3 -- same caveat). Move shebangs to line 1 at
+  cleanup time.
+
+### Score schema
+
+- `assets/score.schema.json` is pinned to the `main` branch of
+  score-spec/spec, not a tag. Freeze the raw content's commit SHA or
+  treat it as vendored (it is already checked in). Bump deliberately
+  when Score spec ships a new version.
+
+---
+
+## 6. Push / remote situation (unresolved)
+
+When attempting `git push origin main` during the session:
+
+- **origin** is `http://localhost:3002/trademomentum.net/developer-portal.git`
+  but that repository path does not exist in the local Gitea. The local
+  Gitea only hosts `gitea_admin/demo-service` (from M1). `origin` was
+  apparently configured but the matching repo was never created.
+- **gitea-com** is `https://gitea.com/trademomentum.net/developer-portal.git`
+  with an embedded credential in the URL. Network attempts to this remote
+  hung indefinitely during the session.
+
+Neither was updated. **All 27 commits are local only.**
+
+Options for the next session to resolve:
+
+1. Create `trademomentum.net/developer-portal` in the local Gitea (via
+   its UI or API) and push to origin.
+2. Fix gitea.com connectivity (or rotate the embedded token, which has
+   been exposed in the `.git/config` and in at least one conversation
+   transcript) and push to gitea-com.
+3. Point origin at gitea-com and retire the localhost origin.
+
+---
+
+## 7. User preferences / memories saved this session
+
+At `/Users/nnos/.claude/projects/-Users-nnos-Projects-developer-portal/memory/`:
+
+- **feedback_verify_locked_tools.md** -- Before asserting a tool is in
+  a milestone, check the "locked-in tool choices" block in
+  PROJECT_SUMMARY.md, not just the M1-M7 roadmap table. The roadmap
+  table is draft placeholders; the locked-in list is authoritative.
+  Cost: one back-and-forth when I asserted Argo CD from the roadmap
+  placeholder when the user never approved it.
+- **project_m2_flux.md** -- M2 uses Flux (not Argo CD) for cluster
+  add-ons drift correction. OpenChoreo stays the workload deployer.
+  Argo Workflows visible in `openchoreo-workflow-plane` is bundled
+  INSIDE OpenChoreo, not Argo CD.
+- **project_runner_labels.md** -- Gitea Actions runner labels are
+  mostly self-hosted but workflows use `runs-on: ubuntu-latest` by
+  convention.
+
+---
+
+## 8. Skills / agents to reach for in the next session
+
+- **superpowers:executing-plans** if resuming the plan task-by-task in
+  a fresh context (lighter than subagent-driven for just Tasks 21-22).
+- **superpowers:finishing-a-development-branch** once Tasks 21-22 are
+  green -- formal end-of-M2 close-out.
+- **opsera-devsecops:security-scan** if its MCP is reachable -- run
+  it repo-wide against the M2 changes before the push.
+- **coderabbit:review** for a second-opinion sweep on the M2 change set
+  (or `/review` in an open PR once the push is resolved).
+
+Do NOT skip the `superpowers:subagent-driven-development` flow for
+Tasks 21-22 if going that route; the live cluster ops are exactly the
+scenario where two-stage review matters (implementer fires the install;
+spec reviewer checks acceptance criteria met; code quality review has
+nothing to review since no code was written, but smoke output is the
+artifact under review).
+
+---
+
+## 9. What to do first in the next session
 
 In this exact order:
 
-1. Read this file (SESSION_HANDOFF.md) first.
-2. Read PROJECT_SUMMARY.md to refresh yourself on the three projects.
-3. Read TODO.md to see the action list.
-4. Verify the emoji guard hook is loaded by running `cat ~/.claude/settings.json`
-   and confirming the PreToolUse Bash hook entry pointing at rr-emoji-guard
-   is present. If it is not, the user will tell you something is wrong.
-5. Greet the user and ask whether they want to:
-   (a) Review the three M1 spec documents before you proceed (recommended)
-   (b) Approve the specs as-is and have you produce the M1 Implementation Plan
-   (c) Switch to a different task entirely
-6. Wait for their direction before doing anything else.
+1. Read this file.
+2. Read `PROJECT_SUMMARY.md` and `TODO.md` for current state.
+3. `git status` and `git log --oneline origin/main..HEAD` to confirm
+   everything here matches on-disk truth.
+4. Decide with the operator whether to:
+   (a) Execute Task 21 now (`scripts/install-m2.sh` end-to-end), or
+   (b) Address tech debt first (Section 5 above), or
+   (c) Resolve the push situation first (Section 6), or
+   (d) Do something else.
+5. Before Task 21: confirm the operator is ready for a 15-20 minute live
+   cluster mutation and that Colima is healthy.
 
-Do NOT:
-- Start implementing M1 without explicit user approval of the specs.
-- Run `brew install` anything until the rr-brew-guard hook is built.
-- Write any file containing a non-ASCII character; trust the hook to enforce it.
-
----
-
-## 5. Critical files to load into your context early
-
-In the new session, before doing meaningful work, read at least these:
-
-```
-/Users/nnos/Projects/developer-portal/docs/specs/m1-substrate/requirements.md
-/Users/nnos/Projects/developer-portal/docs/specs/m1-substrate/design-specification.md
-/Users/nnos/Projects/developer-portal/docs/specs/m1-substrate/technical-specification.md
-/Users/nnos/Projects/developer-portal/PROJECT_SUMMARY.md
-/Users/nnos/Projects/developer-portal/TODO.md
-/Users/nnos/Projects/developer-portal/plugins/rr-policy-guards/README.md
-```
-
-The three RR memory files (deterministic-languages, three-document-plans,
-brew-security-hook, plain-ASCII) load automatically as part of the user's
-memory system.
+Do NOT push to any remote without operator confirmation for which remote
+and which branch.
+Do NOT start live cluster ops without operator confirmation.
 
 ---
 
-## 6. State of the three projects in one paragraph each
+## 10. State of the three projects in one line each
 
-**openchoreo** (`/Users/nnos/Projects/openchoreo/`): unchanged from upstream
-EXCEPT for `check-tools.sh` which had its version bounds bumped to match
-modern tool versions and now exits 0. Colima is running, Docker daemon is
-reachable, all preflight checks pass except Kubectl Server (which gracefully
-skips when no kube context is set). Ready for `make quick-start.dev` whenever
-M1 implementation begins.
-
-**rational-reserve** (`/Users/nnos/Projects/rational-reserve/`): full v0.1
-spine (core Python library, models, factory, c2_router, doctrine loader,
-SQLite persistence, daemon, MCP server with 3 tools) plus v0.2 adapter layer
-(SKILL.md pack, primers, install.sh, MCP config snippets for 5 host agents).
-65 unit + integration tests, all passing. End-to-end smoke test confirms
-state persists across reconnections. Phase v0.3 (LLM execution),
-v0.4 (lifecycle/AAR), Phase 2, Phase 3 are all explicit follow-up specs.
-
-**developer-portal** (`/Users/nnos/Projects/developer-portal/`): repository
-created. Contains three M1 spec documents (awaiting user approval), the
-rr-policy-guards plugin (built, tested, hook registered), and these handoff
-files. No implementation has begun on M1 itself. Backstage is not yet
-scaffolded. No Gitea installed. No k3d cluster running. yarn is not yet
-installed -- it is the only missing prerequisite for M1.
-
----
-
-## 7. Things the user is paying attention to
-
-Based on the session, the user will likely react strongly to:
-
-- Any non-ASCII character in any file (will be caught by the hook now)
-- Process drift (skipping the three-document plan format, jumping to code)
-- Proceeding without explicit approval at decision gates
-- Using interpreted languages where Go would have worked
-- Any brew install attempted before the rr-brew-guard hook exists
-
-The user values clear paper trails, explicit decisions, and being asked
-before being told. When in doubt, stop and ask.
-
----
-
-## 8. Things to remember about the user's preferred workflow
-
-- Three-document specs (Requirements, Design, Technical) FIRST, then a
-  separate Implementation Plan, then build.
-- Use the superpowers:brainstorming skill at the start of any creative work.
-- Use the superpowers:writing-plans skill to produce the TDD implementation
-  plan AFTER the three specs are approved.
-- Use the plugin-dev:hook-development skill if you need to add another hook
-  to the rr-policy-guards plugin.
-- The user has invoked these skills explicitly several times. They want
-  process discipline, not improvisation.
+- **openchoreo** (`/Users/nnos/Projects/openchoreo/`): unchanged since M1,
+  `check-tools.sh` still passes, cluster `k3d-openchoreo` is healthy.
+- **rational-reserve** (`/Users/nnos/Projects/rational-reserve/`): unchanged
+  since earlier sessions, v0.2 spine + adapters complete, 65 tests pass.
+- **developer-portal** (`/Users/nnos/Projects/developer-portal/`): M1
+  substrate complete, M2 specs + plan + codegen (Tasks 1-20, 23-24)
+  committed on `main`; Tasks 21-22 are live cluster runs awaiting
+  operator execution; 27 commits ahead of `origin/main` and not pushed.
