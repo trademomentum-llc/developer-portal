@@ -2,7 +2,7 @@
 
 > Action list ordered by priority and dependency.
 
-**Snapshot date:** 2026-04-21
+**Snapshot date:** 2026-04-21 (late-session update)
 
 ---
 
@@ -56,36 +56,36 @@ Track these before declaring M2 complete. None are blocking Tasks 21-22.
 
 ### Guards (rr-policy-guards)
 
-| ID | Item |
-|---|---|
-| guard-1 | Document or surface silently-swallowed audit I/O errors in all three guards |
-| guard-2 | Pick ONE registration path for rr-tofu-guard (plugin hooks.json OR settings.json); currently double-registered and audit-logs duplicate |
-| guard-3 | Fix merge-tofu-hook-into-settings.sh jq filter to push into existing Bash matcher instead of appending a new one |
-| guard-4 | Investigate overmatch: `wc -w` heredoc containing word `tofu` was blocked; narrow the match |
-| guard-5 | Backport corrected remove-script filter into the plan doc (commit 074c87b vs plan lines 684-690) |
+| ID | Item | Status |
+|---|---|---|
+| guard-1 | Document or surface silently-swallowed audit I/O errors in all three guards | open |
+| guard-2 | Pick ONE registration path for rr-tofu-guard (plugin hooks.json OR settings.json); currently double-registered and audit-logs duplicate | open |
+| guard-3 | Fix merge-tofu-hook-into-settings.sh jq filter to push into existing Bash matcher instead of appending a new one | open |
+| guard-4 | Investigate overmatch: `wc -w` heredoc containing word `tofu` was blocked; narrow the match | open |
+| guard-5 | Backport corrected remove-script filter into the plan doc (commit 074c87b vs plan lines 684-690) | open |
 
 ### score2openchoreo
 
-| ID | Item |
-|---|---|
-| score-1 | Decide and implement inline `${resources.X.Y}` substitution OR error loudly on partial matches |
-| score-2 | Add tests for: multi-container sort order, multi-variable sort order, `environment` resource branch, missing-resource error, annotations-to-labels mapping |
-| score-3 | Document secret-name fallback "X-secret" convention |
-| score-4 | Lowercase error strings (Go idiom) |
-| score-5 | Pin score.schema.json to a git SHA instead of the moving `main` branch |
+| ID | Item | Status |
+|---|---|---|
+| score-1 | Decide and implement inline `${resources.X.Y}` substitution OR error loudly on partial matches | open |
+| score-2 | Add tests for: multi-container sort order, multi-variable sort order, `environment` resource branch, missing-resource error, annotations-to-labels mapping | open |
+| score-3 | Document secret-name fallback "X-secret" convention | open |
+| score-4 | Lowercase error strings (Go idiom) | DONE commit 0983b63 |
+| score-5 | Pin score.schema.json to a git SHA instead of the moving `main` branch | open |
 
 ### Gatekeeper
 
-| ID | Item |
-|---|---|
-| gk-1 | Update policies/README.md with correct `opa test --v0-compatible policies/*.rego -v` invocation |
+| ID | Item | Status |
+|---|---|---|
+| gk-1 | Update policies/README.md with correct `opa test --v0-compatible policies/*.rego -v` invocation | DONE commit 680f40d |
 
 ### Install / scripts
 
-| ID | Item |
-|---|---|
-| inst-1 | Verify or create `scripts/lib/colors.sh` (referenced by install-m2.sh) |
-| inst-2 | Move shebangs to line 1 in all smoke scripts |
+| ID | Item | Status |
+|---|---|---|
+| inst-1 | Verify or create `scripts/lib/{colors,wait-for,confirm}.sh` (referenced by install-m2.sh) | DONE commit 5e1e088 |
+| inst-2 | Move shebangs to line 1 in all smoke scripts | DONE commit 5e1e088 |
 
 ---
 
