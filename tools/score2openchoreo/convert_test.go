@@ -133,3 +133,109 @@ func TestConvertUnsupportedResourceTypeErrors(t *testing.T) {
 		t.Fatal("expected unsupported-type error")
 	}
 }
+
+func TestConvertMultipleContainersSorted(t *testing.T) {
+	in := ScoreDocument{
+		APIVersion: "score.dev/v1b1",
+		Metadata:   ScoreMetadata{Name: "multi"},
+		Containers: map[string]ScoreContainer{
+			"zzz": {Image: "zzz:1"},
+			"aaa": {Image: "aaa:1"},
+			"mmm": {Image: "mmm:1"},
+		},
+	}
+	got, err := Convert(in, ConvertOptions{Environment: "dev", Namespace: "ns", Project: "p"})
+	if err != nil {
+		t.Fatalf("convert: %v", err)
+	}
+	names := make([]string, 0, len(got.Spec.WorkloadTemplate.Containers))
+	for _, c := range got.Spec.WorkloadTemplate.Containers {
+		names = append(names, c.Name)
+	}
+	want := []string{"aaa", "mmm", "zzz"}
+	for i, n := range want {
+		if names[i] != n {
+			t.Fatalf("container[%d]=%q want %q (full order: %v)", i, names[i], n, names)
+		}
+	}
+}
+
+func TestConvertMultipleVariablesSorted(t *testing.T) {
+	in := ScoreDocument{
+		APIVersion: "score.dev/v1b1",
+		Metadata:   ScoreMetadata{Name: "envs"},
+		Containers: map[string]ScoreContainer{
+			"web": {Image: "i", Variables: map[string]string{
+				"ZULU": "3", "ALPHA": "1", "MIKE": "2",
+			}},
+		},
+	}
+	got, _ := Convert(in, ConvertOptions{Environment: "dev", Namespace: "ns", Project: "p"})
+	env := got.Spec.WorkloadTemplate.Containers[0].Env
+	want := []string{"ALPHA", "MIKE", "ZULU"}
+	for i, n := range want {
+		if env[i].Name != n {
+			t.Fatalf("env[%d]=%q want %q", i, env[i].Name, n)
+		}
+	}
+}
+
+func TestConvertEnvironmentResource(t *testing.T) {
+	in := ScoreDocument{
+		APIVersion: "score.dev/v1b1",
+		Metadata:   ScoreMetadata{Name: "x"},
+		Containers: map[string]ScoreContainer{
+			"web": {Image: "i", Variables: map[string]string{
+				"ENV_NAME": "${resources.env.value}",
+			}},
+		},
+		Resources: map[string]ScoreResource{
+			"env": {Type: "environment"},
+		},
+	}
+	got, err := Convert(in, ConvertOptions{Environment: "staging", Namespace: "ns", Project: "p"})
+	if err != nil {
+		t.Fatalf("convert: %v", err)
+	}
+	env := got.Spec.WorkloadTemplate.Containers[0].Env[0]
+	if env.Name != "ENV_NAME" || env.Value != "staging" {
+		t.Fatalf("env=%+v want Name=ENV_NAME Value=staging", env)
+	}
+	if env.ValueFrom != nil {
+		t.Fatalf("env.ValueFrom should be nil for environment resource, got %+v", env.ValueFrom)
+	}
+}
+
+func TestConvertMissingResourceReferenceErrors(t *testing.T) {
+	in := ScoreDocument{
+		APIVersion: "score.dev/v1b1",
+		Metadata:   ScoreMetadata{Name: "x"},
+		Containers: map[string]ScoreContainer{
+			"web": {Image: "i", Variables: map[string]string{
+				"TOKEN": "${resources.nonexistent.key}",
+			}},
+		},
+		Resources: map[string]ScoreResource{
+			// nonexistent is NOT here
+		},
+	}
+	_, err := Convert(in, ConvertOptions{Environment: "dev", Namespace: "ns", Project: "p"})
+	if err == nil {
+		t.Fatal("expected error for missing resource reference")
+	}
+}
+
+func TestConvertAnnotationsBecomeLabels(t *testing.T) {
+	in := ScoreDocument{
+		APIVersion: "score.dev/v1b1",
+		Metadata: ScoreMetadata{
+			Name:        "annotated",
+			Annotations: map[string]string{"team": "platform", "tier": "dev"},
+		},
+		Containers: map[string]ScoreContainer{"web": {Image: "i"}},
+	}
+	got, _ := Convert(in, ConvertOptions{Environment: "dev", Namespace: "ns", Project: "p"})
+	if got.Metadata.Labels["team"] != "platform" || got.Metadata.Labels["tier"] != "dev" {
+		t.Fatalf("labels=%+v", got.Metadata.Labels)
+	}
+}
