@@ -1,0 +1,100 @@
+---
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: c1platformaddonsmainprotected
+spec:
+  crd:
+    spec:
+      names: { kind: C1PlatformAddonsMainProtected }
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package constraints.m2.c1
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "GitRepository"
+          endswith(input.review.object.spec.url, "/openchoreo/platform-addons")
+          input.review.object.spec.ref.branch != "main"
+          msg := "platform-addons GitRepository must reference the main branch"
+        }
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: C1PlatformAddonsMainProtected
+metadata:
+  name: c1-enforce
+spec:
+  match:
+    kinds:
+      - apiGroups: ["source.toolkit.fluxcd.io"]
+        kinds: ["GitRepository"]
+---
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: c2scoreschemavalid
+spec:
+  crd:
+    spec:
+      names: { kind: C2ScoreSchemaValid }
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package constraints.m2.c2
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Component"
+          anns := object.get(input.review.object.metadata, "annotations", {})
+          object.get(anns, "pipeline.m2/score-valid", "") != "true"
+          msg := "Component missing pipeline.m2/score-valid=true annotation"
+        }
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: C2ScoreSchemaValid
+metadata:
+  name: c2-enforce
+spec:
+  match:
+    kinds:
+      - apiGroups: ["core.choreo.dev"]
+        kinds: ["Component"]
+---
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: c3infracostdelta
+spec:
+  crd:
+    spec:
+      names: { kind: C3InfracostDelta }
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            thresholdUSD:
+              type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package constraints.m2.c3
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Component"
+          delta_str := input.review.object.metadata.annotations["pipeline.m2/cost-delta-usd"]
+          delta := to_number(delta_str)
+          threshold := to_number(input.parameters.thresholdUSD)
+          delta > threshold
+          msg := sprintf("estimated monthly cost delta $%v exceeds threshold $%v", [delta, threshold])
+        }
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: C3InfracostDelta
+metadata:
+  name: c3-enforce
+spec:
+  match:
+    kinds:
+      - apiGroups: ["core.choreo.dev"]
+        kinds: ["Component"]
+  parameters:
+    thresholdUSD: "50"

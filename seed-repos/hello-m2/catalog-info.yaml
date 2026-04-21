@@ -1,0 +1,18 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: hello-m2
+  description: M2 demo workload
+  annotations:
+    gitea.io/project: openchoreo/hello-m2
+  links:
+    - url: http://localhost:3002/openchoreo/hello-m2
+      title: Gitea repo
+      icon: web
+    - url: http://localhost:3002/openchoreo/hello-m2/actions
+      title: CI runs
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: experimental
+  owner: openchoreo

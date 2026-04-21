@@ -1,0 +1,7 @@
+name: M2 CI (placeholder)
+on: [push]
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "hello"
