@@ -7,6 +7,8 @@ HOOK_CMD="/Users/nnos/Projects/developer-portal/plugins/rr-policy-guards/bin/rr-
 test -f "$SETTINGS" || exit 0
 
 jq --arg cmd "$HOOK_CMD" '
+  .hooks //= {} |
+  .hooks.PreToolUse //= [] |
   .hooks.PreToolUse |= map(
     if .matcher == "Bash" then
       .hooks |= map(select(.command != $cmd))
