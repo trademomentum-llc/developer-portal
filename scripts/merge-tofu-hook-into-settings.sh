@@ -11,6 +11,13 @@ jq --arg cmd "$HOOK_CMD" '
   .hooks.PreToolUse //= [] |
   if any(.hooks.PreToolUse[]; .matcher == "Bash" and (.hooks[]? | .command == $cmd))
   then .
+  elif any(.hooks.PreToolUse[]; .matcher == "Bash")
+  then .hooks.PreToolUse |= map(
+    if .matcher == "Bash"
+    then .hooks += [{"type": "command", "command": $cmd}]
+    else .
+    end
+  )
   else .hooks.PreToolUse += [{
     "matcher": "Bash",
     "hooks": [{"type": "command", "command": $cmd}]
