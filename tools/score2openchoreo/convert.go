@@ -19,13 +19,13 @@ var resourceRefPattern = regexp.MustCompile(`^\$\{resources\.([a-zA-Z0-9_-]+)\.(
 
 func Convert(in ScoreDocument, opts ConvertOptions) (OpenChoreoComponent, error) {
 	if opts.Environment == "" {
-		return OpenChoreoComponent{}, fmt.Errorf("Environment required")
+		return OpenChoreoComponent{}, fmt.Errorf("environment required")
 	}
 	if opts.Namespace == "" {
-		return OpenChoreoComponent{}, fmt.Errorf("Namespace required")
+		return OpenChoreoComponent{}, fmt.Errorf("namespace required")
 	}
 	if opts.Project == "" {
-		return OpenChoreoComponent{}, fmt.Errorf("Project required")
+		return OpenChoreoComponent{}, fmt.Errorf("project required")
 	}
 
 	// Reject unsupported resource types early
