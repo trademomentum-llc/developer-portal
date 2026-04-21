@@ -1,0 +1,13 @@
+apiVersion: core.choreo.dev/v1alpha1
+kind: Component
+metadata:
+    name: minimal
+    namespace: openchoreo-data-plane
+spec:
+    workloadTemplate:
+        containers:
+            - name: web
+              image: registry.example.com/minimal:1
+    environment: dev
+    owner:
+        project: openchoreo
