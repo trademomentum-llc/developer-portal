@@ -49,7 +49,14 @@ integrations:
       password: ${GITEA_ADMIN_PASSWORD}
 
 proxy:
-  endpoints: {}
+  endpoints:
+    '/gitea-actions':
+      target: http://localhost:3002
+      changeOrigin: true
+      pathRewrite:
+        '^/api/proxy/gitea-actions': '/api/v1'
+      headers:
+        Authorization: 'token ${GITEA_ADMIN_TOKEN}'
 
 # Reference documentation http://backstage.io/docs/features/techdocs/configuration
 # Note: After experimenting with basic setup, use CI/CD to generate docs
@@ -77,17 +84,10 @@ catalog:
     pullRequestBranchName: backstage-integration
   rules:
     - allow: [Component, System, API, Resource, Location]
-  providers:
-    gitea:
-      default:
-        host: localhost:3002
-        organization: trademomentum.net
-        schedule:
-          frequency: { minutes: 5 }
-          timeout: { minutes: 3 }
+  providers: {}
   locations:
     - type: url
-      target: http://localhost:3002/trademomentum.net/demo-service/raw/branch/main/catalog-info.yaml
+      target: http://localhost:3002/gitea_admin/demo-service/raw/branch/main/catalog-info.yaml
     - type: file
       target: ../../examples/entities.yaml
     - type: file
