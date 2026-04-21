@@ -11,6 +11,15 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/rr-tofu-guard"
+          }
+        ]
       }
     ]
   }
