@@ -1,5 +1,5 @@
-# scripts/smoke-tofu.sh
 #!/usr/bin/env bash
+# scripts/smoke-tofu.sh
 set -e
 tofu version >/dev/null
 cd "$(dirname "$0")/../iac"

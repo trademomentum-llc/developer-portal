@@ -1,5 +1,5 @@
-# scripts/smoke-actions.sh
 #!/usr/bin/env bash
+# scripts/smoke-actions.sh
 set -e
 TOKEN_FILE=~/.rational-reserve/m1-gitea-admin-password
 RUN_ID=$(curl -fsS -u "gitea_admin:$(cat $TOKEN_FILE)" \
