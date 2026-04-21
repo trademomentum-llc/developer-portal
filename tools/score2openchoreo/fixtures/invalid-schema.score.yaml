@@ -1,0 +1,4 @@
+apiVersion: score.dev/v1b1
+metadata:
+  name: bad
+# containers missing -- required in Score v1b1

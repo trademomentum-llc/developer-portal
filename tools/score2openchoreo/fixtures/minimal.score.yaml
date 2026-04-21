@@ -1,0 +1,6 @@
+apiVersion: score.dev/v1b1
+metadata:
+  name: minimal
+containers:
+  web:
+    image: registry.example.com/minimal:1
