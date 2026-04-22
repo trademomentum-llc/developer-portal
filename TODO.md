@@ -44,9 +44,20 @@
 
 | Task | Status | Dependency |
 |------|--------|------------|
-| T21 Run scripts/install-m2.sh end-to-end (live) | NOT STARTED | Operator confirmation; Colima healthy |
+| T21 Run scripts/install-m2.sh end-to-end (live) | PARTIAL 2026-04-22 | Tasks 0-3 succeed; task 4 (tofu apply) blocked -- see m2-install-blockers below |
 | T22 First pipeline run on hello-m2 | NOT STARTED | T21 complete |
-| Push 27 local commits to a remote | NOT STARTED | origin repo does not exist in local Gitea; gitea-com hangs |
+| Push local commits to remote | DONE 2026-04-22 | Pushed to origin (local Gitea openchoreo cluster) and gitea-com cloud; local Forgejo still deferred (not yet installed) |
+
+### M2 install blockers (2026-04-22 partial run)
+
+| ID | Item | Status |
+|---|---|---|
+| m2i-1 | OpenChoreo CRD group drift -- iac/modules/openchoreo-environments references `core.choreo.dev/v1alpha1/Environment`; installed CRD is `environments.openchoreo.dev`. Update API path. | open |
+| m2i-2 | k3d-openchoreo single-node cluster CPU-exhausted -- Flux helm-controller stuck Pending (`Insufficient cpu`); times out tofu helm_release. Either scale Docker resources for k3d, free CPU, or switch to multi-node config. | open |
+| m2i-3 | Stale `tofu-state` namespace from 2026-04-21 attempt -- run `tofu import kubernetes_namespace.tofu_state tofu-state` before retry. | open |
+| m2i-4 | ExternalSecret manifests may be impacted by alekc/kubectl provider discovery cache misses under cluster pressure (likely resolves when m2i-2 fixed). | open, monitor |
+| m2i-5 | Deprecated `k3d-m1-substrate` cluster (Gitea pod stuck Terminating, agents NotReady) consumes Docker resources unnecessarily. Tear down with `k3d cluster delete m1-substrate`. | open |
+| m2i-6 | OpenBao runs in dev mode with `inmem` storage -- secrets and `kv/` mount die on pod restart. Plan persistent storage + auto-unseal for production-readiness. | open, low-priority |
 
 ---
 

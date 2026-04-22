@@ -1,6 +1,12 @@
 # Compiled binaries
 plugins/rr-policy-guards/bin/
 
+# OpenTofu / Terraform local state and provider cache
+**/.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+
 # Backstage
 backstage/node_modules/
 backstage/.yarn/cache/

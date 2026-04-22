@@ -32,11 +32,26 @@ resource "helm_release" "act_runner" {
   wait       = true
   timeout    = 600
 
-  set { name = "giteaRootURL"                      value = var.gitea_url }
-  set { name = "existingSecret"                    value = "gitea-runner-token" }
-  set { name = "podSecurityContext.runAsNonRoot"   value = "true" }
-  set { name = "securityContext.allowPrivilegeEscalation" value = "false" }
-  set { name = "config.runner.labels[0]"           value = "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-latest" }
+  set {
+    name  = "giteaRootURL"
+    value = var.gitea_url
+  }
+  set {
+    name  = "existingSecret"
+    value = "gitea-runner-token"
+  }
+  set {
+    name  = "podSecurityContext.runAsNonRoot"
+    value = "true"
+  }
+  set {
+    name  = "securityContext.allowPrivilegeEscalation"
+    value = "false"
+  }
+  set {
+    name  = "config.runner.labels[0]"
+    value = "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-latest"
+  }
 
   depends_on = [kubectl_manifest.runner_token]
 }
