@@ -2,6 +2,7 @@ package main
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -222,6 +223,42 @@ func TestConvertMissingResourceReferenceErrors(t *testing.T) {
 	_, err := Convert(in, ConvertOptions{Environment: "dev", Namespace: "ns", Project: "p"})
 	if err == nil {
 		t.Fatal("expected error for missing resource reference")
+	}
+}
+
+func TestConvertInlineResourceRefErrors(t *testing.T) {
+	// Score-1: a value that embeds ${resources.X.Y} as a substring (rather
+	// than being the whole value) is not supported. The converter must
+	// reject it explicitly instead of silently passing the literal
+	// "prefix-${resources.db.password}" through as an env var value.
+	cases := []struct {
+		name, value string
+	}{
+		{"prefix before ref", "prefix-${resources.db.password}"},
+		{"suffix after ref", "${resources.db.password}-suffix"},
+		{"ref in middle", "prefix-${resources.db.password}-suffix"},
+		{"two refs", "${resources.db.user}:${resources.db.password}"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			in := ScoreDocument{
+				APIVersion: "score.dev/v1b1",
+				Metadata:   ScoreMetadata{Name: "x"},
+				Containers: map[string]ScoreContainer{
+					"web": {Image: "i", Variables: map[string]string{"VAR": tc.value}},
+				},
+				Resources: map[string]ScoreResource{
+					"db": {Type: "secret"},
+				},
+			}
+			_, err := Convert(in, ConvertOptions{Environment: "dev", Namespace: "ns", Project: "p"})
+			if err == nil {
+				t.Fatalf("expected error for inline resource ref in %q", tc.value)
+			}
+			if !strings.Contains(err.Error(), "VAR") {
+				t.Errorf("error should name the variable VAR, got: %v", err)
+			}
+		})
 	}
 }
 

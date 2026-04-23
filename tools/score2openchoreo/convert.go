@@ -95,6 +95,14 @@ func Convert(in ScoreDocument, opts ConvertOptions) (OpenChoreoComponent, error)
 				}
 				switch res.Type {
 				case "secret":
+					// Score-3: secret name defaults to "<resource-key>-secret"
+					// (e.g. resources.db -> db-secret). Overridable via the
+					// resource's metadata.name field. This convention exists
+					// because Score does not specify a Kubernetes Secret name
+					// and OpenChoreo expects one on every SecretKeyRef; the
+					// "-secret" suffix keeps the default resolvable to the
+					// platform's External-Secrets sync convention (see
+					// tools/score2openchoreo/README.md).
 					secretName := resKey + "-secret"
 					if n := res.Metadata["name"]; n != "" {
 						secretName = n
@@ -108,6 +116,14 @@ func Convert(in ScoreDocument, opts ConvertOptions) (OpenChoreoComponent, error)
 				case "environment":
 					cs.Env = append(cs.Env, EnvVarSpec{Name: k, Value: opts.Environment})
 				}
+			} else if strings.Contains(v, "${resources.") {
+				// Score-1: inline substitution is not supported. A Score
+				// variable value must EITHER be a plain literal OR be
+				// exactly "${resources.X.Y}" with nothing around it.
+				// Partial matches like "prefix-${resources.db.password}"
+				// are rejected so they cannot silently ship to production
+				// as literal env-var text.
+				return OpenChoreoComponent{}, fmt.Errorf("variable %s has an inline resource reference in %q; the whole value must be a single ${resources.X.Y} expression (inline substitution is not supported)", k, v)
 			} else {
 				cs.Env = append(cs.Env, EnvVarSpec{Name: k, Value: v})
 			}

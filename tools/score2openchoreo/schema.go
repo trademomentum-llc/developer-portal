@@ -1,5 +1,7 @@
 // Package main: score2openchoreo Score schema validator. Schema embedded at
-// build time -- no network fetch at runtime.
+// build time -- no network fetch at runtime. The file at assets/score.schema.json
+// is vendored with an explicit SHA256 pin recorded in assets/SCHEMA_PROVENANCE.md;
+// TestScoreSchemaPin guards against silent drift.
 package main
 
 import (
@@ -11,6 +13,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// scoreSchemaJSON is pinned by SHA256 (see assets/SCHEMA_PROVENANCE.md).
+// Bump both the file and the documented SHA256 in the same commit.
+//
 //go:embed assets/score.schema.json
 var scoreSchemaJSON []byte
 
