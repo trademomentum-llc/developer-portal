@@ -69,21 +69,21 @@ Track these before declaring M2 complete. None are blocking Tasks 21-22.
 
 | ID | Item | Status |
 |---|---|---|
-| guard-1 | Document or surface silently-swallowed audit I/O errors (documented in tofu-guard; brew-guard + emoji-guard + bash-guard still open) | PARTIAL commit ec2b9a6 |
-| guard-2 | Pick ONE registration path for rr-tofu-guard (plugin hooks.json OR settings.json); currently double-registered and audit-logs duplicate | open |
+| guard-1 | Document or surface silently-swallowed audit I/O errors | DONE 2026-04-23 -- verified all 4 guards carry file- and function-level swallow-semantics comments; TODO description was stale |
+| guard-2 | Pick ONE registration path for rr-tofu-guard | DONE 2026-04-23 -- finding on audit: only settings.json was ever live (plugin never installed). Pivoted from "install as Claude plugin" to "single-source-of-truth in settings.json" after finding that mid-session hook reload works -- all 4 guards registered in ~/.claude/settings.json with absolute paths; smoke-tested each binary. Plugin hooks.json + .claude-plugin/marketplace.json left in the repo as future-ready scaffolding in case a plugin-install migration is ever wanted. Backup at ~/.claude/settings.json.bak-1776979520. |
 | guard-3 | Fix merge-tofu-hook-into-settings.sh jq filter to push into existing Bash matcher instead of appending a new one | DONE commit d4373e6 |
-| guard-4 | Investigate overmatch: `wc -w` heredoc containing word `tofu` was blocked; narrow the match | open |
-| guard-5 | Backport corrected remove-script filter into the plan doc (commit 074c87b vs plan lines 684-690) | open |
+| guard-4 | Investigate overmatch: `wc -w` heredoc containing word `tofu` was blocked; narrow the match | DONE 2026-04-23 -- added IsTofuCommandPrefix gate before Tokenize in tofu-guard; 13 unit subtests + integration test reproducing the audit-log case; binary rebuilt; regressions preserved |
+| guard-5 | Backport corrected remove-script filter into the plan doc (commit 074c87b vs plan lines 684-690) | DONE 2026-04-23 -- plan doc now carries the fixed filter that preserves sibling hooks on the Bash matcher |
 
 ### score2openchoreo
 
 | ID | Item | Status |
 |---|---|---|
-| score-1 | Decide and implement inline `${resources.X.Y}` substitution OR error loudly on partial matches | open |
+| score-1 | Decide and implement inline `${resources.X.Y}` substitution OR error loudly on partial matches | DONE 2026-04-23 -- errors loudly per design call (deterministic-first); 4 subtests cover prefix/suffix/middle/two-refs; error names the variable |
 | score-2 | Add tests for: multi-container sort order, multi-variable sort order, `environment` resource branch, missing-resource error, annotations-to-labels mapping | DONE commit 55ce5a7 |
-| score-3 | Document secret-name fallback "X-secret" convention | open |
+| score-3 | Document secret-name fallback "X-secret" convention | DONE 2026-04-23 -- inline comment in convert.go at the secret-name fallback site; new tools/score2openchoreo/README.md documents all three conversion conventions |
 | score-4 | Lowercase error strings (Go idiom) | DONE commit 0983b63 |
-| score-5 | Pin score.schema.json to a git SHA instead of the moving `main` branch | open |
+| score-5 | Pin score.schema.json to a git SHA instead of the moving `main` branch | DONE 2026-04-23 -- vendored file is the pin; SHA256 recorded in assets/SCHEMA_PROVENANCE.md with update procedure; TestScoreSchemaPin guards against drift |
 
 ### Gatekeeper
 
