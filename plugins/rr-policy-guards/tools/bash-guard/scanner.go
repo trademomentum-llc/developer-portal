@@ -106,6 +106,21 @@ func scanSimpleExpansion(command string) []Violation {
 			continue
 		}
 
+		// Heredoc with a quoted delimiter (<<'DELIM', <<"DELIM", <<\DELIM,
+		// and the <<- tab-stripping variants of each) has a fully literal
+		// body -- no parameter, command, or arithmetic expansion. Skip the
+		// body entirely so variable-looking text inside commit messages
+		// and similar documentation does not produce false positives.
+		// <<< (here-string) is NOT a heredoc and is handled by normal
+		// scanning below.
+		if r == '<' && i+1 < len(command) && command[i+1] == '<' &&
+			!(i+2 < len(command) && command[i+2] == '<') {
+			if end, skip := parseQuotedHeredoc(command, i); skip {
+				i = end
+				continue
+			}
+		}
+
 		if r == '$' && !isEscaped(command, i) {
 			v := classifyDollar(command, i)
 			if v != nil {
@@ -119,6 +134,91 @@ func scanSimpleExpansion(command string) []Violation {
 	}
 
 	return violations
+}
+
+// parseQuotedHeredoc examines an occurrence of `<<` at pos. If the heredoc
+// has a quoted delimiter (single-quoted, double-quoted, or backslash-
+// escaped), it returns the position immediately after the closing
+// delimiter line and skip=true so the caller can jump past the literal
+// body. Otherwise returns (pos, false) and the caller falls through to
+// normal scanning.
+func parseQuotedHeredoc(s string, pos int) (end int, skip bool) {
+	p := pos + 2
+
+	dash := false
+	if p < len(s) && s[p] == '-' {
+		dash = true
+		p++
+	}
+
+	for p < len(s) && (s[p] == ' ' || s[p] == '\t') {
+		p++
+	}
+	if p >= len(s) {
+		return pos, false
+	}
+
+	quoteChar := byte(0)
+	if c := s[p]; c == '\'' || c == '"' {
+		quoteChar = c
+		p++
+	} else if c == '\\' {
+		quoteChar = '\\'
+		p++
+	}
+
+	delimStart := p
+	for p < len(s) && (isIdentChar(s[p]) || s[p] == '-') {
+		p++
+	}
+	if p == delimStart {
+		return pos, false
+	}
+	delim := s[delimStart:p]
+
+	if quoteChar == '\'' || quoteChar == '"' {
+		if p >= len(s) || s[p] != quoteChar {
+			return pos, false
+		}
+		p++
+	}
+
+	if quoteChar == 0 {
+		return pos, false
+	}
+
+	for p < len(s) && s[p] != '\n' {
+		p++
+	}
+	if p < len(s) {
+		p++
+	}
+
+	for p < len(s) {
+		lineStart := p
+		q := p
+		for dash && q < len(s) && s[q] == '\t' {
+			q++
+		}
+		if q+len(delim) <= len(s) && s[q:q+len(delim)] == delim {
+			after := q + len(delim)
+			if after == len(s) || s[after] == '\n' {
+				if after < len(s) {
+					after++
+				}
+				return after, true
+			}
+		}
+		p = lineStart
+		for p < len(s) && s[p] != '\n' {
+			p++
+		}
+		if p < len(s) {
+			p++
+		}
+	}
+
+	return pos, false
 }
 
 // classifyDollar examines a $ at position pos and determines if it is

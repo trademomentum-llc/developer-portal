@@ -74,6 +74,7 @@ Track these before declaring M2 complete. None are blocking Tasks 21-22.
 | guard-3 | Fix merge-tofu-hook-into-settings.sh jq filter to push into existing Bash matcher instead of appending a new one | DONE commit d4373e6 |
 | guard-4 | Investigate overmatch: `wc -w` heredoc containing word `tofu` was blocked; narrow the match | DONE 2026-04-23 -- added IsTofuCommandPrefix gate before Tokenize in tofu-guard; 13 unit subtests + integration test reproducing the audit-log case; binary rebuilt; regressions preserved |
 | guard-5 | Backport corrected remove-script filter into the plan doc (commit 074c87b vs plan lines 684-690) | DONE 2026-04-23 -- plan doc now carries the fixed filter that preserves sibling hooks on the Bash matcher |
+| guard-6 | bash-guard scanner had no model of heredocs, so quoted-delimiter bodies (`<<'EOF'...EOF`) false-positived on `${VAR}` literal text inside them -- tripped every attempt to commit with a heredoc-wrapped message | DONE 2026-04-23 -- added parseQuotedHeredoc to scanner.go; skips literal bodies (single-quoted, double-quoted, backslash-escaped, and <<- variants); unquoted heredocs still get flagged since their body DOES expand; binary rebuilt |
 
 ### score2openchoreo
 

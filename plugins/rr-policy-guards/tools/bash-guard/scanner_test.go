@@ -118,6 +118,56 @@ func TestScanCommand_MultipleViolations(t *testing.T) {
 	}
 }
 
+func TestScanCommand_HeredocQuotedDelimiter_NoViolations(t *testing.T) {
+	// Guard-6: a heredoc with a quoted delimiter (<<'EOF' or <<"EOF") has
+	// a fully literal body -- no variable expansion, no command
+	// substitution. The scanner must not flag ${VAR} or $VAR inside
+	// such a body.
+	cases := []struct {
+		name string
+		cmd  string
+	}{
+		{"single-quoted EOF", "cat <<'EOF'\nmessage with ${HOME} inside\nEOF"},
+		{"double-quoted EOF", "cat <<\"EOF\"\nmessage with $HOME inside\nEOF"},
+		{"dash-single-quoted EOF", "cat <<-'EOF'\n\tmessage with ${PATH}\n\tEOF"},
+		{"git commit heredoc", "git commit -m \"$(cat <<'EOF'\nfix: score-1 error on ${resources.X.Y} partial match\nEOF\n)\""},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			violations := ScanCommand(tc.cmd)
+			if len(violations) != 0 {
+				t.Errorf("ScanCommand(%q) returned %d violations, want 0 (body is literal)", tc.cmd, len(violations))
+				for _, v := range violations {
+					t.Logf("  [%s] %s at offset %d (original=%q)", v.Rule, v.Description, v.Offset, v.Original)
+				}
+			}
+		})
+	}
+}
+
+func TestScanCommand_HeredocUnquotedDelimiter_StillFlags(t *testing.T) {
+	// Sanity: with an UNQUOTED delimiter, bash DOES expand ${VAR} inside
+	// the body. The scanner should continue to flag such usage.
+	cmd := "cat <<EOF\nmessage with ${HOME}\nEOF"
+	violations := ScanCommand(cmd)
+	if len(violations) == 0 {
+		t.Fatalf("ScanCommand(%q) returned no violations; an unquoted heredoc body DOES expand, should be flagged", cmd)
+	}
+}
+
+func TestScanCommand_ResumesAfterHeredoc(t *testing.T) {
+	// If a quoted heredoc body is skipped, scanning must resume on the
+	// next line so subsequent bare vars are still caught.
+	cmd := "cat <<'EOF'\nliteral ${IGNORED}\nEOF\necho $LATER"
+	violations := ScanCommand(cmd)
+	if len(violations) != 1 {
+		t.Fatalf("ScanCommand(%q) returned %d violations, want exactly 1 ($LATER)", cmd, len(violations))
+	}
+	if violations[0].Original != "$LATER" {
+		t.Errorf("violation original = %q, want $LATER", violations[0].Original)
+	}
+}
+
 func TestApplyFixes_SingleVar(t *testing.T) {
 	cmd := "ls $HOME/projects"
 	violations := ScanCommand(cmd)
