@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -128,6 +129,29 @@ func TestBinaryShellMetacharacter(t *testing.T) {
 	}
 	if !strings.Contains(stderr, "shell metacharacter") {
 		t.Fatalf("stderr missing 'shell metacharacter': %q", stderr)
+	}
+}
+
+func TestBinaryHeredocWithApostropheAllowed(t *testing.T) {
+	// Regression: tofu-guard.jsonl 2026-04-21T18:20:20 recorded a block with
+	// reason "tokenize-error: unterminated quote" for a cat heredoc that
+	// contained an apostrophe (Gitea's) and mentioned "tofu apply" as
+	// literal text. The command was not a tofu invocation and must not be
+	// blocked just because the tokenizer cannot handle heredocs.
+	heredoc := "cat <<'EOF' | wc -w\n## M2 heredoc\nGitea's OCI registry references to tofu apply in text.\nEOF"
+	in, err := json.Marshal(map[string]any{
+		"tool_name":  "Bash",
+		"tool_input": map[string]any{"command": heredoc},
+		"session_id": "s-heredoc",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	bin := buildBinary(t)
+	log := filepath.Join(t.TempDir(), "a.jsonl")
+	code, _, stderr := runGuard(t, bin, string(in), map[string]string{"RR_TOFU_GUARD_AUDIT_LOG": log})
+	if code != 0 {
+		t.Fatalf("exit=%d want 0; stderr=%q", code, stderr)
 	}
 }
 

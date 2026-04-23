@@ -29,6 +29,14 @@ func main() {
 	if input.ToolName != "Bash" {
 		os.Exit(0)
 	}
+	// Fast gate: if the command does not begin with the word "tofu", there
+	// is nothing to enforce. This avoids running the quote-aware tokenizer
+	// over shell constructs it does not model (heredocs, process
+	// substitutions), which would otherwise produce false positives when a
+	// non-tofu command happens to contain an unbalanced quote in its data.
+	if !IsTofuCommandPrefix(input.ToolInput.Command) {
+		os.Exit(0)
+	}
 	tokens, err := Tokenize(input.ToolInput.Command)
 	if err != nil {
 		logAudit("block", "tokenize-error: "+err.Error(), input.ToolInput.Command, input.SessionID)

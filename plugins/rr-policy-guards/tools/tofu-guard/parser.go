@@ -27,6 +27,24 @@ var BlockedStateSubcommands = map[string]struct{}{
 
 var shellMeta = regexp.MustCompile("[;&|<>`$()]")
 
+// IsTofuCommandPrefix reports whether cmd, after leading whitespace, begins
+// with the word "tofu" as a standalone token (followed by whitespace or
+// end-of-string). It exists so main.go can short-circuit on commands that
+// clearly do not invoke tofu, before running Tokenize: the tokenizer does
+// not model heredocs or other shell constructs, and an unbalanced quote
+// inside a heredoc must not trigger a block on a non-tofu command.
+func IsTofuCommandPrefix(cmd string) bool {
+	trimmed := strings.TrimLeft(cmd, " \t\n\r")
+	if trimmed == "tofu" {
+		return true
+	}
+	if !strings.HasPrefix(trimmed, "tofu") {
+		return false
+	}
+	next := trimmed[4]
+	return next == ' ' || next == '\t' || next == '\n' || next == '\r'
+}
+
 // Tokenize splits a command into tokens honoring single and double quotes.
 // Backslash escapes inside double quotes. Returns error on unterminated quote.
 func Tokenize(cmd string) ([]string, error) {

@@ -1,0 +1,13 @@
+{
+  "name": "developer-portal-local",
+  "owner": {
+    "name": "Rational Reserve platform build"
+  },
+  "plugins": [
+    {
+      "name": "rr-policy-guards",
+      "source": "./plugins/rr-policy-guards",
+      "description": "Four PreToolUse guards enforcing Rational Reserve platform rules: rr-emoji-guard (pure-ASCII file writes), rr-bash-guard (no bare $VAR expansion), rr-brew-guard (supply-chain-risky brew flags/URL installs/untrusted taps), rr-tofu-guard (no direct tofu apply/destroy/import from a Bash tool use). Bypass env vars per-guard; every use audit-logged to ~/.rational-reserve/logs/."
+    }
+  ]
+}

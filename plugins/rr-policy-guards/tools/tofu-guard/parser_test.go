@@ -66,3 +66,33 @@ func TestTokenizeUnterminatedQuote(t *testing.T) {
 		t.Fatal("expected error on unterminated quote")
 	}
 }
+
+func TestIsTofuCommandPrefix(t *testing.T) {
+	tests := []struct {
+		name string
+		cmd  string
+		want bool
+	}{
+		{"bare tofu", "tofu", true},
+		{"tofu with args", "tofu apply", true},
+		{"leading spaces", "  tofu plan", true},
+		{"leading tab", "\ttofu plan", true},
+		{"leading newline", "\ntofu plan", true},
+		{"not tofu", "ls -la", false},
+		{"empty", "", false},
+		{"tofum prefix", "tofum apply", false},
+		{"tofu-hyphen prefix", "tofu-like apply", false},
+		{"echo contains tofu", "echo tofu", false},
+		{"chained with tofu", "cd foo && tofu apply", false},
+		{"heredoc with tofu in text", "cat <<'EOF' | wc -w\ntofu apply here\nEOF", false},
+		{"heredoc with apostrophe that breaks tokenizer", "cat <<'EOF' | wc -w\nGitea's OCI registry\ntofu apply\nEOF", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := IsTofuCommandPrefix(tt.cmd)
+			if got != tt.want {
+				t.Errorf("IsTofuCommandPrefix(%q) = %v, want %v", tt.cmd, got, tt.want)
+			}
+		})
+	}
+}

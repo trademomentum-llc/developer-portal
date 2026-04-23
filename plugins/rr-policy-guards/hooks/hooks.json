@@ -1,5 +1,5 @@
 {
-  "description": "Policy guards for the Rational Reserve platform. Currently blocks emoji characters in file-write tool invocations.",
+  "description": "Policy guards for the Rational Reserve platform. Four PreToolUse hooks: rr-emoji-guard on file writes; rr-bash-guard + rr-brew-guard + rr-tofu-guard on Bash. All four audit-log to ~/.rational-reserve/logs/ and respect their own RR_*_GUARD_BYPASS=1 env vars.",
   "hooks": {
     "PreToolUse": [
       {
@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/nnos/Projects/developer-portal/plugins/rr-policy-guards/bin/rr-emoji-guard",
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/rr-emoji-guard",
             "timeout": 5
           }
         ]
@@ -15,6 +15,14 @@
       {
         "matcher": "Bash",
         "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/rr-bash-guard"
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/bin/rr-brew-guard"
+          },
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/bin/rr-tofu-guard"
