@@ -26,3 +26,7 @@ module "openchoreo_environments" {
 module "external_secrets_wiring" {
   source = "./modules/external-secrets-wiring"
 }
+
+module "local_registry" {
+  source = "./modules/local-registry"
+}
