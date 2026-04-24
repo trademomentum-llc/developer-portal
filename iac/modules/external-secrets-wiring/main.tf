@@ -1,6 +1,47 @@
-resource "kubectl_manifest" "flux_deploy_key" {
+# Dev-mode auth for OpenBao's kv/ mount. The root token is acceptable here
+# because openbao runs in dev mode with inmem storage (m2i-6 tracks the
+# persistent-backing follow-up). For prod: swap to kubernetes auth with a
+# service account, mirroring openchoreo/install/prerequisites/openbao/setup.sh.
+resource "kubernetes_secret" "openbao_root_token" {
+  metadata {
+    name      = "openbao-root-token"
+    namespace = "external-secrets"
+  }
+  data = {
+    token = "root"
+  }
+  type = "Opaque"
+}
+
+resource "kubectl_manifest" "openbao_kv_store" {
+  depends_on = [kubernetes_secret.openbao_root_token]
   yaml_body = yamlencode({
-    apiVersion = "external-secrets.io/v1beta1"
+    apiVersion = "external-secrets.io/v1"
+    kind       = "ClusterSecretStore"
+    metadata   = { name = "openbao-kv" }
+    spec = {
+      provider = {
+        vault = {
+          server  = "http://openbao.openbao.svc:8200"
+          path    = "kv"
+          version = "v2"
+          auth = {
+            tokenSecretRef = {
+              name      = "openbao-root-token"
+              namespace = "external-secrets"
+              key       = "token"
+            }
+          }
+        }
+      }
+    }
+  })
+}
+
+resource "kubectl_manifest" "flux_deploy_key" {
+  depends_on = [kubectl_manifest.openbao_kv_store]
+  yaml_body = yamlencode({
+    apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
     metadata = {
       name      = "gitea-deploy-key"
@@ -19,8 +60,9 @@ resource "kubectl_manifest" "flux_deploy_key" {
 }
 
 resource "kubectl_manifest" "hello_m2_dev_secret" {
+  depends_on = [kubectl_manifest.openbao_kv_store]
   yaml_body = yamlencode({
-    apiVersion = "external-secrets.io/v1beta1"
+    apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
     metadata = {
       name      = "hello-m2-example-secret"
