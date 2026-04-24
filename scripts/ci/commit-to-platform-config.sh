@@ -9,10 +9,13 @@ COMPONENT_YAML=$3
 CONTENT_B64=$(base64 -w 0 < "$COMPONENT_YAML" 2>/dev/null || base64 < "$COMPONENT_YAML")
 PATH_IN_REPO="environments/${ENVIRONMENT}/${APP}.yaml"
 
-# Check if file exists; update vs create uses different SHAs
-SHA=$(curl -fsS -u "gitea_admin:${GITEA_TOKEN}" \
+# Check if file exists; update vs create uses different SHAs. A 404 on the
+# initial GET (file does not exist yet) is expected on first commit, so we
+# do NOT use curl -f here and we tolerate a non-zero exit on the GET
+# specifically -- the rest of the script still runs under set -e.
+SHA=$(curl -sS -u "gitea_admin:${GITEA_TOKEN}" \
     "http://gitea-http.gitea.svc.cluster.local:3000/api/v1/repos/openchoreo/platform-config/contents/${PATH_IN_REPO}" \
-    2>/dev/null | jq -r '.sha // empty')
+    2>/dev/null | jq -r '.sha // empty' 2>/dev/null || true)
 
 PAYLOAD=$(jq -n \
     --arg msg "ci: ${APP} ${ENVIRONMENT} -> ${GITHUB_SHA::7}" \
