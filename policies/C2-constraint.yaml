@@ -26,5 +26,5 @@ metadata:
 spec:
   match:
     kinds:
-      - apiGroups: ["core.choreo.dev"]
+      - apiGroups: ["openchoreo.dev"]
         kinds: ["Component"]

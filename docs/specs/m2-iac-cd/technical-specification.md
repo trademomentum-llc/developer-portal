@@ -1005,7 +1005,7 @@ locals {
 resource "kubectl_manifest" "environment" {
   for_each = toset(local.environments)
   yaml_body = yamlencode({
-    apiVersion = "core.choreo.dev/v1alpha1"
+    apiVersion = "openchoreo.dev/v1alpha1"
     kind       = "Environment"
     metadata = {
       name      = each.key

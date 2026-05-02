@@ -36,7 +36,7 @@ func Convert(in ScoreDocument, opts ConvertOptions) (OpenChoreoComponent, error)
 	}
 
 	comp := OpenChoreoComponent{
-		APIVersion: "core.choreo.dev/v1alpha1",
+		APIVersion: "openchoreo.dev/v1alpha1",
 		Kind:       "Component",
 		Metadata: ComponentMetadata{
 			Name:      in.Metadata.Name,

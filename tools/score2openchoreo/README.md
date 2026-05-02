@@ -1,7 +1,7 @@
 # score2openchoreo
 
 Converts a [Score](https://score.dev) YAML document to an OpenChoreo
-`core.choreo.dev/v1alpha1/Component` CRD. Used by the M2 CI pipeline after
+`openchoreo.dev/v1alpha1/Component` CRD. Used by the M2 CI pipeline after
 schema validation, before committing the rendered Component to
 `openchoreo/platform-config/environments/<env>/`.
 

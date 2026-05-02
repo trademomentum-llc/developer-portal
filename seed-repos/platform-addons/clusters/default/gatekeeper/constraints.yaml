@@ -56,7 +56,7 @@ metadata:
 spec:
   match:
     kinds:
-      - apiGroups: ["core.choreo.dev"]
+      - apiGroups: ["openchoreo.dev"]
         kinds: ["Component"]
 ---
 apiVersion: templates.gatekeeper.sh/v1
@@ -94,7 +94,7 @@ metadata:
 spec:
   match:
     kinds:
-      - apiGroups: ["core.choreo.dev"]
+      - apiGroups: ["openchoreo.dev"]
         kinds: ["Component"]
   parameters:
     thresholdUSD: "50"

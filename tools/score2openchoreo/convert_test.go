@@ -23,7 +23,7 @@ func TestConvertMinimal(t *testing.T) {
 		t.Fatalf("convert: %v", err)
 	}
 	want := OpenChoreoComponent{
-		APIVersion: "core.choreo.dev/v1alpha1",
+		APIVersion: "openchoreo.dev/v1alpha1",
 		Kind:       "Component",
 		Metadata:   ComponentMetadata{Name: "hello", Namespace: "openchoreo-data-plane"},
 		Spec: ComponentSpec{
