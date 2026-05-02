@@ -2,120 +2,122 @@
 
 > Action list ordered by priority and dependency.
 
-**Snapshot date:** 2026-04-21 (late-session update)
+**Snapshot date:** 2026-05-02
 
 ---
 
-## M2 IaC + CD Loop
+## M2 IaC + CD Loop -- where we actually are
 
-### Done this session (committed on main, 25 M2 commits)
+M2 is **architecturally validated end-to-end** through Pod creation, but **score2openchoreo's output model is wrong for the real OpenChoreo CRDs** and the **k3d cluster does not trust the in-cluster local-registry** for image pulls. Both are scoped, well-understood follow-ups (see m2-renderer-rewrite and m2i-7 below).
 
-| Task | Commit |
-|------|--------|
-| M2 spec package (3 docs) | 41db8f0 |
-| M2 implementation plan (24 tasks) | 3392c3e |
-| T1 rr-tofu-guard failing parser tests | e86ef88 |
-| T2 rr-tofu-guard parser implementation | 9a435bf |
-| T3 rr-tofu-guard audit writer | aa74333 |
-| T4 rr-tofu-guard main + integration tests | 7a59b01 |
-| T4-fix missing test paths + audit error detail | e89194a |
-| T5 register rr-tofu-guard PreToolUse hook | 074c87b |
-| T5-fix remove-script defensive null handling | 0ee5acc |
-| T6 score2openchoreo module + types | f7e756f |
-| T7 score2openchoreo Convert + table tests | c2d1359 |
-| T8 score2openchoreo schema validator + fixtures | 18d2e72 |
-| T9 score2openchoreo CLI + main + golden tests | e0f067d |
-| T10 Gatekeeper policies C-1 C-2 C-3 + Rego tests | ae3f073 |
-| T10-fix C-2 Rego handles missing annotations | 0514a2a |
-| T11 tofu root module scaffolding | aa0a0f1 |
-| T12 tofu modules/flux | fecb218 |
-| T13 tofu modules/gatekeeper | 700d2ef |
-| T14 tofu modules/gitea-runner | 844175a |
-| T15 tofu modules/openchoreo-environments | 7d71da3 |
-| T16 tofu modules/external-secrets-wiring | ae49185 |
-| T17 gitea + openbao seed scripts | 59fee9b |
-| T18 seed-repos content | 6718753 |
-| T19 canonical CI workflow + runner helpers | de3f383 |
-| T20 install/teardown/smoke scripts | d3e9fb9 |
-| T23 backstage proxy for /api/proxy/gitea-actions | cc56870 |
-| T24 README M2 section | 45fa8a8 |
+What was proved this session (2026-05-02): a push to `openchoreo/hello-m2` triggers CI, CI builds + pushes image, CI renders + commits the Component to `platform-config/environments/dev/`, **Flux pulls platform-config**, **Flux applies the (manually-corrected) Component+Workload+Project triplet**, **OpenChoreo creates a ComponentRelease, then a Deployment, then a Pod** in an auto-named per-environment data-plane namespace (`dp-default-default-development-<hash>`). The Pod cannot pull its image (k3d/containerd registry trust gap), but everything upstream of that works.
 
-### Outstanding M2 work (for next session or operator-driven)
+### Outstanding M2 work
 
-| Task | Status | Dependency |
-|------|--------|------------|
-| T21 Run scripts/install-m2.sh end-to-end (live) | PARTIAL 2026-04-22 | Tasks 0-3 succeed; task 4 (tofu apply) blocked -- see m2-install-blockers below |
-| T22 First pipeline run on hello-m2 | NOT STARTED | T21 complete |
-| Push local commits to remote | DONE 2026-04-22 | Pushed to origin (local Gitea openchoreo cluster) and gitea-com cloud; local Forgejo still deferred (not yet installed) |
+| Task | Status | Notes |
+|------|--------|-------|
+| T21 install-m2.sh end-to-end | DONE 2026-05-02 | Cluster healthy with all M2 namespaces; tofu apply ran successfully; m2i-1..m2i-6 closed |
+| T22 first pipeline run on hello-m2 | PARTIAL 2026-05-02 | Run #17 (sha dc407cc) completed CI in ~88s; chain validated through Pod creation; pod blocked on image pull (m2i-7) |
+| Score2openchoreo renderer rewrite | OPEN -- next session | See m2-renderer-rewrite below; ~2-4 hours of focused work |
+| Push 42b2231 to gitea-com | DONE 2026-05-02 | Pushed via one-shot ephemeral PAT; PAT then revoked by operator |
+| Push to local Gitea origin | DEFERRED | origin URL is stale (`localhost:3002`); update to 3333 and push when next convenient |
 
-### M2 install blockers (2026-04-22 partial run)
+---
+
+## M2 install blockers (status as of 2026-05-02)
 
 | ID | Item | Status |
 |---|---|---|
-| m2i-1 | OpenChoreo CRD group drift -- iac/modules/openchoreo-environments references `core.choreo.dev/v1alpha1/Environment`; installed CRD is `environments.openchoreo.dev`. Update API path. | open |
-| m2i-2 | k3d-openchoreo single-node cluster CPU-exhausted -- Flux helm-controller stuck Pending (`Insufficient cpu`); times out tofu helm_release. Either scale Docker resources for k3d, free CPU, or switch to multi-node config. | open |
-| m2i-3 | Stale `tofu-state` namespace from 2026-04-21 attempt -- run `tofu import kubernetes_namespace.tofu_state tofu-state` before retry. | open |
-| m2i-4 | ExternalSecret manifests may be impacted by alekc/kubectl provider discovery cache misses under cluster pressure (likely resolves when m2i-2 fixed). | open, monitor |
-| m2i-5 | Deprecated `k3d-m1-substrate` cluster (Gitea pod stuck Terminating, agents NotReady) consumes Docker resources unnecessarily. Tear down with `k3d cluster delete m1-substrate`. | open |
-| m2i-6 | OpenBao runs in dev mode with `inmem` storage -- secrets and `kv/` mount die on pod restart. Plan persistent storage + auto-unseal for production-readiness. | open, low-priority |
+| m2i-1 | OpenChoreo CRD group drift -- `core.choreo.dev` -> `openchoreo.dev` | **DONE 2026-05-02 commit 42b2231** -- score2openchoreo, gatekeeper constraints (both `policies/` and the `seed-repos/` mirror), and the technical-spec doc all migrated. Earlier commit 692f200 had only fixed the Environment module |
+| m2i-2 | k3d cluster CPU exhausted | **DONE** -- archive memory: colima upgrade (6 CPU / 10 GB) addressed |
+| m2i-3 | Stale `tofu-state` ns from 2026-04-21 | **DONE** -- imported during the successful tofu apply |
+| m2i-4 | ExternalSecret cache misses under cluster pressure | **DONE** (resolved with m2i-2) |
+| m2i-5 | Deprecated `k3d-m1-substrate` cluster | **DONE** -- archive memory: torn down |
+| m2i-6 | OpenBao dev-mode `inmem` storage loses kv on restart | **OPEN, low-priority** -- production-readiness item, not M2 closeout |
+| **m2i-7** | **k3d/containerd does not trust in-cluster local-registry** | **NEW 2026-05-02** -- pods get ImagePullBackOff: containerd resolves `registry.local-registry.svc.cluster.local` via host DNS (not cluster DNS) and defaults to HTTPS on a HTTP-only registry. Fix: add `/etc/rancher/k3s/registries.yaml` mirror entry on k3d node OR expose registry via NodePort/hostPort. Affects install-m1.sh / cluster bootstrap, not M2 codebase |
 
 ---
 
-## Post-M2 tech debt (discovered during subagent-driven reviews)
+## m2-renderer-rewrite -- the score2openchoreo redesign
 
-Track these before declaring M2 complete. None are blocking Tasks 21-22.
+**Why:** the current `tools/score2openchoreo/convert.go` emits a single Component CRD with `spec.workloadTemplate`, `spec.environment`, and `spec.owner.project`. The actual `openchoreo.dev/v1alpha1/Component` schema rejects all three -- it expects `spec.componentType` (a ref to a ClusterComponentType like `deployment/service`), `spec.owner.projectName`, and stores the workload definition in a separate `Workload` CRD. The renderer was written against an outdated conception of Component.
+
+**Reference shape** (validated by hand this session against the cluster's CRD schema):
+
+```yaml
+apiVersion: openchoreo.dev/v1alpha1
+kind: Component
+metadata: {name, namespace}
+spec:
+  owner: {projectName: <project>}
+  autoDeploy: true
+  componentType: {kind: ClusterComponentType, name: deployment/<service|web-application|worker|scheduled-task>}
+---
+apiVersion: openchoreo.dev/v1alpha1
+kind: Workload
+metadata: {name: <component>-workload, namespace}
+spec:
+  owner: {componentName: <component>, projectName: <project>}
+  endpoints: {http: {type: HTTP, port: <port>, visibility: [external]}}
+  container:
+    image: <oci-ref>
+    env: [{key, value | valueFrom.secretKeyRef}]
+```
+
+**Required work (Path B, next session):**
+
+| ID | Item |
+|---|---|
+| score-6a | Replace types.go with `Component`, `Workload`, optional `Project`, optional `SecretReference` shapes matching openchoreo.dev/v1alpha1 |
+| score-6b | Convert function returns a list of resources (multi-document YAML), not a single Component |
+| score-6c | Decide componentType inference: heuristic from Score (e.g., `service.ports` -> `deployment/service`, no ports -> `worker`) OR a `pipeline.m2/component-type` annotation in score.yaml |
+| score-6d | Namespace strategy: emit Components in same namespace as Project (currently `default` per cluster install). Drop `--namespace openchoreo-data-plane` flag or repurpose it |
+| score-6e | Rewrite golden fixtures (minimal, with-secret) to multi-document YAML |
+| score-6f | Update convert_test, schema_test, main_test for new shape |
+| score-6g | Document the new conversion conventions in README; update technical-specification.md |
+| score-6h | Update CI workflow (hello-m2/.gitea/workflows/ci.yaml) if `--namespace` flag drops |
+
+---
+
+## M2 done backlog (chronological closeout this session)
+
+| Item | Commit | Date |
+|---|---|---|
+| Track CLAUDE.md, document Gitea port migration in plan | a99d97e | 2026-05-02 |
+| **Complete CRD-group migration: score2openchoreo + gatekeeper + flux platform-config watch** | **42b2231** | **2026-05-02** |
+
+---
+
+## Post-M2 tech debt -- closed before this session
+
+(Carried forward for reference; all DONE before 2026-04-30.)
 
 ### Guards (rr-policy-guards)
 
-| ID | Item | Status |
-|---|---|---|
-| guard-1 | Document or surface silently-swallowed audit I/O errors | DONE 2026-04-23 -- verified all 4 guards carry file- and function-level swallow-semantics comments; TODO description was stale |
-| guard-2 | Pick ONE registration path for rr-tofu-guard | DONE 2026-04-23 -- finding on audit: only settings.json was ever live (plugin never installed). Pivoted from "install as Claude plugin" to "single-source-of-truth in settings.json" after finding that mid-session hook reload works -- all 4 guards registered in ~/.claude/settings.json with absolute paths; smoke-tested each binary. Plugin hooks.json + .claude-plugin/marketplace.json left in the repo as future-ready scaffolding in case a plugin-install migration is ever wanted. Backup at ~/.claude/settings.json.bak-1776979520. |
-| guard-3 | Fix merge-tofu-hook-into-settings.sh jq filter to push into existing Bash matcher instead of appending a new one | DONE commit d4373e6 |
-| guard-4 | Investigate overmatch: `wc -w` heredoc containing word `tofu` was blocked; narrow the match | DONE 2026-04-23 -- added IsTofuCommandPrefix gate before Tokenize in tofu-guard; 13 unit subtests + integration test reproducing the audit-log case; binary rebuilt; regressions preserved |
-| guard-5 | Backport corrected remove-script filter into the plan doc (commit 074c87b vs plan lines 684-690) | DONE 2026-04-23 -- plan doc now carries the fixed filter that preserves sibling hooks on the Bash matcher |
-| guard-6 | bash-guard scanner had no model of heredocs, so quoted-delimiter bodies (`<<'EOF'...EOF`) false-positived on `${VAR}` literal text inside them -- tripped every attempt to commit with a heredoc-wrapped message | DONE 2026-04-23 -- added parseQuotedHeredoc to scanner.go; skips literal bodies (single-quoted, double-quoted, backslash-escaped, and <<- variants); unquoted heredocs still get flagged since their body DOES expand; binary rebuilt |
+guard-1 through guard-6 -- DONE 2026-04-23. See git log for commit-level detail.
 
 ### score2openchoreo
 
-| ID | Item | Status |
-|---|---|---|
-| score-1 | Decide and implement inline `${resources.X.Y}` substitution OR error loudly on partial matches | DONE 2026-04-23 -- errors loudly per design call (deterministic-first); 4 subtests cover prefix/suffix/middle/two-refs; error names the variable |
-| score-2 | Add tests for: multi-container sort order, multi-variable sort order, `environment` resource branch, missing-resource error, annotations-to-labels mapping | DONE commit 55ce5a7 |
-| score-3 | Document secret-name fallback "X-secret" convention | DONE 2026-04-23 -- inline comment in convert.go at the secret-name fallback site; new tools/score2openchoreo/README.md documents all three conversion conventions |
-| score-4 | Lowercase error strings (Go idiom) | DONE commit 0983b63 |
-| score-5 | Pin score.schema.json to a git SHA instead of the moving `main` branch | DONE 2026-04-23 -- vendored file is the pin; SHA256 recorded in assets/SCHEMA_PROVENANCE.md with update procedure; TestScoreSchemaPin guards against drift |
+score-1 through score-5 -- DONE 2026-04-23. (Note: score-6 above is a NEW item from this session, distinct from those.)
 
-### Gatekeeper
+### Gatekeeper / Install
 
-| ID | Item | Status |
-|---|---|---|
-| gk-1 | Update policies/README.md with correct `opa test --v0-compatible policies/*.rego -v` invocation | DONE commit 680f40d |
-
-### Install / scripts
-
-| ID | Item | Status |
-|---|---|---|
-| inst-1 | Verify or create `scripts/lib/{colors,wait-for,confirm}.sh` (referenced by install-m2.sh) | DONE commit 5e1e088 |
-| inst-2 | Move shebangs to line 1 in all smoke scripts | DONE commit 5e1e088 |
+gk-1, inst-1, inst-2 -- DONE.
 
 ---
 
-## Push / remote resolution
+## Push / remote resolution -- update
 
-| Option | Action |
-|---|---|
-| A | Create `trademomentum.net/developer-portal` in local Gitea; push to origin |
-| B | Fix gitea.com connectivity; rotate embedded credential; push to gitea-com |
-| C | Retire localhost origin; rename gitea-com to origin |
+The 2026-04-21 entry suggested gitea.com URL had embedded credentials. As of 2026-05-02:
+- `.git/config` has clean URLs (no embedded creds)
+- gitea-com auth uses ephemeral PATs minted per-push and immediately revoked
+- osxkeychain caches credentials but expires when PATs are revoked
 
-The embedded credential in the gitea-com URL is exposed in `.git/config`
-and in at least one conversation transcript -- rotate regardless of which
-option is chosen.
+origin (local Gitea) URL still points at port 3002; Gitea is now on 3333. Update with `git remote set-url origin http://localhost:3333/openchoreo/developer-portal.git` or similar before next push to local origin.
 
 ---
 
-## M3-M7 (unchanged from prior snapshots)
+## M3-M7 (unchanged)
 
 | Milestone | Scope | Status |
 |---|---|---|

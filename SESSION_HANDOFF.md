@@ -4,339 +4,155 @@
 > what is now committed that was not before, what is still outstanding, and
 > exactly what to do first.
 
-**Last session ended:** 2026-04-21 (late)
-**Reason for handoff:** Context window running out mid-M2 execution. User
-requested handoff docs written while context still healthy, then we keep
-pushing until we cannot. Initial handoff doc was written at commit
-`e260ce8`; eight more fix commits landed afterward (`5e1e088` through
-`54a49a6`) before this final update.
+**Last session ended:** 2026-05-02 (mid-afternoon)
+**Reason for handoff:** M2 architectural validation complete; substantial Path B (score2openchoreo rewrite) deserves a fresh session with clean energy.
 
 ---
 
 ## 1. The single most important thing
 
-**M2 codegen is complete and committed on `main`.** 22 of 24 Task 10 tasks
-landed via the `superpowers:subagent-driven-development` flow. The two
-remaining tasks (21, 22) are **live cluster mutations** that the operator
-runs by invoking `scripts/install-m2.sh` manually -- they were deliberately
-deferred to a human-driven execution, not subagent-driven, because:
+**M2 is architecturally validated end-to-end through Pod creation.** Push -> CI -> render -> commit -> Flux pulls -> Flux applies -> OpenChoreo reconciles -> ComponentRelease -> Deployment -> Pod. **Six links of the seven-link chain proved on a live cluster.** The final link (Pod runs) is blocked by an out-of-scope k3d/containerd registry trust gap (m2i-7), not anything in the M2 codebase.
 
-- `tofu apply` against the real cluster takes 15 to 20 minutes
-- `scripts/install-m2.sh` modifies openbao kv, Gitea repos, and helm releases
-- The operator wanted to confirm cluster state before committing to it
-
-The full M2 source tree, specs, implementation plan, 27 commits, and all
-tests are on `main` at or before commit `45fa8a8`. A `git push` will send
-everything once the remote situation is resolved (see Section 6).
+But this only works with **manually-corrected Component+Workload YAML**. The score2openchoreo renderer emits the wrong CRD shape -- a substantial rewrite (Path B) is required before the chain works without manual intervention. See `TODO.md` -> `m2-renderer-rewrite` for the spec.
 
 ---
 
 ## 2. Git state at handoff
 
 - **Branch:** `main`
-- **Local HEAD:** `54a49a6 docs: TODO -- mark score-2 + guard-3 done; guard-1 partial`
-- **Ahead of origin/main by:** 35 commits (2 M1 follow-ons + 25 M2 plan commits + 8 post-handoff commits: handoff docs, tech debt fixes, TODO updates)
-- **Working tree:** clean except for `.remember/` (untracked, tooling
-  artifact -- leave alone)
+- **Local HEAD:** `42b2231 fix(m2): complete CRD-group migration -- score2openchoreo + gatekeeper + flux platform-config watch`
+- **gitea-com:** has 42b2231 (pushed this session via ephemeral PAT, then PAT revoked)
+- **origin (local Gitea):** still 9 commits behind; URL points at stale port 3002 (Gitea is now on 3333)
+- **Working tree:** clean
 
-Recent commit log (most-recent first):
-
+Two new commits this session:
 ```
-54a49a6  docs: TODO -- mark score-2 + guard-3 done; guard-1 partial
-ec2b9a6  docs: rr-tofu-guard audit.go document intentional error swallow (guard-1)
-d4373e6  fix: merge-tofu-hook pushes into existing Bash matcher (guard-3)
-55ce5a7  test: score2openchoreo add 5 Convert coverage tests (score-2)
-5cd620c  docs: TODO -- mark 4 post-M2 tech debt items done
-0983b63  fix: score2openchoreo lowercase error strings (Go idiom)
-680f40d  docs: policies/README -- correct opa test invocation
-5e1e088  fix: add scripts/lib helpers and move smoke script shebangs to line 1
-e260ce8  docs: session handoff + M2 status snapshot
-45fa8a8  docs: README M2 section
-cc56870  feat: backstage proxy for /api/proxy/gitea-actions
-d3e9fb9  feat: M2 install, teardown, and per-tool smoke scripts
-de3f383  feat: canonical CI workflow + runner helper scripts
-6718753  feat: seed-repos content for platform-addons, platform-config, hello-m2
-59fee9b  feat: gitea + openbao seed scripts
-ae49185  feat: tofu modules/external-secrets-wiring
-7d71da3  feat: tofu modules/openchoreo-environments
-844175a  feat: tofu modules/gitea-runner
-700d2ef  feat: tofu modules/gatekeeper
-fecb218  feat: tofu modules/flux
-aa0a0f1  feat: tofu root module scaffolding
-0514a2a  fix: C-2 Rego handles missing annotations correctly
-ae3f073  feat: Gatekeeper policies C-1 C-2 C-3 with Rego tests
-e0f067d  feat: score2openchoreo CLI + main + golden-file tests
-18d2e72  feat: score2openchoreo schema validator + fixtures
-c2d1359  feat: score2openchoreo Convert function with table tests
-f7e756f  feat: score2openchoreo module + shared types
-0ee5acc  fix: rr-tofu-guard remove script defensive null handling
-074c87b  feat: register rr-tofu-guard as PreToolUse hook
-e89194a  fix: rr-tofu-guard add missing test paths and audit error detail
-7a59b01  feat: rr-tofu-guard main + integration tests + build
-aa74333  feat: rr-tofu-guard audit log writer
-9a435bf  feat: implement rr-tofu-guard parser
-e86ef88  test: failing parser_test for rr-tofu-guard
-3392c3e  M2 IaC + CD Loop -- implementation plan
-41db8f0  M2 IaC + CD Loop -- initial spec package
+a99d97e docs(m2): finalize -- track CLAUDE.md, document Gitea port migration
+42b2231 fix(m2): complete CRD-group migration -- score2openchoreo + gatekeeper + flux platform-config watch
 ```
 
 ---
 
-## 3. What was built in this session
+## 3. What was built / proved this session
 
-Chronological overview:
+### Documentation finalization (commit a99d97e)
 
-1. **M2 spec package** -- three-doc spec (requirements, design, technical)
-   in `docs/specs/m2-iac-cd/` committed as `41db8f0`.
-2. **M2 implementation plan** -- 24-task TDD plan in
-   `docs/superpowers/plans/2026-04-20-m2-iac-cd.md` committed as `3392c3e`.
-3. **rr-tofu-guard** (Tasks 1-5) -- new PreToolUse hook that blocks direct
-   `tofu apply`/`destroy`/`import` from Bash tool uses. Go, stdlib only,
-   28 sub-tests pass, binary at
-   `plugins/rr-policy-guards/bin/rr-tofu-guard`. Registered in
-   `~/.claude/settings.json` and is ACTIVE.
-4. **score2openchoreo** (Tasks 6-9) -- new Go converter from Score YAML to
-   OpenChoreo Component CRDs. Two deps (yaml.v3, jsonschema/v5). 11 tests
-   (6 Convert + 2 schema + 3 golden-file) pass. Binary at
-   `tools/score2openchoreo/bin/score2openchoreo` (rebuilt on demand).
-5. **Gatekeeper policies** (Task 10) -- C-1 (platform-addons main-protected),
-   C-2 (Score schema annotation gate), C-3 (Infracost delta threshold).
-   6/6 Rego tests pass via `opa test --v0-compatible policies/*.rego`.
-6. **OpenTofu root + 5 modules** (Tasks 11-16) -- root module in `iac/`,
-   modules for flux, gatekeeper, gitea-runner, openchoreo-environments,
-   external-secrets-wiring. 33 HCL/README files total.
-7. **Seed scripts + seed-repos content** (Tasks 17-18) -- openbao seed,
-   Gitea org + repo + branch-protection seed, push helper, delete helper,
-   and the content for `platform-addons/`, `platform-config/`, `hello-m2/`.
-8. **Canonical CI workflow + runner helpers** (Task 19) --
-   `iac/templates/ci.yaml` plus `scripts/ci/post-infracost-comment.sh` and
-   `scripts/ci/commit-to-platform-config.sh`.
-9. **Install/teardown/smoke scripts** (Task 20) -- `install-m2.sh`,
-   `teardown-m2.sh`, `smoke-m2.sh` + 7 per-tool smoke scripts.
-10. **Backstage proxy entry** (Task 23) -- `/api/proxy/gitea-actions` added
-    in `backstage/app-config.yaml`.
-11. **README M2 section** (Task 24) -- 112-word M2 section appended.
+- Added `CLAUDE.md` to repo (was untracked previously)
+- Plan doc `2026-04-20-m2-iac-cd.md` got a Host Port Selection appendix capturing the 3002 -> 3333 Gitea port migration with substitution checklist for downstream files
 
----
+### M2 install completion + retrospective review
 
-## 3a. Tech debt addressed AFTER initial handoff
+Verified the M2 install completed successfully on 2026-04-24 (per session memory archive). Cluster state at session start:
+- 1/1 nodes Ready
+- 19 namespaces, all M2 components healthy: flux-system, gatekeeper-system, gitea, gitea-runners, local-registry, external-secrets, openbao, tofu-state, plus the openchoreo planes
 
-Eight additional commits landed after `e260ce8` wrote the initial handoff,
-addressing a subset of the tech debt list in Section 5:
+Filed retrospective review thread on gitea.com: Issue #1 at https://gitea.com/trademomentum.net/developer-portal/issues/1 -- captures the 9 finalization commits and pending review prompts.
 
-| Commit | Item | Description |
-|---|---|---|
-| `5e1e088` | inst-1, inst-2 | Created `scripts/lib/{colors,wait-for,confirm}.sh` (install-m2.sh was sourcing colors.sh that did not exist). Moved shebangs to line 1 in 7 smoke scripts. |
-| `680f40d` | gk-1 | `policies/README.md` updated to show the correct `opa test --v0-compatible policies/*.rego -v` invocation. |
-| `0983b63` | score-4 | Lowercased error strings in `convert.go` to Go idiom. |
-| `55ce5a7` | score-2 | Added 5 new `convert_test.go` tests (multi-container sort, multi-variable sort, environment resource, missing-reference error, annotations-to-labels). All pass. Total package tests: 11 -> 16. |
-| `d4373e6` | guard-3 | `merge-tofu-hook-into-settings.sh` now pushes into an existing Bash matcher's hooks array instead of appending a duplicate matcher. Verified with three test inputs (empty, existing-other, existing-Bash). |
-| `ec2b9a6` | guard-1 (partial) | `audit.go` in rr-tofu-guard documents the intentional I/O-error swallow semantics. brew-guard + bash-guard + emoji-guard still need the same comment. |
-| `5cd620c`, `54a49a6` | -- | TODO.md bookkeeping to reflect the above. |
+### CRD-group migration completion (commit 42b2231)
 
-Remaining tech debt (see Section 5 for the full list): guard-1 still open
-on 3 of 4 guards; guard-2, guard-4, guard-5 open; score-1, score-3, score-5
-open.
+Task 22 acceptance test exposed two gaps after the post-handoff finalization:
+
+**Gap 1: score2openchoreo + Gatekeeper still emitted/matched the stale `core.choreo.dev` API group.** Earlier commit 692f200 (2026-04-24) had fixed only the openchoreo-environments tofu module, missing:
+- `tools/score2openchoreo/convert.go:39` (renamed to `openchoreo.dev/v1alpha1`)
+- `tools/score2openchoreo/fixtures/*.component.yaml` (golden file regeneration)
+- `tools/score2openchoreo/convert_test.go` (test expectation)
+- `tools/score2openchoreo/README.md` (doc)
+- `policies/C2-constraint.yaml`, `policies/C3-constraint.yaml`, `seed-repos/platform-addons/clusters/default/gatekeeper/constraints.yaml` (all updated)
+- `docs/specs/m2-iac-cd/technical-specification.md` line 1008 (spec updated)
+
+**Gap 2: Flux only watched `platform-addons`, never `platform-config`.** The CD chain stopped dead at "CI commits Component to platform-config" because nothing pulled it back into the cluster.
+
+Fix: added GitRepository + dev/staging Kustomizations for platform-config in `iac/modules/flux/main.tf`. Tofu apply was clean: 3 to add, 0 to change, 0 to destroy. Flux now watches both repos.
+
+### Path A end-to-end validation (no commits -- transient platform-config edits)
+
+After the commit, triggered CI run #17 on hello-m2 (sha dc407cc). Run completed in ~88 seconds and committed a fresh `platform-config/environments/dev/hello-m2.yaml` with the corrected `openchoreo.dev/v1alpha1` API group.
+
+Flux pulled it -- but Flux schema validation FAILED:
+> `.spec.environment: field not declared in schema`
+
+This exposed **Gap 3 (the deepest one): score2openchoreo's entire output model is wrong for the real CRD.** The cluster's `components.openchoreo.dev` CRD requires `spec.componentType` + `spec.owner.projectName` and uses a separate `Workload` CRD for container/image/env/ports. score2openchoreo conflated them.
+
+Hand-wrote a schema-valid Component+Workload+Project triplet using the canonical pattern from `~/Projects/openchoreo/samples/from-image/go-greeter-service/greeter-service.yaml`. After three iterations (v1: only Component+Workload, no Project; v2: added Project but in wrong namespace; v3: moved everything to `default` ns to colocate with the existing DeploymentPipeline + Project), Flux applied successfully and OpenChoreo reconciled:
+
+```
+Component (Ready=True, ComponentReleaseReady)
+  -> ComponentRelease hello-m2-6b5cd77c7b
+    -> Deployment in dp-default-default-development-f8e58905
+      -> Pod hello-m2-development-95297084-7676dd9cc-brrt8 (ImagePullBackOff)
+```
+
+Pod ImagePullBackOff cause: k3d/containerd doesn't resolve cluster DNS for `registry.local-registry.svc.cluster.local` and defaults to HTTPS on the HTTP-only registry. **This is m2i-7 in TODO** -- a cluster bootstrap config gap, not part of M2.
+
+### Net findings about the actual OpenChoreo deployment model
+
+Important learnings -- score2openchoreo's design assumptions are wrong:
+
+1. **Components live in the same namespace as their Project + DeploymentPipeline** (here: `default`). NOT in `openchoreo-data-plane`.
+2. **OpenChoreo auto-creates a per-environment data-plane namespace** for actual workloads, named `dp-<dataplane>-<project>-<environment>-<hash>`. Operators don't pick that namespace.
+3. **Component is a thin abstraction**; the real deployable spec lives in `Workload`. Score's container/ports/env map to Workload, not Component.
+4. **The four `ClusterComponentType`s** installed: `deployment/service`, `deployment/web-application`, `deployment/worker`, `cronjob/scheduled-task`. Score has no concept of this -- the renderer needs a heuristic or annotation to choose.
 
 ---
 
 ## 4. What is NOT yet done
 
-**Task 21 -- Run `scripts/install-m2.sh` end-to-end.** This is a live 15 to
-20 minute cluster mutation. The operator runs it manually when ready. It:
+### Path B: score2openchoreo rewrite (next session, ~2-4 hours)
 
-- Builds rr-tofu-guard and registers the hook (already done)
-- Installs host tools (tofu, flux, infracost, score-k8s) via brew
-- Seeds openbao kv paths (prompts for runner registration token)
-- Seeds the three Gitea repos under `openchoreo` org
-- Builds score2openchoreo
-- Runs `tofu init && tofu apply -auto-approve` in `iac/` with
-  `RR_TOFU_GUARD_BYPASS=1` exported (so the install can run the blocked
-  apply legitimately)
-- Waits for Flux to reconcile `platform-addons`
-- Runs `scripts/smoke-m2.sh`
+See `TODO.md` -> `m2-renderer-rewrite` for the full spec (8 line items: score-6a..6h). Summary:
 
-**Task 22 -- First pipeline run on hello-m2.** Depends on Task 21 leaving
-the cluster healthy. Verifies the pipeline renders a Component, commits it
-to platform-config, and OpenChoreo deploys it.
+- Replace types.go with Component+Workload+Project+SecretReference shapes
+- Convert function returns multi-document YAML (a list of resources)
+- Decide componentType inference (heuristic vs annotation)
+- Move default namespace from `openchoreo-data-plane` to `default`
+- Rewrite all golden fixtures (multi-document)
+- Update tests (convert_test, schema_test, main_test)
+- Update README + technical-specification.md
+- Update hello-m2 CI workflow if `--namespace` flag semantics change
 
-Both tasks live in
-`docs/superpowers/plans/2026-04-20-m2-iac-cd.md` under Task 21 and Task 22.
+### m2i-7: k3d registry trust (next session, ~30-60 min)
 
----
+Add `/etc/rancher/k3s/registries.yaml` mirror entry on the k3d node so containerd resolves and pulls from the in-cluster registry. The fix likely belongs in `scripts/install-m1.sh` (cluster bootstrap), not M2 codebase. Without this, even after Path B, hello-m2 still won't run.
 
-## 5. Tech debt captured for post-M2 cleanup
+### Push 42b2231 to local Gitea origin
 
-Issues surfaced by the subagent-driven reviews during this session. None
-block Tasks 21 or 22, but they should land before M2 is declared "shipped"
-for real workloads:
-
-### Guards (rr-policy-guards)
-
-- **I-1 class**: `rr-brew-guard/audit.go`, `rr-tofu-guard/audit.go`, and
-  likely `rr-emoji-guard`'s equivalent all silently swallow I/O errors in
-  the audit writer. Add a stderr fallback line OR a file-header comment
-  explaining the intentional swallow semantics. Mirrors brew-guard's own
-  header.
-- **I-2**: `rr-tofu-guard` is registered BOTH in the plugin's
-  `hooks.json` (via `${CLAUDE_PLUGIN_ROOT}`) AND in `~/.claude/settings.json`
-  (via absolute path). The hook fires twice per Bash call; audit log
-  double-writes. Pick one registration path (plugin is preferred) and
-  remove the other.
-- **I-3**: The `merge-tofu-hook-into-settings.sh` jq filter appends a new
-  `{matcher: Bash}` entry instead of pushing into an existing one. If
-  another guard already claims the Bash matcher, there will be two. The
-  corrected filter is sketched in Task 5's code review (in the
-  subagent-driven-development skill's review output).
-- **Tokenizer overmatch observed in the wild**: a `wc -w` heredoc that
-  contained the literal word `tofu` was blocked because the guard
-  inspected the containing string (not the actual `tofu` command). This
-  suggests either a shellMeta false positive or the tokenizer treating
-  a substring wrongly. Reproduce and narrow.
-- **Plan text fix**: the plan's `remove-tofu-hook-from-settings.sh` filter
-  (plan lines 684-690) is the original buggy version; the corrected
-  filter that shipped (commit `074c87b`) should be backported into the
-  plan so replays do not regress.
-
-### score2openchoreo
-
-- **Strict-anchored regex**: the `resourceRefPattern` only matches a Score
-  variable that is ENTIRELY a resource reference. Inline substitution
-  like `"prefix-${resources.db.password}"` silently passes through
-  unexpanded. Either support inline or emit an error when a value
-  contains `${resources.` without full-matching.
-- **Test coverage gaps**: no test verifies multi-container sort order,
-  multi-variable sort order, the `environment` resource branch, missing-
-  resource errors, nor the annotations-to-labels mapping.
-- **Secret-name fallback `"X-secret"`** is a magic suffix with no
-  documenting comment.
-- **Error strings capitalized**: `"Environment required"` etc. violate Go
-  convention; `staticcheck` would flag them.
-
-### Gatekeeper policies
-
-- **Plan's `opa test policies/` command**: in opa 1.15.2 this fails
-  because of Rego v0 vs v1 defaults and because it loads the constraint
-  YAMLs as data. The correct invocation is
-  `opa test --v0-compatible policies/*.rego -v`. Update the
-  `policies/README.md` accordingly (it was written verbatim from the
-  plan and still shows the old command).
-
-### install-m2.sh
-
-- It sources `scripts/lib/colors.sh` which was an M1 artifact. Verify
-  that lib exists at install time; create it if missing. Otherwise the
-  first install will fail at the `source` line.
-- Per-tool smoke scripts place the shebang on line 2 (line 1 is a
-  comment). They are chmod +x but will not execute via shebang
-  discovery. Works when invoked via `bash scripts/smoke-*.sh` or via
-  `smoke-m2.sh` which invokes each by path (and smoke-m2.sh itself has
-  the shebang on line 3 -- same caveat). Move shebangs to line 1 at
-  cleanup time.
-
-### Score schema
-
-- `assets/score.schema.json` is pinned to the `main` branch of
-  score-spec/spec, not a tag. Freeze the raw content's commit SHA or
-  treat it as vendored (it is already checked in). Bump deliberately
-  when Score spec ships a new version.
+Stale `localhost:3002` URL; Gitea is on 3333. Update remote URL and push when port-forward is conveniently up. Not blocking anything.
 
 ---
 
-## 6. Push / remote situation (unresolved)
+## 5. Live state at handoff
 
-When attempting `git push origin main` during the session:
-
-- **origin** is `http://localhost:3002/trademomentum.net/developer-portal.git`
-  but that repository path does not exist in the local Gitea. The local
-  Gitea only hosts `gitea_admin/demo-service` (from M1). `origin` was
-  apparently configured but the matching repo was never created.
-- **gitea-com** is `https://gitea.com/trademomentum.net/developer-portal.git`
-  with an embedded credential in the URL. Network attempts to this remote
-  hung indefinitely during the session.
-
-Neither was updated. **All 27 commits are local only.**
-
-Options for the next session to resolve:
-
-1. Create `trademomentum.net/developer-portal` in the local Gitea (via
-   its UI or API) and push to origin.
-2. Fix gitea.com connectivity (or rotate the embedded token, which has
-   been exposed in the `.git/config` and in at least one conversation
-   transcript) and push to gitea-com.
-3. Point origin at gitea-com and retire the localhost origin.
+- **k3d-openchoreo cluster:** healthy. All M2 namespaces present.
+- **Gitea port-forward:** I started one this session at localhost:3333 (background task `b6zf5th1l`). Still running unless terminated. Safe to leave.
+- **platform-config repo state:** has hand-written Component+Workload+Project YAML at `environments/dev/hello-m2.yaml` (v3, commit c6656c8 in platform-config). Flux is currently applying this. **Heads up:** when Path B's renderer ships and a fresh CI run happens, that file will be overwritten with the new auto-generated multi-document YAML. The hand-written copy was for chain validation only.
+- **OpenChoreo workload state:** Component `hello-m2`, Workload `hello-m2-workload`, ComponentRelease `hello-m2-6b5cd77c7b` all live in `default` namespace. Deployment in `dp-default-default-development-f8e58905`. Pod stuck ImagePullBackOff.
 
 ---
 
-## 7. User preferences / memories saved this session
+## 6. Skills / agents to reach for in the next session
 
-At `/Users/nnos/.claude/projects/-Users-nnos-Projects-developer-portal/memory/`:
-
-- **feedback_verify_locked_tools.md** -- Before asserting a tool is in
-  a milestone, check the "locked-in tool choices" block in
-  PROJECT_SUMMARY.md, not just the M1-M7 roadmap table. The roadmap
-  table is draft placeholders; the locked-in list is authoritative.
-  Cost: one back-and-forth when I asserted Argo CD from the roadmap
-  placeholder when the user never approved it.
-- **project_m2_flux.md** -- M2 uses Flux (not Argo CD) for cluster
-  add-ons drift correction. OpenChoreo stays the workload deployer.
-  Argo Workflows visible in `openchoreo-workflow-plane` is bundled
-  INSIDE OpenChoreo, not Argo CD.
-- **project_runner_labels.md** -- Gitea Actions runner labels are
-  mostly self-hosted but workflows use `runs-on: ubuntu-latest` by
-  convention.
+- **superpowers:writing-plans** to spec the Path B rewrite before touching code (the score2openchoreo redesign is multi-step enough to warrant a plan).
+- **superpowers:test-driven-development** for the actual rewrite -- new fixtures + new tests are the natural TDD signal.
+- **superpowers:verification-before-completion** at the end -- a Path B that "passes its own tests" but doesn't render schema-valid YAML against the live cluster CRD is the same trap that bit us in 2026-04-24.
 
 ---
 
-## 8. Skills / agents to reach for in the next session
-
-- **superpowers:executing-plans** if resuming the plan task-by-task in
-  a fresh context (lighter than subagent-driven for just Tasks 21-22).
-- **superpowers:finishing-a-development-branch** once Tasks 21-22 are
-  green -- formal end-of-M2 close-out.
-- **opsera-devsecops:security-scan** if its MCP is reachable -- run
-  it repo-wide against the M2 changes before the push.
-- **coderabbit:review** for a second-opinion sweep on the M2 change set
-  (or `/review` in an open PR once the push is resolved).
-
-Do NOT skip the `superpowers:subagent-driven-development` flow for
-Tasks 21-22 if going that route; the live cluster ops are exactly the
-scenario where two-stage review matters (implementer fires the install;
-spec reviewer checks acceptance criteria met; code quality review has
-nothing to review since no code was written, but smoke output is the
-artifact under review).
-
----
-
-## 9. What to do first in the next session
+## 7. What to do first in the next session
 
 In this exact order:
 
 1. Read this file.
-2. Read `PROJECT_SUMMARY.md` and `TODO.md` for current state.
-3. `git status` and `git log --oneline origin/main..HEAD` to confirm
-   everything here matches on-disk truth.
-4. Decide with the operator whether to:
-   (a) Execute Task 21 now (`scripts/install-m2.sh` end-to-end), or
-   (b) Address tech debt first (Section 5 above), or
-   (c) Resolve the push situation first (Section 6), or
-   (d) Do something else.
-5. Before Task 21: confirm the operator is ready for a 15-20 minute live
-   cluster mutation and that Colima is healthy.
-
-Do NOT push to any remote without operator confirmation for which remote
-and which branch.
-Do NOT start live cluster ops without operator confirmation.
+2. Read `TODO.md` (especially `m2-renderer-rewrite` and m2i-7).
+3. Read `PROJECT_SUMMARY.md` for the wider context.
+4. `git status` and `git log --oneline origin/main..HEAD` (or gitea-com/main..HEAD) to verify state.
+5. Confirm cluster is still healthy: `kubectl --context k3d-openchoreo get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded` should return only the long-Completed cluster-agent-dataplane pod.
+6. If Gitea port-forward is no longer running: `kubectl --context k3d-openchoreo -n gitea port-forward svc/gitea-http 3333:3000 &`
+7. Decide with the operator: start Path B (the renderer rewrite) OR address m2i-7 first (so when Path B ships, the demo actually shows a running pod).
 
 ---
 
-## 10. State of the three projects in one line each
+## 8. State of the three projects in one line each
 
-- **openchoreo** (`/Users/nnos/Projects/openchoreo/`): unchanged since M1,
-  `check-tools.sh` still passes, cluster `k3d-openchoreo` is healthy.
-- **rational-reserve** (`/Users/nnos/Projects/rational-reserve/`): unchanged
-  since earlier sessions, v0.2 spine + adapters complete, 65 tests pass.
-- **developer-portal** (`/Users/nnos/Projects/developer-portal/`): M1
-  substrate complete, M2 specs + plan + codegen (Tasks 1-20, 23-24)
-  committed on `main`; Tasks 21-22 are live cluster runs awaiting
-  operator execution; 27 commits ahead of `origin/main` and not pushed.
+- **openchoreo** (`/Users/nnos/Projects/openchoreo/`): unchanged, cluster healthy, used as reference for canonical Component+Workload patterns.
+- **rational-reserve** (`/Users/nnos/Projects/rational-reserve/`): unchanged this session.
+- **developer-portal** (`/Users/nnos/Projects/developer-portal/`): M1 + M2 architecturally complete; M2 chain validated through Pod creation; score2openchoreo renderer rewrite (Path B) outstanding; k3d registry trust (m2i-7) outstanding.

@@ -4,7 +4,7 @@
 > state. For "what to do next" see TODO.md. For "where we stopped and what
 > changed mid-session" see SESSION_HANDOFF.md.
 
-**Snapshot date:** 2026-04-21 (late -- reflects 35 commits ahead of origin)
+**Snapshot date:** 2026-05-02 (M2 chain validated end-to-end through Pod creation; score2openchoreo renderer rewrite outstanding as Path B)
 
 ---
 
@@ -63,14 +63,23 @@ state store all working. Integration into the portal is deferred to M7.
 ## 3. developer-portal (current focus)
 
 **Source:** `~/Projects/developer-portal/`. git repository, branch `main`,
-35 commits ahead of `origin/main` and not pushed (2 M1 follow-ons + 25 M2
-plan commits + 8 post-handoff commits for tech debt fixes + doc updates).
+HEAD `42b2231` -- pushed to gitea-com 2026-05-02; local Gitea origin is
+9 commits behind (port-forward URL stale).
 
 **Role:** The umbrella for the full self-hosted IDP build.
 
-**Build status:** M1 substrate complete and healthy. **M2 codegen complete**
-as of this session (22 of 24 plan tasks landed; Tasks 21-22 are live
-cluster runs the operator drives manually).
+**Build status:** M1 substrate complete and healthy. **M2 architecturally
+validated end-to-end through Pod creation as of 2026-05-02.** Push -> CI ->
+render -> commit -> Flux pulls -> Flux applies -> OpenChoreo reconciles ->
+ComponentRelease -> Deployment -> Pod. Pod is currently ImagePullBackOff'd
+on a cluster-bootstrap-level registry trust gap (m2i-7) -- this is platform
+config, not M2 codebase.
+
+The score2openchoreo renderer needs a redesign (Path B / score-6) before
+the chain works without manual hand-edited YAML in platform-config -- the
+real `openchoreo.dev/v1alpha1` Component schema requires a Component+Workload
+split that the current renderer does not produce. See `TODO.md` ->
+`m2-renderer-rewrite` and `SESSION_HANDOFF.md` section 3 for full detail.
 
 ### Repository layout (current)
 
@@ -156,8 +165,8 @@ cluster runs the operator drives manually).
 | score2openchoreo schema | 2 | PASS |
 | score2openchoreo golden + validate-only | 3 | PASS |
 | Gatekeeper Rego | 6 | PASS (via `opa test --v0-compatible`) |
-| OpenTofu modules | n/a | not yet init'd; awaits tofu binary install in Task 21 |
-| End-to-end pipeline | n/a | Task 22, pending Task 21 |
+| OpenTofu modules | initialized + applied | Task 21 done; Flux watching both platform-addons AND platform-config (commit 42b2231 added the platform-config watch) |
+| End-to-end pipeline | architecturally validated 2026-05-02 | CI run #17 (sha dc407cc) ran in ~88s; rendered Component delivered; Flux applied (with hand-corrected YAML); pod created (image pull blocked by m2i-7) |
 
 ### M2 delta from locked-in tool list (canonical)
 
@@ -180,11 +189,9 @@ post-deploy dashboard role stays M3/M4.
 
 ### Outstanding (see TODO.md and SESSION_HANDOFF.md)
 
-- Task 21 live install run (operator-driven)
-- Task 22 live pipeline verification (operator-driven, after 21)
-- Tech debt list: 5 guard issues, 5 score2openchoreo issues, 1 Gatekeeper
-  doc issue, 2 install-script issues
-- Push of the 27 local commits to a remote
+- **Path B: score2openchoreo renderer rewrite** -- 8 line items in TODO under `m2-renderer-rewrite` (score-6a..6h). The current renderer emits a single Component that doesn't match the cluster's Component+Workload schema split. Estimated 2-4 hours.
+- **m2i-7: k3d/containerd registry trust** -- pods cannot pull from in-cluster local-registry. Fix belongs in install-m1.sh / cluster bootstrap.
+- **Push 42b2231 to local Gitea origin** -- stale URL, fix when port-forward is up.
 
 ---
 
@@ -200,8 +207,12 @@ post-deploy dashboard role stays M3/M4.
 - **Environment model:** two OpenChoreo Environments (`dev`, `staging`)
   in the single k3d cluster. Promotion is a commit to `platform-config`.
 - **Score rendering:** a new Go `score2openchoreo` converter reads Score
-  YAML and emits OpenChoreo Component CRDs. Score tools do not render
-  raw Deployments in M2.
+  YAML and emits OpenChoreo CRDs. Score tools do not render raw
+  Deployments in M2. (Note 2026-05-02: the converter currently emits a
+  single Component CRD with a `workloadTemplate` block that the live
+  cluster CRD rejects; the redesign in TODO `m2-renderer-rewrite` will
+  emit a Component + Workload pair matching the canonical openchoreo
+  pattern from `~/Projects/openchoreo/samples/from-image/`.)
 - **Pipeline runner:** Gitea Actions in-cluster (`act-runner` helm),
   label `ubuntu-latest` per operator convention.
 - **Docker daemon:** still Colima at `~/.colima/default/docker.sock`.
