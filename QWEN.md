@@ -1,152 +1,126 @@
 # developer-portal -- QWEN.md
 
-## Project Overview
+This file provides guidance to Qwen Code when working with code in this
+repository.
 
-Self-hosted Internal Developer Platform (IDP) built on a k3d Kubernetes cluster, Gitea, and Backstage. This is an umbrella project for a seven-milestone roadmap (M1-M7) modeled on the Platform Engineering community reference architecture. The platform spans five planes: Observability, Developer Control Plane, Integration & Delivery, Platform Orchestration, and Security.
+## Current project state
 
-**Current milestone:** M1 (Substrate) -- specs written, implementation in progress.
+This repository is the umbrella for a self-hosted Internal Developer Platform
+(IDP) split into seven milestones, M1 through M7. M1 substrate is complete and
+healthy. M2, the IaC and CD loop, is architecturally validated through Pod
+creation on the live `k3d-openchoreo` cluster.
 
-**Key relationships:**
-- `~/Projects/openchoreo/` -- upstream platform orchestrator. M1 reuses its `openchoreo-cluster` (already running).
-- `~/Projects/rational-reserve/` -- AI swarm orchestration layer (built separately, v0.1/v0.2 complete)
+The remaining M2 closeout work is narrow: trigger a fresh `hello-m2` CI run so
+the rewritten `score2openchoreo` output is committed by automation and the
+new image tag is pushed into the in-cluster local registry.
 
-## Directory Structure
+Always read these files first in a new session:
 
-```
-developer-portal/
-+-- README.md                       Quick start guide
-+-- PROJECT_SUMMARY.md              Three-project snapshot
-+-- SESSION_HANDOFF.md              Session state handoff
-+-- TODO.md                         Prioritized action list
-+-- catalog-info.yaml               Backstage catalog descriptors
-+-- backstage/                      Backstage app (scaffolded with create-app)
-+-- docs/
-|   +-- specs/m1-substrate/         M1 Requirements, Design Spec, Technical Spec
-|   +-- superpowers/plans/          Implementation plans go here
-+-- plugins/
-|   +-- rr-policy-guards/           Claude Code PreToolUse policy hooks (Go)
-|       +-- bin/                    Compiled guard binaries
-|       +-- tools/emoji-guard/      ASCII enforcement guard
-|       +-- tools/bash-guard/       Bash $VAR expansion guard
-|       +-- tools/brew-guard/       brew install security guard
-+-- scripts/                        Install, teardown, and helper scripts
-|   +-- install-m1.sh               M1 substrate installer (checkpointed)
-|   +-- teardown-m1.sh              M1 teardown
-|   +-- gitea-values.yaml           Gitea helm values
-|   +-- setup-*.sh                  Gitea and Backstage helpers
-```
+1. `SESSION_HANDOFF.md`
+2. `PROJECT_SUMMARY.md`
+3. `TODO.md`
 
-## Technologies
+They are more authoritative than git history alone.
 
-- **Runtime:** k3d (Kubernetes), Colima (Docker daemon)
-- **Git:** Gitea (helm-deployed into k3d)
-- **Portal:** Backstage (TypeScript/Node.js, runs on host via `yarn dev`)
-- **Policy guards:** Go (stdlib only, static binaries)
-- **Package manager:** yarn (v4.4.1 via Corepack)
-- **Build tooling:** Go 1.21+, Node 22/24, helm v3
+## Related checkouts
 
-## Building and Running
+- `~/Projects/openchoreo/` -- upstream platform orchestrator. Provides the
+  shared `k3d-openchoreo` cluster and the canonical OpenChoreo sample manifests.
+- `~/Projects/rational-reserve/` -- AI swarm orchestration layer. Integration
+  into this portal is deferred to M7.
 
-### Prerequisites
+## Core constraints
 
-- Colima running: `colima start --cpu 4 --memory 8`
-- Installed: k3d, kubectl, helm, node, yarn, Go 1.21+
+- Keep all file writes pure ASCII. No emoji, smart quotes, em dashes,
+  box-drawing characters, arrows, or other non-ASCII bytes.
+- Do not run `tofu apply`, `tofu destroy`, or `tofu import` directly. Use
+  `scripts/install-m2.sh` for M2 infrastructure mutation. `tofu init` and
+  `tofu plan` are allowed.
+- Keep `SESSION_HANDOFF.md`, `PROJECT_SUMMARY.md`, and `TODO.md` current when
+  scope, blockers, milestone state, or closeout status changes.
+- New modules, tools, scripts, plugins, or systems require Requirements,
+  Design Specification, and Technical Specification docs per the parent
+  project rule.
+- Prefer deterministic logic and compiled tools. Use Go for local utilities
+  unless an existing ecosystem forces another language.
 
-### Install M1 Substrate
+## Common commands
+
+Policy guards:
 
 ```bash
-./scripts/install-m1.sh          # resume from last checkpoint
-./scripts/install-m1.sh --fresh  # wipe checkpoints and start over
+cd plugins/rr-policy-guards/tools/<emoji|bash|brew|tofu>-guard
+go test ./...
+go build -o ../../bin/rr-<name>-guard .
 ```
 
-The installer is checkpointed (uses `~/.rational-reserve/m1-progress/*.done` files). It runs these tasks in order:
-
-0. Build and register policy guard hooks (emoji-guard, bash-guard, brew-guard)
-1. Install yarn if missing
-2. Verify openchoreo-cluster exists and switch kubectl context to it (requires OpenChoreo running at `~/Projects/openchoreo/`)
-3. Install Gitea via helm into the openchoreo-cluster
-4. Port-forward Gitea to localhost:3002
-5. Port-forward OpenChoreo API to localhost:9090
-6. Create demo repo in Gitea with catalog-info.yaml
-7. Scaffold Backstage and wire to Gitea
-8. Start Backstage on localhost:3000
-
-### Teardown
+score2openchoreo:
 
 ```bash
-./scripts/teardown-m1.sh
+cd tools/score2openchoreo
+go test ./...
+go build -o bin/score2openchoreo .
 ```
 
-Stops all services, deletes the k3d cluster, removes credentials. Preserves source code and audit logs.
+Gatekeeper policies:
 
-### Services (when running)
+```bash
+opa test --v0-compatible policies/*.rego -v
+```
 
-| Service | URL | Notes |
-|---------|-----|-------|
-| Backstage | http://localhost:3000 | Frontend + backend on host |
-| Gitea | http://localhost:3002 | Git hosting, admin: gitea_admin |
-| OpenChoreo API | http://localhost:9090 | Port-forwarded from openchoreo-cluster |
-| k3d cluster | -- | Name: openchoreo-cluster (shared with ~/Projects/openchoreo/) |
-
-### Backstage Development
+Backstage:
 
 ```bash
 cd backstage
 yarn install
-yarn start          # starts on localhost:3000 with hot-reload
+yarn dev
+yarn tsc
+yarn test
+yarn lint
+yarn test:e2e
 ```
 
-### Policy Guards
-
-All three guards are Go binaries in `plugins/rr-policy-guards/bin/`:
-
-- **rr-emoji-guard** -- blocks non-ASCII in file writes (Write/Edit/MultiEdit)
-- **rr-bash-guard** -- blocks bare $VAR expansion, suggests safe syntax
-- **rr-brew-guard** -- blocks dangerous brew flags, URL installs, untrusted taps
-
-To build and test:
+Lifecycle scripts:
 
 ```bash
-cd plugins/rr-policy-guards/tools/<guard>
-go test ./...
-go build -o ../../bin/<guard> .
+./scripts/install-m1.sh
+./scripts/install-m1.sh --fresh
+./scripts/teardown-m1.sh
+
+./scripts/install-m2.sh
+./scripts/smoke-m2.sh
+./scripts/teardown-m2.sh
 ```
 
-## Development Conventions
+## Architecture notes
 
-1. **Plain ASCII in all files.** Absolute rule. No emojis, em dashes, smart quotes, box-drawing characters, or any non-ASCII byte. The emoji-guard hook enforces this at PreToolUse time (exit 2 on violation).
-2. **Deterministic / compiled languages preferred.** Use Go for new tools, scripts, hooks, and services. Use interpreted languages only when the ecosystem forces it (e.g., Backstage is TypeScript).
-3. **Three-document plan format.** Before any non-trivial implementation, produce: Requirements Document, Design Specification, Technical Specification. Then an Implementation Plan (TDD bite-sized tasks) after user approval.
-4. **TDD practices.** Policy guards include both unit tests (table-driven) and integration tests. All tests must pass before a binary is considered ready.
-5. **Checkpointed installs.** The `install-m1.sh` script uses progress files so it can be interrupted and resumed. Use `--fresh` to start over.
-6. **No non-ASCII characters.** Use `--` for em dashes, `->` for arrows, straight quotes, and write words instead of symbols for check marks or cross marks.
+The locked-in Integration and Delivery stack is:
 
-## M1-M7 Roadmap
+**Gitea + Backstage Software Catalog and Score + OpenTofu + Gitea Actions +
+an OCI registry**
 
-| Milestone | Scope |
-|-----------|-------|
-| M1 | Substrate -- k3d + OpenChoreo + Gitea + Backstage skeleton |
-| M2 | IaC + CD loop -- OpenTofu, Gitea Actions, Argo-style GitOps, Score templates, Infracost |
-| M3 | Observability -- OpenTelemetry Collector, SigNoz, instrumentation |
-| M4 | Cost + mesh -- OpenCost, Cilium, Envoy Gateway |
-| M5 | Messaging -- RabbitMQ or Kafka with OpenResty front-door |
-| M6 | Security suite -- OPA/Gatekeeper, MISP, TheHive + Cortex + Velociraptor, Cloud Custodian |
-| M7 | Agent integration -- Backstage MCP plugin, RR <-> OpenChoreo wiring, per-agent Gitea tokens |
+The implemented M2 image path uses the dedicated in-cluster `local-registry`
+module so the runner and k3s containerd can push and pull over stable
+cluster-local HTTP endpoints.
 
-## User's Locked-in Tool Choices
+M2 also uses Flux for cluster add-on drift correction and OPA/Gatekeeper for
+pipeline-scoped constraints. OpenChoreo remains the workload deployer.
 
-- **Observability:** OpenTelemetry + SigNoz + (Infracost + OpenCost + Cloud Custodian)
-- **Dev Control Plane:** VS Code/Cursor + named agents + OpenChoreo
-- **Integration & Delivery:** Gitea + Backstage Catalog & Score + OpenTofu + Gitea Actions + Gitea OCI Registry
-- **Platform Orchestration:** OpenChoreo + Cilium & Envoy Gateway + (RabbitMQ/Kafka + OpenResty)
-- **Security:** OpenChoreo via Backstage + Cilium & Envoy Gateway
-- **SOC stack (M6):** TheHive + Cortex + Velociraptor
+The M2 developer path is:
 
-## Important Notes
+1. Push to `openchoreo/hello-m2`.
+2. Gitea Actions runner executes `.gitea/workflows/ci.yaml`.
+3. CI validates Score, runs plan/cost checks, builds and pushes the image.
+4. `score2openchoreo` renders OpenChoreo resources.
+5. CI commits rendered YAML to `openchoreo/platform-config`.
+6. Flux applies platform-config.
+7. OpenChoreo reconciles to ComponentRelease, Deployment, and Pod.
 
-- **Docker daemon:** Provided by Colima at `~/.colima/default/docker.sock`. Docker Desktop is NOT installed.
-- **Helm:** User uses helm v3 (3.20.1). Helm v4 is installed but not on PATH.
-- **Backstage runs on host** (not in cluster) during M1 to preserve hot-reload. Containerization deferred to a later milestone.
-- **OpenChoreo cluster:** M1 uses the existing `openchoreo-cluster` from `~/Projects/openchoreo/`. It does NOT create its own cluster. Teardown does not delete it.
-- **yarn version:** 4.4.1 via Corepack (packageManager field in package.json).
-- **Node versions:** 22 or 24 (specified in backstage/package.json engines).
+## Current known stale item
+
+The local `origin` remote historically pointed at `localhost:3002`. Gitea now
+runs through the 3333 port-forward. Prefer:
+
+```bash
+git remote set-url origin http://localhost:3333/openchoreo/developer-portal.git
+```

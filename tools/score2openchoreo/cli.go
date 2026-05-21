@@ -22,8 +22,8 @@ func parseFlags(args []string) (CLIOptions, error) {
 	var o CLIOptions
 	fs.StringVar(&o.Input, "input", "", "path to score.yaml (default: stdin)")
 	fs.StringVar(&o.Environment, "environment", "", "target OpenChoreo environment (dev|staging)")
-	fs.StringVar(&o.Namespace, "namespace", "openchoreo-data-plane", "target namespace")
-	fs.StringVar(&o.Project, "project", "openchoreo", "OpenChoreo project name")
+	fs.StringVar(&o.Namespace, "namespace", "default", "OpenChoreo project namespace")
+	fs.StringVar(&o.Project, "project", "default", "OpenChoreo project name")
 	fs.StringVar(&o.Image, "image", "", "override container image reference")
 	fs.BoolVar(&o.ValidateOnly, "validate-only", false, "validate schema and exit without emitting output")
 	if err := fs.Parse(args); err != nil {

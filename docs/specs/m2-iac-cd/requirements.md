@@ -18,7 +18,7 @@ This document captures what M2 must do. It does not describe how -- that is the 
 
 M1 shipped the substrate: a k3d cluster with OpenChoreo (control, data, observability, and workflow planes), Gitea, cert-manager, external-secrets, openbao, Argo Workflows (OpenChoreo-internal), and a Backstage skeleton. All pods reach `Ready`. The three M1 spec documents and the `rr-policy-guards` plugin are in place. The `emoji-guard`, `bash-guard`, and `brew-guard` hooks are registered.
 
-M2 extends that substrate with an end-to-end IaC + CD loop. Per the user's locked-in tool list, the Integration and Delivery stack is: **Gitea + Backstage Software Catalog and Score + OpenTofu + Gitea Actions + Gitea OCI Registry**. Flux was added on 2026-04-20 as the GitOps controller for cluster add-ons drift correction; the canonical tool list should be updated to reflect it when this spec is approved. Infracost is cross-cutting -- the user's list categorizes it under Observability (stacked with OpenCost and Cloud Custodian), but its M2 use is pre-deploy cost estimation in the Gitea Actions PR gate. Its post-deploy dashboards land in M3/M4.
+M2 extends that substrate with an end-to-end IaC + CD loop. Per the user's locked-in tool list, the Integration and Delivery stack is: **Gitea + Backstage Software Catalog and Score + OpenTofu + Gitea Actions + an in-cluster OCI registry**. The initial draft named Gitea's OCI package registry, but the implemented M2 image path uses the dedicated `local-registry` module so both Gitea Actions and k3s containerd can push/pull over stable in-cluster HTTP endpoints. Flux was added on 2026-04-20 as the GitOps controller for cluster add-ons drift correction; the canonical tool list should be updated to reflect it when this spec is approved. Infracost is cross-cutting -- the user's list categorizes it under Observability (stacked with OpenCost and Cloud Custodian), but its M2 use is pre-deploy cost estimation in the Gitea Actions PR gate. Its post-deploy dashboards land in M3/M4.
 
 OPA/Gatekeeper is pulled forward from M6 for a narrow set of pipeline-scoped constraints. The broader runtime policy surface stays M6.
 
@@ -61,7 +61,7 @@ OPA/Gatekeeper is pulled forward from M6 for a narrow set of pipeline-scoped con
 ### 4.4 Score and score2openchoreo
 
 - **FR-15** Application authors SHALL describe workloads using Score (`score.yaml`), not directly in OpenChoreo Component YAML.
-- **FR-16** A small converter binary named `score2openchoreo` SHALL be written in Go, with stdlib-only dependencies except for a pinned Score schema library, and SHALL take a `score.yaml` file on input and emit an OpenChoreo `Component` CRD manifest on stdout.
+- **FR-16** A small converter binary named `score2openchoreo` SHALL be written in Go, with stdlib-only dependencies except for a pinned Score schema library, and SHALL take a `score.yaml` file on input and emit OpenChoreo `Component` and `Workload` CRD manifests on stdout.
 - **FR-17** The converter SHALL support, at minimum: container image reference, container resource requests (cpu and memory), container ports, environment variables, and at least one workload-scoped secret sourced via external-secrets from openbao.
 - **FR-18** A workload author SHALL NOT need to read OpenChoreo CRD schemas to ship a workload. Score is the authoring surface.
 
@@ -93,16 +93,16 @@ OPA/Gatekeeper is pulled forward from M6 for a narrow set of pipeline-scoped con
 
 - **FR-31** Three Gitea repositories SHALL exist after M2 install:
   - `platform-addons` -- watched by Flux, contains Kustomization for cluster add-ons
-  - `platform-config` -- watched by OpenChoreo, contains rendered Component manifests per environment
+  - `platform-config` -- watched by OpenChoreo, contains rendered OpenChoreo manifests per environment
   - `hello-m2` -- the demo application repo used to validate the M2 pipeline end to end
 - **FR-32** `platform-addons` and `platform-config` SHALL be owned by an `openchoreo` Gitea organization, not by `gitea_admin`.
 - **FR-33** A Gitea webhook or poll-based sync SHALL fire a CI workflow on push to any of the three M2 repos.
 
-### 4.9 Gitea OCI Registry
+### 4.9 Local OCI Registry
 
-- **FR-34** The Gitea OCI package registry SHALL be used to store container images built from the demo application.
-- **FR-35** A Gitea Actions workflow SHALL build, tag (git SHA), and push the demo image to Gitea's OCI registry on merge to `main`.
-- **FR-36** OpenChoreo Component manifests in `platform-config` SHALL reference images by `gitea.gitea.svc.cluster.local:3000/openchoreo/hello-m2:<sha>` (cluster-internal form) and SHALL NOT pull from external registries for M2.
+- **FR-34** The in-cluster `local-registry` SHALL be used to store container images built from the demo application.
+- **FR-35** A Gitea Actions workflow SHALL build, tag (git SHA), and push the demo image to the local registry on merge to `main`.
+- **FR-36** OpenChoreo manifests in `platform-config` SHALL reference images by `registry.local-registry.svc.cluster.local:5000/hello-m2:<sha>` (cluster-internal form) and SHALL NOT pull from external registries for M2.
 
 ### 4.10 openbao integration
 
@@ -199,7 +199,7 @@ M2 is complete when **all** of the following are true:
 - [ ] `kubectl get pods -n gatekeeper-system` shows all Ready
 - [ ] `kubectl get constrainttemplates` lists the three C-1/C-2/C-3 templates; `kubectl get constraints` lists three constraints; audit shows them Ready
 - [ ] `kubectl get pods -n gitea-runners` shows the runner Ready and registered against Gitea
-- [ ] A push to `hello-m2`'s `main` triggers a pipeline that: checks out, validates Score, runs `tofu plan`, runs Infracost, posts the Infracost comment, builds the image, pushes to Gitea OCI registry, renders an OpenChoreo Component, commits to `platform-config`
+- [ ] A push to `hello-m2`'s `main` triggers a pipeline that: checks out, validates Score, runs `tofu plan`, runs Infracost, posts the Infracost comment, builds the image, pushes to local-registry, renders OpenChoreo resources, commits to `platform-config`
 - [ ] A merged PR on `platform-config` that moves `hello-m2` from `dev` to `staging` results in a `hello-m2` Deployment running in the `staging` OpenChoreo Environment
 - [ ] Backstage shows `hello-m2` with links to Gitea repo, Gitea Actions last run, and the Infracost artifact
 - [ ] `scripts/smoke-m2.sh` exits 0
@@ -241,11 +241,11 @@ M2 is complete when **all** of the following are true:
 - **IaC** -- Infrastructure as Code (OpenTofu in this project)
 - **CD loop** -- Continuous Delivery loop: commit -> CI -> cost/policy gate -> merge -> render -> deploy
 - **Score** -- ScoreSpec workload specification language used as the authoring surface for workloads
-- **score2openchoreo** -- Go converter this milestone introduces; reads Score and emits OpenChoreo Component CRDs
+- **score2openchoreo** -- Go converter this milestone introduces; reads Score and emits OpenChoreo Component and Workload CRDs
 - **Flux** -- GitOps controller used in M2 only for cluster add-ons drift correction
 - **Gatekeeper** -- The OPA-based admission controller; in M2 used only for pipeline-scoped constraints
 - **platform-addons** -- Gitea repo Flux watches
-- **platform-config** -- Gitea repo OpenChoreo watches (rendered Components)
+- **platform-config** -- Gitea repo OpenChoreo watches (rendered OpenChoreo resources)
 - **hello-m2** -- the demo application repo used to prove the pipeline end to end
 - **Environment** -- OpenChoreo's first-class concept for isolated deployment targets; in M2 these are `dev` and `staging`
 - **rr-tofu-guard** -- the new PreToolUse hook this milestone introduces to block direct `tofu apply`

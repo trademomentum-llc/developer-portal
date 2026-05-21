@@ -2,23 +2,28 @@
 
 > Action list ordered by priority and dependency.
 
-**Snapshot date:** 2026-05-02
+**Snapshot date:** 2026-05-17
 
 ---
 
 ## M2 IaC + CD Loop -- where we actually are
 
-M2 is **architecturally validated end-to-end** through Pod creation, but **score2openchoreo's output model is wrong for the real OpenChoreo CRDs** and the **k3d cluster does not trust the in-cluster local-registry** for image pulls. Both are scoped, well-understood follow-ups (see m2-renderer-rewrite and m2i-7 below).
+M2 is **architecturally validated end-to-end** through Pod creation, and the two major follow-ups from 2026-05-02 are now implemented locally:
 
-What was proved this session (2026-05-02): a push to `openchoreo/hello-m2` triggers CI, CI builds + pushes image, CI renders + commits the Component to `platform-config/environments/dev/`, **Flux pulls platform-config**, **Flux applies the (manually-corrected) Component+Workload+Project triplet**, **OpenChoreo creates a ComponentRelease, then a Deployment, then a Pod** in an auto-named per-environment data-plane namespace (`dp-default-default-development-<hash>`). The Pod cannot pull its image (k3d/containerd registry trust gap), but everything upstream of that works.
+- `score2openchoreo` now renders schema-valid OpenChoreo `Component` + `Workload` multi-document YAML.
+- k3d/containerd registry trust is configured through a NodePort-backed local registry mirror.
+
+Remaining closeout is a fresh `hello-m2` CI run so the new renderer output is committed by automation and the expected image tag is pushed into the local registry. The existing live pod still uses the old `dc407cc` tag and now fails with `not found`, which means registry resolution is working but that stale image tag is absent.
+
+What was proved on 2026-05-02: a push to `openchoreo/hello-m2` triggers CI, CI builds + pushes image, CI renders + commits the Component to `platform-config/environments/dev/`, **Flux pulls platform-config**, **Flux applies the (manually-corrected) Component+Workload+Project triplet**, **OpenChoreo creates a ComponentRelease, then a Deployment, then a Pod** in an auto-named per-environment data-plane namespace (`dp-default-default-development-<hash>`). On 2026-05-17, the renderer output and registry-trust configuration were fixed; the next proof point is a fresh CI run.
 
 ### Outstanding M2 work
 
 | Task | Status | Notes |
 |------|--------|-------|
 | T21 install-m2.sh end-to-end | DONE 2026-05-02 | Cluster healthy with all M2 namespaces; tofu apply ran successfully; m2i-1..m2i-6 closed |
-| T22 first pipeline run on hello-m2 | PARTIAL 2026-05-02 | Run #17 (sha dc407cc) completed CI in ~88s; chain validated through Pod creation; pod blocked on image pull (m2i-7) |
-| Score2openchoreo renderer rewrite | OPEN -- next session | See m2-renderer-rewrite below; ~2-4 hours of focused work |
+| T22 first pipeline run on hello-m2 | PARTIAL 2026-05-17 | Chain validated through Pod creation. Needs fresh CI run after renderer rewrite + registry trust so the image tag exists and the pod can run |
+| Score2openchoreo renderer rewrite | DONE 2026-05-17 | Emits Component + Workload multi-doc YAML; Go tests, score smoke, and live server-side dry-run passed |
 | Push 42b2231 to gitea-com | DONE 2026-05-02 | Pushed via one-shot ephemeral PAT; PAT then revoked by operator |
 | Push to local Gitea origin | DEFERRED | origin URL is stale (`localhost:3002`); update to 3333 and push when next convenient |
 
@@ -34,13 +39,15 @@ What was proved this session (2026-05-02): a push to `openchoreo/hello-m2` trigg
 | m2i-4 | ExternalSecret cache misses under cluster pressure | **DONE** (resolved with m2i-2) |
 | m2i-5 | Deprecated `k3d-m1-substrate` cluster | **DONE** -- archive memory: torn down |
 | m2i-6 | OpenBao dev-mode `inmem` storage loses kv on restart | **OPEN, low-priority** -- production-readiness item, not M2 closeout |
-| **m2i-7** | **k3d/containerd does not trust in-cluster local-registry** | **NEW 2026-05-02** -- pods get ImagePullBackOff: containerd resolves `registry.local-registry.svc.cluster.local` via host DNS (not cluster DNS) and defaults to HTTPS on a HTTP-only registry. Fix: add `/etc/rancher/k3s/registries.yaml` mirror entry on k3d node OR expose registry via NodePort/hostPort. Affects install-m1.sh / cluster bootstrap, not M2 codebase |
+| **m2i-7** | **k3d/containerd does not trust in-cluster local-registry** | **DONE 2026-05-17** -- `scripts/install-m1.sh` writes `/etc/rancher/k3s/registries.yaml`; local-registry Service is NodePort `30082`; k3s mirror maps `registry.local-registry.svc.cluster.local:5000` to `http://127.0.0.1:30082`. Current pod pull error is now `not found` for old tag `dc407cc`, not DNS/HTTPS trust |
 
 ---
 
 ## m2-renderer-rewrite -- the score2openchoreo redesign
 
-**Why:** the current `tools/score2openchoreo/convert.go` emits a single Component CRD with `spec.workloadTemplate`, `spec.environment`, and `spec.owner.project`. The actual `openchoreo.dev/v1alpha1/Component` schema rejects all three -- it expects `spec.componentType` (a ref to a ClusterComponentType like `deployment/service`), `spec.owner.projectName`, and stores the workload definition in a separate `Workload` CRD. The renderer was written against an outdated conception of Component.
+**Status:** DONE 2026-05-17.
+
+**Why it mattered:** the old `tools/score2openchoreo/convert.go` emitted a single Component CRD with `spec.workloadTemplate`, `spec.environment`, and `spec.owner.project`. The actual `openchoreo.dev/v1alpha1/Component` schema rejects all three -- it expects `spec.componentType` (a ref to a ClusterComponentType like `deployment/service`), `spec.owner.projectName`, and stores the workload definition in a separate `Workload` CRD. The renderer was written against an outdated conception of Component.
 
 **Reference shape** (validated by hand this session against the cluster's CRD schema):
 
@@ -64,18 +71,25 @@ spec:
     env: [{key, value | valueFrom.secretKeyRef}]
 ```
 
-**Required work (Path B, next session):**
+**Completion evidence:**
+
+- `go test ./...` passed in `tools/score2openchoreo`.
+- `go build -o bin/score2openchoreo .` passed.
+- `./scripts/smoke-score.sh` passed.
+- `kubectl --context k3d-openchoreo apply --dry-run=server -f /private/tmp/hello-m2-rendered.yaml` accepted the generated `Component` and `Workload`.
+
+**Completed work:**
 
 | ID | Item |
 |---|---|
-| score-6a | Replace types.go with `Component`, `Workload`, optional `Project`, optional `SecretReference` shapes matching openchoreo.dev/v1alpha1 |
-| score-6b | Convert function returns a list of resources (multi-document YAML), not a single Component |
-| score-6c | Decide componentType inference: heuristic from Score (e.g., `service.ports` -> `deployment/service`, no ports -> `worker`) OR a `pipeline.m2/component-type` annotation in score.yaml |
-| score-6d | Namespace strategy: emit Components in same namespace as Project (currently `default` per cluster install). Drop `--namespace openchoreo-data-plane` flag or repurpose it |
-| score-6e | Rewrite golden fixtures (minimal, with-secret) to multi-document YAML |
-| score-6f | Update convert_test, schema_test, main_test for new shape |
-| score-6g | Document the new conversion conventions in README; update technical-specification.md |
-| score-6h | Update CI workflow (hello-m2/.gitea/workflows/ci.yaml) if `--namespace` flag drops |
+| score-6a | DONE -- types now include Component, Workload, optional Project, and optional SecretReference shapes matching openchoreo.dev/v1alpha1 |
+| score-6b | DONE -- Convert returns `[]OpenChoreoResource` and CLI writes multi-document YAML |
+| score-6c | DONE -- heuristic: Score service ports -> `deployment/service`, otherwise `deployment/worker`; `pipeline.m2/component-type` annotation overrides |
+| score-6d | DONE -- default namespace and project are `default`, matching the local cluster Project and DeploymentPipeline |
+| score-6e | DONE -- golden fixtures are multi-document YAML |
+| score-6f | DONE -- convert and CLI/golden tests updated for new shape |
+| score-6g | DONE -- README and M2 specs updated in the M2 closeout commit |
+| score-6h | DONE -- hello-m2 CI render step no longer passes stale namespace/project flags |
 
 ---
 
@@ -85,6 +99,8 @@ spec:
 |---|---|---|
 | Track CLAUDE.md, document Gitea port migration in plan | a99d97e | 2026-05-02 |
 | **Complete CRD-group migration: score2openchoreo + gatekeeper + flux platform-config watch** | **42b2231** | **2026-05-02** |
+| Implement score2openchoreo Component+Workload renderer rewrite | M2 closeout commit | 2026-05-17 |
+| Implement k3d/containerd local-registry trust via NodePort mirror | M2 closeout commit | 2026-05-17 |
 
 ---
 

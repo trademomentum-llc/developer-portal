@@ -61,10 +61,10 @@ dev pushes to hello-m2 (PR)
         -> tofu plan on iac/ (no-op unless IaC changed)
         -> Infracost breakdown, comment to PR
         -> Gatekeeper pipeline constraints evaluated
-        -> build image, tag sha, push to Gitea OCI registry (build only; push on merge)
+        -> build image, tag sha, push to local-registry (build only; push on merge)
     (merge)
     -> CI on main:
-        -> render Component via score2openchoreo
+        -> render OpenChoreo resources via score2openchoreo
         -> commit rendered manifest to platform-config repo (dev environment)
         -> OpenChoreo reconciles, hello-m2 starts in dev namespace
 
@@ -93,7 +93,7 @@ M2 has eight components, each with a single clearly-owned responsibility. Six ar
 | **rr-tofu-guard** | Block direct `tofu apply` from Bash tool use | PreToolUse hook on host | **Go** | yes |
 | **Seeded Gitea repos** | `platform-addons`, `platform-config`, `hello-m2` | In Gitea (from M1) | -- | yes (content) |
 
-Reused unchanged from M1: Gitea (repos and OCI registry), openbao (state and secrets), external-secrets (materializer), OpenChoreo (workload reconciler), Backstage (catalog surfacer).
+Reused unchanged from M1: Gitea (repos), openbao (state and secrets), external-secrets (materializer), OpenChoreo (workload reconciler), Backstage (catalog surfacer), and the dedicated in-cluster local registry for M2 image storage.
 
 No component owns another component's responsibilities. Communication happens only via published APIs: OpenTofu reads and writes Kubernetes and Helm via their providers; Flux watches git via Gitea's HTTPS git protocol; the runner calls Gitea's REST API; score2openchoreo reads YAML on stdin and emits YAML on stdout; the tofu-guard reads JSON on stdin per Claude Code's PreToolUse contract.
 
@@ -129,7 +129,7 @@ Three options were considered to get Score input into OpenChoreo's Component mod
 
 1. **Teach OpenChoreo to accept Score directly.** Would require an upstream contribution to OpenChoreo -- weeks of review, potential rejection, and creates a fork risk. Out of scope for M2.
 2. **Use `score-k8s` and render raw Deployments and Services.** Bypasses OpenChoreo entirely. Contradicts M1.
-3. **Write `score2openchoreo` as a small Go converter** (chosen). Reads Score on stdin, emits an OpenChoreo Component YAML on stdout. ~200 to 400 lines of Go. Runs in CI as a step. No changes to OpenChoreo.
+3. **Write `score2openchoreo` as a small Go converter** (chosen). Reads Score on stdin, emits OpenChoreo Component and Workload YAML on stdout. Runs in CI as a step. No changes to OpenChoreo.
 
 The converter is the bridge between the authoring surface (Score, per the user's locked-in tool list) and the orchestrator surface (OpenChoreo). It has one job and can be tested exhaustively against fixture Score files.
 
@@ -265,11 +265,11 @@ Gitea Actions workflow on main branch
     |
     +-- build + push image
     |     +-- image tag = git short SHA
-    |     +-- push target = gitea.gitea.svc.cluster.local:3000/openchoreo/hello-m2:<sha>
+    |     +-- push target = registry.local-registry.svc.cluster.local:5000/hello-m2:<sha>
     |
-    +-- render OpenChoreo Component via score2openchoreo
+    +-- render OpenChoreo Component + Workload via score2openchoreo
     |     +-- input: score.yaml
-    |     +-- output: Component YAML with image ref pinned to :<sha>
+    |     +-- output: multi-document YAML with image ref pinned to :<sha>
     |
     +-- clone platform-config
     |     +-- write rendered YAML to environments/dev/hello-m2.yaml
@@ -277,7 +277,7 @@ Gitea Actions workflow on main branch
     |     +-- push via runner's service-account token (sourced from openbao)
     |
     +-- OpenChoreo controller sees the platform-config change
-          +-- reconciles Component into Deployment + Service in dev namespace
+          +-- reconciles Component + Workload into Deployment + Service in dev namespace
 ```
 
 ### 5.4 Promotion flow (dev -> staging)
@@ -296,7 +296,7 @@ PR diff: environments/staging/hello-m2.yaml now points to the same image SHA as 
     |
     v
 OpenChoreo controller sees the platform-config change
-    +-- reconciles Component into Deployment + Service in staging namespace
+    +-- reconciles Component + Workload into Deployment + Service in staging namespace
     +-- dev remains running at whatever SHA was last promoted to dev
 ```
 
@@ -383,10 +383,12 @@ Exact contents of every file are the Technical Specification's job.
 ### 7.1 score2openchoreo CLI
 
 - **Input:** a Score YAML document on stdin. Alternately, `score2openchoreo --input path/to/score.yaml`.
-- **Output:** an OpenChoreo `Component` CRD manifest on stdout.
+- **Output:** OpenChoreo `Component` and `Workload` CRD manifests as a multi-document YAML stream on stdout.
 - **Exit codes:** 0 on success, 1 on Score validation failure (with error on stderr), 2 on output encoding failure.
 - **Flags:**
-  - `--environment <name>` -- sets metadata.labels to pin the emitted Component to an Environment
+  - `--environment <name>` -- required; used for environment resource substitution
+  - `--namespace <name>` -- OpenChoreo Project namespace; defaults to `default`
+  - `--project <name>` -- OpenChoreo Project name; defaults to `default`
   - `--image <ref>` -- overrides the Score container image reference (used in CI to pin to git SHA)
   - `--validate-only` -- run Score schema validation and exit without emitting output
 
@@ -427,7 +429,7 @@ OpenTofu state lives separately, in a Kubernetes Secret managed by the native `k
 | Flux cannot pull from Gitea | Kustomization condition NotReady | `flux events` shows auth error; operator rotates the Flux deploy key |
 | Gatekeeper ConstraintTemplate fails to compile | Template object has status not Ready | install-m2.sh detects and fails loudly; no Constraint is created |
 | Gitea Actions runner cannot register | runner pod crashloops | runner logs show token error; operator verifies openbao path and external-secrets sync |
-| score2openchoreo emits invalid Component YAML | OpenChoreo controller rejects the manifest in platform-config | OpenChoreo status shows validation error; CI pipeline Red on the next run because Component is not Ready |
+| score2openchoreo emits invalid OpenChoreo YAML | OpenChoreo controller rejects the manifest in platform-config | OpenChoreo status shows validation error; CI pipeline Red on the next run because Component or Workload is not Ready |
 | Infracost run fails (offline or token error) | PR comment missing | runner marks the workflow yellow but does not block merge; operator decides case by case |
 | openbao unsealed but network partition to runner | runner pod crashloops fetching secrets | external-secrets logs show timeout; operator restarts runner pod after network restored |
 | tofu plan differs from applied state outside CI | no automatic alert in M2 | caught on next `tofu plan` in CI; M3 will add drift alerting |

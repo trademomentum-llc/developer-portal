@@ -1,5 +1,5 @@
 // Package main: score2openchoreo shared types. Score input and OpenChoreo
-// Component output structs. No I/O.
+// output structs. No I/O.
 package main
 
 type ScoreDocument struct {
@@ -50,6 +50,8 @@ type ScorePort struct {
 	Protocol   string `yaml:"protocol,omitempty"`
 }
 
+type OpenChoreoResource any
+
 type OpenChoreoComponent struct {
 	APIVersion string            `yaml:"apiVersion"`
 	Kind       string            `yaml:"kind"`
@@ -64,27 +66,47 @@ type ComponentMetadata struct {
 }
 
 type ComponentSpec struct {
-	WorkloadTemplate WorkloadTemplate `yaml:"workloadTemplate"`
-	Environment      string           `yaml:"environment"`
-	Owner            ComponentOwner   `yaml:"owner"`
+	Owner         ComponentOwner   `yaml:"owner"`
+	AutoDeploy    bool             `yaml:"autoDeploy,omitempty"`
+	ComponentType ComponentTypeRef `yaml:"componentType"`
 }
 
-type WorkloadTemplate struct {
-	Containers []ContainerSpec `yaml:"containers"`
-	Ports      []PortSpec      `yaml:"ports,omitempty"`
+type ComponentOwner struct {
+	ProjectName string `yaml:"projectName"`
 }
 
-type ContainerSpec struct {
-	Name      string                  `yaml:"name"`
-	Image     string                  `yaml:"image"`
-	Command   []string                `yaml:"command,omitempty"`
-	Args      []string                `yaml:"args,omitempty"`
-	Env       []EnvVarSpec            `yaml:"env,omitempty"`
-	Resources *ContainerResourcesSpec `yaml:"resources,omitempty"`
+type ComponentTypeRef struct {
+	Kind string `yaml:"kind"`
+	Name string `yaml:"name"`
+}
+
+type OpenChoreoWorkload struct {
+	APIVersion string            `yaml:"apiVersion"`
+	Kind       string            `yaml:"kind"`
+	Metadata   ComponentMetadata `yaml:"metadata"`
+	Spec       WorkloadSpec      `yaml:"spec"`
+}
+
+type WorkloadSpec struct {
+	Owner     WorkloadOwner               `yaml:"owner"`
+	Endpoints map[string]WorkloadEndpoint `yaml:"endpoints,omitempty"`
+	Container WorkloadContainer           `yaml:"container"`
+}
+
+type WorkloadOwner struct {
+	ComponentName string `yaml:"componentName"`
+	ProjectName   string `yaml:"projectName"`
+}
+
+type WorkloadContainer struct {
+	Image   string       `yaml:"image"`
+	Command []string     `yaml:"command,omitempty"`
+	Args    []string     `yaml:"args,omitempty"`
+	Env     []EnvVarSpec `yaml:"env,omitempty"`
 }
 
 type EnvVarSpec struct {
-	Name      string            `yaml:"name"`
+	Key       string            `yaml:"key"`
 	Value     string            `yaml:"value,omitempty"`
 	ValueFrom *EnvVarSourceSpec `yaml:"valueFrom,omitempty"`
 }
@@ -98,23 +120,55 @@ type SecretKeySelectorSpec struct {
 	Key  string `yaml:"key"`
 }
 
-type ContainerResourcesSpec struct {
-	Requests *ResourceQuantitiesSpec `yaml:"requests,omitempty"`
-	Limits   *ResourceQuantitiesSpec `yaml:"limits,omitempty"`
+type WorkloadEndpoint struct {
+	Type       string   `yaml:"type"`
+	Port       int      `yaml:"port"`
+	TargetPort int      `yaml:"targetPort,omitempty"`
+	Visibility []string `yaml:"visibility,omitempty"`
 }
 
-type ResourceQuantitiesSpec struct {
-	CPU    string `yaml:"cpu,omitempty"`
-	Memory string `yaml:"memory,omitempty"`
+type OpenChoreoProject struct {
+	APIVersion string            `yaml:"apiVersion"`
+	Kind       string            `yaml:"kind"`
+	Metadata   ComponentMetadata `yaml:"metadata"`
+	Spec       ProjectSpec       `yaml:"spec"`
 }
 
-type PortSpec struct {
-	Name       string `yaml:"name"`
-	Port       int    `yaml:"port"`
-	TargetPort int    `yaml:"targetPort,omitempty"`
-	Protocol   string `yaml:"protocol,omitempty"`
+type ProjectSpec struct {
+	DeploymentPipelineRef DeploymentPipelineRef `yaml:"deploymentPipelineRef"`
 }
 
-type ComponentOwner struct {
-	Project string `yaml:"project"`
+type DeploymentPipelineRef struct {
+	Name string `yaml:"name"`
+}
+
+type OpenChoreoSecretReference struct {
+	APIVersion string              `yaml:"apiVersion"`
+	Kind       string              `yaml:"kind"`
+	Metadata   ComponentMetadata   `yaml:"metadata"`
+	Spec       SecretReferenceSpec `yaml:"spec"`
+}
+
+type SecretReferenceSpec struct {
+	Template        SecretReferenceTemplate `yaml:"template"`
+	Data            []SecretReferenceData   `yaml:"data"`
+	RefreshInterval string                  `yaml:"refreshInterval,omitempty"`
+}
+
+type SecretReferenceTemplate struct {
+	Type     string             `yaml:"type"`
+	Metadata SecretTemplateMeta `yaml:"metadata,omitempty"`
+}
+
+type SecretTemplateMeta struct {
+	Labels map[string]string `yaml:"labels,omitempty"`
+}
+
+type SecretReferenceData struct {
+	SecretKey string          `yaml:"secretKey"`
+	RemoteRef SecretRemoteRef `yaml:"remoteRef"`
+}
+
+type SecretRemoteRef struct {
+	Key string `yaml:"key"`
 }

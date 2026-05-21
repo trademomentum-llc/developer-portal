@@ -66,8 +66,6 @@ jobs:
           score2openchoreo \
             --input score.yaml \
             --environment dev \
-            --namespace openchoreo-data-plane \
-            --project openchoreo \
             --image registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7} \
             > /tmp/component.yaml
 

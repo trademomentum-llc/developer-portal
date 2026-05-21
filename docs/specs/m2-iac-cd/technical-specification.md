@@ -450,8 +450,8 @@ tools/score2openchoreo/
 +-- main.go             # cobra-less entrypoint -- flag parsing + dispatch
 +-- cli.go              # CLI flag parsing, invocation wiring
 +-- schema.go           # embedded Score JSON schema, validation
-+-- convert.go          # pure conversion from Score struct to Component struct
-+-- types.go            # Go structs for Score input and Component output
++-- convert.go          # pure conversion from Score struct to OpenChoreo resources
++-- types.go            # Go structs for Score input and OpenChoreo output
 +-- convert_test.go     # pure-function conversion tests
 +-- main_test.go        # end-to-end tests: exec the binary, compare stdout to fixture
 +-- fixtures/
@@ -513,7 +513,7 @@ type ScorePort struct {
 }
 
 // OpenChoreoComponent is the subset of OpenChoreo's Component CRD this milestone emits.
-// Field names mirror the OpenChoreo Component v1alpha1 schema.
+// Field names mirror the live openchoreo.dev/v1alpha1 schema.
 type OpenChoreoComponent struct {
     APIVersion string                  `yaml:"apiVersion"`
     Kind       string                  `yaml:"kind"`
@@ -528,59 +528,49 @@ type ComponentMetadata struct {
 }
 
 type ComponentSpec struct {
-    WorkloadTemplate WorkloadTemplate `yaml:"workloadTemplate"`
-    Environment      string           `yaml:"environment"`
-    Owner            ComponentOwner   `yaml:"owner"`
-}
-
-type WorkloadTemplate struct {
-    Containers []ContainerSpec `yaml:"containers"`
-    Ports      []PortSpec      `yaml:"ports,omitempty"`
-}
-
-type ContainerSpec struct {
-    Name      string                  `yaml:"name"`
-    Image     string                  `yaml:"image"`
-    Command   []string                `yaml:"command,omitempty"`
-    Args      []string                `yaml:"args,omitempty"`
-    Env       []EnvVarSpec            `yaml:"env,omitempty"`
-    Resources *ContainerResourcesSpec `yaml:"resources,omitempty"`
-}
-
-type EnvVarSpec struct {
-    Name      string             `yaml:"name"`
-    Value     string             `yaml:"value,omitempty"`
-    ValueFrom *EnvVarSourceSpec  `yaml:"valueFrom,omitempty"`
-}
-
-type EnvVarSourceSpec struct {
-    SecretKeyRef *SecretKeySelectorSpec `yaml:"secretKeyRef,omitempty"`
-}
-
-type SecretKeySelectorSpec struct {
-    Name string `yaml:"name"`
-    Key  string `yaml:"key"`
-}
-
-type ContainerResourcesSpec struct {
-    Requests *ResourceQuantitiesSpec `yaml:"requests,omitempty"`
-    Limits   *ResourceQuantitiesSpec `yaml:"limits,omitempty"`
-}
-
-type ResourceQuantitiesSpec struct {
-    CPU    string `yaml:"cpu,omitempty"`
-    Memory string `yaml:"memory,omitempty"`
-}
-
-type PortSpec struct {
-    Name       string `yaml:"name"`
-    Port       int    `yaml:"port"`
-    TargetPort int    `yaml:"targetPort,omitempty"`
-    Protocol   string `yaml:"protocol,omitempty"`
+    Owner         ComponentOwner  `yaml:"owner"`
+    AutoDeploy    bool            `yaml:"autoDeploy,omitempty"`
+    ComponentType ComponentTypeRef `yaml:"componentType"`
 }
 
 type ComponentOwner struct {
-    Project string `yaml:"project"`
+    ProjectName string `yaml:"projectName"`
+}
+
+type ComponentTypeRef struct {
+    Kind string `yaml:"kind"`
+    Name string `yaml:"name"`
+}
+
+type OpenChoreoWorkload struct {
+    APIVersion string            `yaml:"apiVersion"`
+    Kind       string            `yaml:"kind"`
+    Metadata   ComponentMetadata `yaml:"metadata"`
+    Spec       WorkloadSpec      `yaml:"spec"`
+}
+
+type WorkloadSpec struct {
+    Owner     WorkloadOwner               `yaml:"owner"`
+    Endpoints map[string]WorkloadEndpoint `yaml:"endpoints,omitempty"`
+    Container WorkloadContainer           `yaml:"container"`
+}
+
+type WorkloadOwner struct {
+    ComponentName string `yaml:"componentName"`
+    ProjectName   string `yaml:"projectName"`
+}
+
+type WorkloadContainer struct {
+    Image   string       `yaml:"image"`
+    Command []string     `yaml:"command,omitempty"`
+    Args    []string     `yaml:"args,omitempty"`
+    Env     []EnvVarSpec `yaml:"env,omitempty"`
+}
+
+type EnvVarSpec struct {
+    Key       string             `yaml:"key"`
+    Value     string             `yaml:"value,omitempty"`
+    ValueFrom *EnvVarSourceSpec  `yaml:"valueFrom,omitempty"`
 }
 ```
 
@@ -589,15 +579,15 @@ type ComponentOwner struct {
 ```go
 // convert.go
 
-// Convert takes a validated ScoreDocument and returns an OpenChoreoComponent.
+// Convert takes a validated ScoreDocument and returns OpenChoreo resources.
 // Pure function -- no I/O, no side effects, no mutable globals.
-func Convert(in ScoreDocument, opts ConvertOptions) (OpenChoreoComponent, error)
+func Convert(in ScoreDocument, opts ConvertOptions) ([]OpenChoreoResource, error)
 
 type ConvertOptions struct {
     Environment string // required; `dev` or `staging`
-    Namespace   string // required; OpenChoreo project namespace
+    Namespace   string // required; OpenChoreo project namespace, default "default" in CLI
     ImageRef    string // optional; overrides the Score container image
-    Project     string // required; OpenChoreo project name
+    Project     string // required; OpenChoreo project name, default "default" in CLI
 }
 ```
 
@@ -634,7 +624,7 @@ func main() {
         os.Exit(1)
     }
 
-    comp, err := Convert(doc, ConvertOptions{
+    resources, err := Convert(doc, ConvertOptions{
         Environment: opts.Environment,
         Namespace:   opts.Namespace,
         ImageRef:    opts.Image,
@@ -645,7 +635,7 @@ func main() {
         os.Exit(1)
     }
 
-    out, err := yaml.Marshal(comp)
+    out, err := marshalDocuments(resources)
     if err != nil {
         fmt.Fprintf(os.Stderr, "score2openchoreo: marshal: %s\n", err)
         os.Exit(2)
@@ -681,19 +671,20 @@ The conversion rules are:
 
 | Score field | OpenChoreo field | Notes |
 |---|---|---|
-| `metadata.name` | `metadata.name` | direct copy |
-| `metadata.annotations` | `metadata.labels` | flattened into labels |
-| `containers[<key>].image` | `spec.workloadTemplate.containers[].image` | overridden by `--image` flag |
-| `containers[<key>].command` | `spec.workloadTemplate.containers[].command` | direct copy |
-| `containers[<key>].args` | `spec.workloadTemplate.containers[].args` | direct copy |
-| `containers[<key>].variables` | `spec.workloadTemplate.containers[].env[]` | each entry becomes an EnvVar with `value` set |
-| `containers[<key>].resources.requests` | `spec.workloadTemplate.containers[].resources.requests` | direct copy |
-| `containers[<key>].resources.limits` | `spec.workloadTemplate.containers[].resources.limits` | direct copy |
-| `service.ports` | `spec.workloadTemplate.ports` | converted from map to list, port name = map key |
+| `metadata.name` | Component `metadata.name`, Workload `metadata.name` | Workload name is `<component>-workload` |
+| `metadata.annotations` | Component `metadata.labels` | `pipeline.m2/component-type` is consumed, not copied |
+| `metadata.annotations.pipeline.m2/component-type` | Component `spec.componentType.name` | optional override; default is inferred |
+| `containers[<key>].image` | Workload `spec.container.image` | overridden by `--image` flag |
+| `containers[<key>].command` | Workload `spec.container.command` | direct copy |
+| `containers[<key>].args` | Workload `spec.container.args` | direct copy |
+| `containers[<key>].variables` | Workload `spec.container.env[]` | each entry becomes an EnvVar with `key` and `value` |
+| `service.ports` | Workload `spec.endpoints` | converted from map to endpoint map; default visibility is `external` |
 | `resources[<key>]` where `type: secret` | EnvVar with `valueFrom.secretKeyRef` | see secret binding rules |
 | other `resources[<key>]` | error -- unsupported at M2 | |
 
-Secret binding: a Score `resources.<key>` with `type: secret` produces an ExternalSecret/Secret pair in the target namespace via external-secrets. The converter emits only the Component; the ExternalSecret is provisioned by the `external-secrets-wiring` Tofu module separately at pipeline-run time.
+Component type inference: Score with service ports renders `deployment/service`; Score without service ports renders `deployment/worker`; the `pipeline.m2/component-type` annotation can select another installed ClusterComponentType such as `deployment/web-application`.
+
+Secret binding: a Score `resources.<key>` with `type: secret` references a Kubernetes Secret by `metadata.name` or by the fallback `<resource-key>-secret`. The converter emits Component and Workload resources; the ExternalSecret is provisioned separately by the platform wiring.
 
 ### 5.7 Test strategy
 
@@ -702,7 +693,7 @@ convert_test.go     -- table-driven tests for Convert. Covers: all supported Sco
                        all error cases, idempotency (Convert(Convert(x)) semantic invariants).
 
 main_test.go        -- exec's the binary, pipes fixture Score YAMLs on stdin, compares
-                       stdout to golden Component YAMLs in fixtures/.
+                       stdout to golden multi-document YAMLs in fixtures/.
 
 schema_test.go      -- tests ValidateScore against fixtures including invalid-schema.score.yaml.
 ```
@@ -1216,7 +1207,7 @@ metadata:
     pipeline.m2/owner: openchoreo
 containers:
   web:
-    image: gitea.gitea.svc.cluster.local:3000/openchoreo/hello-m2:latest
+    image: registry.local-registry.svc.cluster.local:5000/hello-m2:latest
     variables:
       ENVIRONMENT: "${resources.env.value}"
       EXAMPLE_SECRET: "${resources.example.password}"
@@ -1325,25 +1316,19 @@ jobs:
 
       - name: Build image
         run: |
-          docker build -t gitea.gitea.svc.cluster.local:3000/openchoreo/hello-m2:${GITHUB_SHA::7} .
+          docker build -t registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7} .
 
       - name: Push image
         if: github.event_name == 'push'
-        run: |
-          echo "$GITEA_TOKEN" | docker login gitea.gitea.svc.cluster.local:3000 -u gitea_admin --password-stdin
-          docker push gitea.gitea.svc.cluster.local:3000/openchoreo/hello-m2:${GITHUB_SHA::7}
-        env:
-          GITEA_TOKEN: ${{ secrets.GITEA_WRITE_TOKEN }}
+        run: docker push registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7}
 
-      - name: Render Component
+      - name: Render OpenChoreo resources
         if: github.event_name == 'push'
         run: |
           ./tools/score2openchoreo/bin/score2openchoreo \
             --input score.yaml \
             --environment dev \
-            --namespace openchoreo-data-plane \
-            --project openchoreo \
-            --image gitea.gitea.svc.cluster.local:3000/openchoreo/hello-m2:${GITHUB_SHA::7} \
+            --image registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7} \
             > /tmp/component.yaml
 
       - name: Commit to platform-config
@@ -1518,8 +1503,9 @@ echo "PASS"
 # scripts/smoke-score.sh
 out=$("$(dirname "$0")/../tools/score2openchoreo/bin/score2openchoreo" \
   --input "$(dirname "$0")/../tools/score2openchoreo/fixtures/minimal.score.yaml" \
-  --environment dev --namespace openchoreo-data-plane --project openchoreo)
-echo "$out" | yq eval '.kind' - | grep -q Component
+  --environment dev)
+echo "$out" | yq eval 'select(document_index == 0) | .kind' - | grep -q Component
+echo "$out" | yq eval 'select(document_index == 1) | .kind' - | grep -q Workload
 echo "PASS"
 ```
 

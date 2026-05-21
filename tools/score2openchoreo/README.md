@@ -1,8 +1,9 @@
 # score2openchoreo
 
-Converts a [Score](https://score.dev) YAML document to an OpenChoreo
-`openchoreo.dev/v1alpha1/Component` CRD. Used by the M2 CI pipeline after
-schema validation, before committing the rendered Component to
+Converts a [Score](https://score.dev) YAML document to OpenChoreo
+`openchoreo.dev/v1alpha1` resources. The renderer emits a `Component` and a
+matching `Workload` as a multi-document YAML stream. Used by the M2 CI pipeline
+after schema validation, before committing the rendered resources to
 `openchoreo/platform-config/environments/<env>/`.
 
 ## Full spec
@@ -68,8 +69,30 @@ already has a different Kubernetes name.
 Only `secret` and `environment` resource types are handled. Any other
 `type:` value fails Convert with an explicit error.
 
+### 4. Component type inference
+
+By default, a Score file with `service.ports` renders an OpenChoreo
+`deployment/service` component. A Score file without service ports renders
+`deployment/worker`.
+
+Override this by setting the `pipeline.m2/component-type` annotation:
+
+```yaml
+metadata:
+  annotations:
+    pipeline.m2/component-type: deployment/web-application
+```
+
+The renderer always references the type as a `ClusterComponentType`.
+
+### 5. Namespace and project defaults
+
+OpenChoreo Components and Workloads must live in the same namespace as their
+Project and DeploymentPipeline. The CLI therefore defaults both `--namespace`
+and `--project` to `default`, matching the local M2 cluster.
+
 ## Determinism
 
-Convert walks containers and variables in sorted key order so that two
-runs over the same Score document produce byte-identical Component output.
-This matters because CI commits the output into a git repo.
+Convert sorts variable and endpoint keys so that two runs over the same Score
+document produce byte-identical output. Multiple Score containers are rejected
+because the current OpenChoreo Workload API models a single container.

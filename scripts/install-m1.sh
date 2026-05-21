@@ -89,6 +89,42 @@ task_2_cluster() {
 }
 
 # ---------------------------------------------------------------------------
+# Task 2a: Configure k3s containerd trust for the M2 local registry
+# ---------------------------------------------------------------------------
+task_2a_registry_trust() {
+    info "task 2a: configuring k3s registry mirror for M2 local-registry"
+
+    local node="k3d-openchoreo-server-0"
+    local registries_yaml
+    registries_yaml='mirrors:
+  "host.k3d.internal:10082":
+    endpoint:
+      - "http://host.k3d.internal:10082"
+  "registry.local-registry.svc.cluster.local:5000":
+    endpoint:
+      - "http://127.0.0.1:30082"
+'
+
+    docker inspect "$node" >/dev/null 2>&1 || fail "$node not found"
+
+    local current
+    current="$(docker exec "$node" sh -c 'cat /etc/rancher/k3s/registries.yaml 2>/dev/null || true')"
+    if [ "$current" = "$registries_yaml" ]; then
+        info "task 2a: registry mirror already configured"
+        return 0
+    fi
+
+    printf '%s' "$registries_yaml" | docker exec -i "$node" sh -c 'mkdir -p /etc/rancher/k3s && cat > /etc/rancher/k3s/registries.yaml' \
+        || fail "failed to write k3s registries.yaml"
+
+    info "task 2a: restarting k3d server so containerd reloads registry mirrors"
+    docker restart "$node" >/dev/null || fail "failed to restart $node"
+    kubectl config use-context k3d-openchoreo >/dev/null || fail "failed to switch context after restart"
+    kubectl wait --for=condition=Ready node --all --timeout=180s || fail "cluster did not become Ready after registry mirror restart"
+    info "task 2a: registry mirror configured"
+}
+
+# ---------------------------------------------------------------------------
 # Task 3: Install Gitea via helm
 # ---------------------------------------------------------------------------
 task_3_gitea() {
@@ -298,6 +334,7 @@ main() {
     task_0_guards
     task_1_yarn
     task_2_cluster
+    task_2a_registry_trust
     task_3_gitea
     task_4_gitea_portforward
     task_5_oc_api_portforward

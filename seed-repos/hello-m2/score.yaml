@@ -5,7 +5,7 @@ metadata:
     pipeline.m2/owner: openchoreo
 containers:
   web:
-    image: gitea.gitea.svc.cluster.local:3000/openchoreo/hello-m2:latest
+    image: registry.local-registry.svc.cluster.local:5000/hello-m2:latest
     variables:
       ENVIRONMENT: "${resources.env.value}"
       EXAMPLE_SECRET: "${resources.example.password}"

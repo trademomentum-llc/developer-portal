@@ -53,11 +53,13 @@ resource "kubernetes_service" "registry" {
     namespace = kubernetes_namespace.local_registry.metadata[0].name
   }
   spec {
+    type     = "NodePort"
     selector = { app = "registry" }
     port {
       name        = "http"
       port        = 5000
       target_port = 5000
+      node_port   = 30082
     }
   }
 }

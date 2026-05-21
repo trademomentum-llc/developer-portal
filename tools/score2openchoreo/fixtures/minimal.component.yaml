@@ -2,12 +2,23 @@ apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
     name: minimal
-    namespace: openchoreo-data-plane
+    namespace: default
 spec:
-    workloadTemplate:
-        containers:
-            - name: web
-              image: registry.example.com/minimal:1
-    environment: dev
     owner:
-        project: openchoreo
+        projectName: default
+    autoDeploy: true
+    componentType:
+        kind: ClusterComponentType
+        name: deployment/worker
+---
+apiVersion: openchoreo.dev/v1alpha1
+kind: Workload
+metadata:
+    name: minimal-workload
+    namespace: default
+spec:
+    owner:
+        componentName: minimal
+        projectName: default
+    container:
+        image: registry.example.com/minimal:1

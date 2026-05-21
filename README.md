@@ -1,6 +1,8 @@
-# Developer Portal -- M1 Substrate
+# Developer Portal -- Internal Developer Platform
 
-Self-hosted Internal Developer Platform (IDP) built on k3d, Gitea, and Backstage. OpenChoreo integration is deferred to M3.
+Self-hosted Internal Developer Platform (IDP) built on k3d, Gitea,
+Backstage, OpenTofu, Flux, Gatekeeper, and OpenChoreo. M1 substrate is
+complete. M2 is validated through OpenChoreo Pod creation and is in closeout.
 
 ## Prerequisites
 
@@ -22,9 +24,9 @@ Resumes from the last completed task. Use `--fresh` to start over.
 | Service | URL | Notes |
 |---------|-----|-------|
 | Backstage | http://localhost:3000 | Frontend + backend |
-| Gitea | http://localhost:3002 | Git hosting, admin: gitea_admin |
-| OpenChoreo API | http://localhost:9090 | Port-forwarded from openchoreo-cluster |
-| k3d cluster | -- | Name: openchoreo-cluster (shared) |
+| Gitea | http://localhost:3333 | Git hosting, admin: gitea_admin |
+| OpenChoreo API | http://localhost:9090 | Port-forwarded from k3d-openchoreo |
+| k3d cluster | -- | Name: k3d-openchoreo (shared) |
 
 ## Teardown
 
@@ -56,11 +58,13 @@ All hooks are Go binaries in `plugins/rr-policy-guards/bin/`.
 M2 lands Flux (cluster add-ons drift correction), Gatekeeper (three pipeline
 constraints), and the Gitea Actions runner. The developer path: push to
 `openchoreo/hello-m2`, CI validates Score, runs `tofu plan` + Infracost,
-builds and pushes the image to Gitea's OCI registry, renders an OpenChoreo
-Component via `score2openchoreo`, and commits it to
+builds and pushes the image to the in-cluster local registry, renders
+OpenChoreo Component and Workload resources via `score2openchoreo`, and
+commits them to
 `openchoreo/platform-config/environments/dev/`. OpenChoreo reconciles the
-Component into a running pod. Promote to staging by committing the same
-Component into `environments/staging/`. All three M2 repos live under the
+Component and Workload into a running pod. Promote to staging by committing
+the same rendered resources into `environments/staging/`. All three M2 repos
+live under the
 Gitea `openchoreo` organization. Run `scripts/install-m2.sh` to set up,
 `scripts/teardown-m2.sh` to remove, `scripts/smoke-m2.sh` to verify.
 Direct `tofu apply` from a Bash tool use is blocked by `rr-tofu-guard`;

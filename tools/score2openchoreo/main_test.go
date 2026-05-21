@@ -41,8 +41,6 @@ func TestGoldenMinimal(t *testing.T) {
 	got, code := runBinary(t, bin,
 		"--input", "fixtures/minimal.score.yaml",
 		"--environment", "dev",
-		"--namespace", "openchoreo-data-plane",
-		"--project", "openchoreo",
 	)
 	if code != 0 {
 		t.Fatalf("exit=%d", code)
@@ -61,8 +59,6 @@ func TestGoldenWithSecret(t *testing.T) {
 	got, code := runBinary(t, bin,
 		"--input", "fixtures/with-secret.score.yaml",
 		"--environment", "dev",
-		"--namespace", "openchoreo-data-plane",
-		"--project", "openchoreo",
 	)
 	if code != 0 {
 		t.Fatalf("exit=%d", code)

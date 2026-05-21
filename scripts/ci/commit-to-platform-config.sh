@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Commit a rendered Component YAML into platform-config/environments/<env>/<app>.yaml
+# Commit rendered OpenChoreo YAML into platform-config/environments/<env>/<app>.yaml
 set -euo pipefail
 
 ENVIRONMENT=$1

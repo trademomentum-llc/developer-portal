@@ -117,11 +117,11 @@ M2 wires a push-to-deploy loop on top of the M1 substrate. The developer path:
 
 1. Push to `openchoreo/hello-m2` (Gitea, org `openchoreo`).
 2. Gitea Actions runner (`act-runner` helm, label `ubuntu-latest`) picks up `.gitea/workflows/ci.yaml`.
-3. CI validates Score YAML against its schema, runs `tofu plan` + Infracost, builds and pushes image to the Gitea OCI registry.
-4. `score2openchoreo` renders an OpenChoreo Component CRD from the Score file (it does NOT emit raw Deployments; that is the locked-in design).
-5. CI commits the rendered Component into `openchoreo/platform-config/environments/dev/`.
-6. OpenChoreo reconciles the Component into a running pod.
-7. Promotion is a commit that copies the same Component into `environments/staging/`.
+3. CI validates Score YAML against its schema, runs `tofu plan` + Infracost, builds and pushes image to the in-cluster local registry.
+4. `score2openchoreo` renders OpenChoreo Component and Workload CRDs from the Score file (it does NOT emit raw Deployments; that is the locked-in design).
+5. CI commits the rendered Component and Workload into `openchoreo/platform-config/environments/dev/`.
+6. OpenChoreo reconciles the Component and Workload into a running pod.
+7. Promotion is a commit that copies the same rendered resources into `environments/staging/`.
 
 Only two OpenChoreo `Environment`s exist in the single k3d cluster: `dev` and `staging`.
 
@@ -134,7 +134,7 @@ Root `iac/main.tf` composes five modules:
 
 ### Locked-in tool list (canonical) vs M2 additions
 
-The user's Integration & Delivery stack is fixed: **Gitea + Backstage Software Catalog & Score + OpenTofu + Gitea Actions + Gitea OCI Registry**. Roadmap tables in `PROJECT_SUMMARY.md` are drafts -- never treat their rows as decided. Two explicit additions for M2 are:
+The user's Integration & Delivery stack is fixed: **Gitea + Backstage Software Catalog & Score + OpenTofu + Gitea Actions + an OCI registry**. Roadmap tables in `PROJECT_SUMMARY.md` are drafts -- never treat their rows as decided. The implemented M2 image path uses the dedicated in-cluster `local-registry` module. Two explicit additions for M2 are:
 - Flux (cluster add-ons drift only; explicit approval 2026-04-20)
 - OPA/Gatekeeper (pipeline-scoped only, pulled forward from M6)
 
@@ -147,13 +147,13 @@ Pre-built content pushed into three Gitea repos under org `openchoreo`:
 - `platform-config/` -- empty `environments/{dev,staging}/` directories that CI commits into.
 - `hello-m2/` -- the demo app: `main.go`, `Dockerfile`, `score.yaml`, `catalog-info.yaml`, `.gitea/workflows/ci.yaml`.
 
-`scripts/seed-gitea-repos.sh` creates the repos; `scripts/push-seed-content.sh` pushes the content; `scripts/delete-m2-gitea-repos.sh` tears them down. Gitea runs at `http://localhost:3002` on the `k3d-openchoreo` cluster (the deprecated `k3d-m1-substrate` cluster should be deleted -- see m2i-5 in TODO.md).
+`scripts/seed-gitea-repos.sh` creates the repos; `scripts/push-seed-content.sh` pushes the content; `scripts/delete-m2-gitea-repos.sh` tears them down. Gitea normally runs at `http://localhost:3333` via port-forward on the `k3d-openchoreo` cluster.
 
 ### Score -> OpenChoreo conversion
 
-`tools/score2openchoreo/` reads a Score YAML and emits an OpenChoreo Component CRD. Layout:
-- `types.go` -- Score and Component shared structs.
-- `convert.go` -- `Convert(doc ScoreDocument, opts ConvertOptions) (Component, error)`; deterministic sort order for multi-container / multi-variable.
+`tools/score2openchoreo/` reads a Score YAML and emits OpenChoreo Component and Workload CRDs as multi-document YAML. Layout:
+- `types.go` -- Score and OpenChoreo resource shared structs.
+- `convert.go` -- `Convert(doc ScoreDocument, opts ConvertOptions) ([]OpenChoreoResource, error)`; deterministic sort order for variables and endpoints.
 - `schema.go` -- `ValidateScore([]byte) error` using the embedded JSON schema in `assets/score.schema.json`.
 - `cli.go` / `main.go` -- flags, stdin/file input, stdout YAML output, `--validate-only` short-circuit.
 - `fixtures/` -- Score inputs (minimal, with-secret, invalid) and golden Component outputs.

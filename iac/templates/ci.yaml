@@ -53,15 +53,11 @@ jobs:
 
       - name: Build image
         run: |
-          docker build -t gitea.gitea.svc.cluster.local:3000/openchoreo/hello-m2:${GITHUB_SHA::7} .
+          docker build -t registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7} .
 
       - name: Push image
         if: github.event_name == 'push'
-        run: |
-          echo "$GITEA_TOKEN" | docker login gitea.gitea.svc.cluster.local:3000 -u gitea_admin --password-stdin
-          docker push gitea.gitea.svc.cluster.local:3000/openchoreo/hello-m2:${GITHUB_SHA::7}
-        env:
-          GITEA_TOKEN: ${{ secrets.GITEA_WRITE_TOKEN }}
+        run: docker push registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7}
 
       - name: Render Component
         if: github.event_name == 'push'
@@ -69,9 +65,7 @@ jobs:
           ./tools/score2openchoreo/bin/score2openchoreo \
             --input score.yaml \
             --environment dev \
-            --namespace openchoreo-data-plane \
-            --project openchoreo \
-            --image gitea.gitea.svc.cluster.local:3000/openchoreo/hello-m2:${GITHUB_SHA::7} \
+            --image registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7} \
             > /tmp/component.yaml
 
       - name: Commit to platform-config

@@ -4,7 +4,7 @@
 > state. For "what to do next" see TODO.md. For "where we stopped and what
 > changed mid-session" see SESSION_HANDOFF.md.
 
-**Snapshot date:** 2026-05-02 (M2 chain validated end-to-end through Pod creation; score2openchoreo renderer rewrite outstanding as Path B)
+**Snapshot date:** 2026-05-17 (score2openchoreo renderer rewrite and k3d local-registry trust implemented locally; fresh hello-m2 CI run still needed)
 
 ---
 
@@ -14,8 +14,8 @@ The user is building a self-hosted Internal Developer Platform (IDP) on
 their local machine, using the Platform Engineering community reference
 architecture in `~/Downloads/platform.pptx` as the blueprint. The platform
 is decomposed into seven milestones (M1 through M7); M1 substrate is
-complete and M2 (IaC + CD loop) is functionally code-complete with the
-two live-execution tasks pending operator action.
+complete and M2 (IaC + CD loop) is functionally code-complete with one
+fresh pipeline validation still pending.
 
 Three projects on disk are involved, in dependency order:
 
@@ -62,24 +62,25 @@ state store all working. Integration into the portal is deferred to M7.
 
 ## 3. developer-portal (current focus)
 
-**Source:** `~/Projects/developer-portal/`. git repository, branch `main`,
-HEAD `42b2231` -- pushed to gitea-com 2026-05-02; local Gitea origin is
-9 commits behind (port-forward URL stale).
+**Source:** `~/Projects/developer-portal/`. git repository, branch `main`.
+The 2026-05-17 M2 closeout work for score2openchoreo and local-registry trust
+is ready to land as the next local commit. Local Gitea origin is behind and
+uses the localhost:3333 port-forward.
 
 **Role:** The umbrella for the full self-hosted IDP build.
 
-**Build status:** M1 substrate complete and healthy. **M2 architecturally
-validated end-to-end through Pod creation as of 2026-05-02.** Push -> CI ->
-render -> commit -> Flux pulls -> Flux applies -> OpenChoreo reconciles ->
-ComponentRelease -> Deployment -> Pod. Pod is currently ImagePullBackOff'd
-on a cluster-bootstrap-level registry trust gap (m2i-7) -- this is platform
-config, not M2 codebase.
+**Build status:** M1 substrate complete and healthy. **M2 is implemented
+through schema-valid renderer output and registry-trust bootstrap.** Push ->
+CI -> render -> commit -> Flux pulls -> Flux applies -> OpenChoreo reconciles
+-> ComponentRelease -> Deployment -> Pod was validated through Pod creation
+on 2026-05-02. On 2026-05-17, the renderer rewrite was validated with Go
+tests, score smoke, and a live server-side dry-run against the OpenChoreo
+CRDs. The k3d node now has a containerd mirror for the in-cluster registry.
 
-The score2openchoreo renderer needs a redesign (Path B / score-6) before
-the chain works without manual hand-edited YAML in platform-config -- the
-real `openchoreo.dev/v1alpha1` Component schema requires a Component+Workload
-split that the current renderer does not produce. See `TODO.md` ->
-`m2-renderer-rewrite` and `SESSION_HANDOFF.md` section 3 for full detail.
+The existing live `hello-m2` pod still uses the stale `dc407cc` image tag and
+now fails with `not found`, which means registry resolution is working but the
+old tag is absent. Remaining M2 closeout is a fresh CI run that pushes a new
+image tag and commits renderer-generated Component+Workload YAML.
 
 ### Repository layout (current)
 
@@ -161,17 +162,22 @@ split that the current renderer does not produce. See `TODO.md` ->
 | Suite | Count | Result |
 |---|---|---|
 | rr-tofu-guard unit + integration | 28 sub-tests | all PASS |
-| score2openchoreo Convert | 6 | PASS |
+| score2openchoreo Convert | expanded | PASS |
 | score2openchoreo schema | 2 | PASS |
 | score2openchoreo golden + validate-only | 3 | PASS |
 | Gatekeeper Rego | 6 | PASS (via `opa test --v0-compatible`) |
 | OpenTofu modules | initialized + applied | Task 21 done; Flux watching both platform-addons AND platform-config (commit 42b2231 added the platform-config watch) |
-| End-to-end pipeline | architecturally validated 2026-05-02 | CI run #17 (sha dc407cc) ran in ~88s; rendered Component delivered; Flux applied (with hand-corrected YAML); pod created (image pull blocked by m2i-7) |
+| score2openchoreo live CRD dry-run | Component + Workload | PASS 2026-05-17 via `kubectl apply --dry-run=server` |
+| End-to-end pipeline | architecturally validated 2026-05-02 | CI run #17 (sha dc407cc) ran in ~88s; rendered Component delivered; Flux applied (with hand-corrected YAML); pod created. Fresh CI run still needed after renderer rewrite + registry trust |
 
 ### M2 delta from locked-in tool list (canonical)
 
 User's locked-in Integration & Delivery stack:
-**Gitea + Backstage Software Catalog & Score + OpenTofu + Gitea Actions + Gitea OCI Registry**
+**Gitea + Backstage Software Catalog & Score + OpenTofu + Gitea Actions + in-cluster OCI registry**
+
+The initial draft named Gitea OCI Registry. The implemented M2 image path uses
+the dedicated `local-registry` module so Gitea Actions and k3s containerd have
+stable in-cluster HTTP push/pull endpoints.
 
 Added in M2 with explicit approval 2026-04-20:
 - **Flux** (cluster add-ons drift correction only; OpenChoreo stays the
@@ -189,9 +195,10 @@ post-deploy dashboard role stays M3/M4.
 
 ### Outstanding (see TODO.md and SESSION_HANDOFF.md)
 
-- **Path B: score2openchoreo renderer rewrite** -- 8 line items in TODO under `m2-renderer-rewrite` (score-6a..6h). The current renderer emits a single Component that doesn't match the cluster's Component+Workload schema split. Estimated 2-4 hours.
-- **m2i-7: k3d/containerd registry trust** -- pods cannot pull from in-cluster local-registry. Fix belongs in install-m1.sh / cluster bootstrap.
-- **Push 42b2231 to local Gitea origin** -- stale URL, fix when port-forward is up.
+- **Fresh hello-m2 CI run** -- needed to push a new image tag into local-registry and overwrite the hand-written platform-config YAML with renderer-generated Component+Workload YAML.
+- **m2i-6: OpenBao dev-mode `inmem` storage** -- production-readiness item, not M2 closeout.
+- **Push the current `main` to local Gitea origin** -- needed before using local
+  Gitea as the canonical remote for M2 pipeline assets.
 
 ---
 
@@ -206,13 +213,12 @@ post-deploy dashboard role stays M3/M4.
   state to openbao is a future milestone.
 - **Environment model:** two OpenChoreo Environments (`dev`, `staging`)
   in the single k3d cluster. Promotion is a commit to `platform-config`.
-- **Score rendering:** a new Go `score2openchoreo` converter reads Score
-  YAML and emits OpenChoreo CRDs. Score tools do not render raw
-  Deployments in M2. (Note 2026-05-02: the converter currently emits a
-  single Component CRD with a `workloadTemplate` block that the live
-  cluster CRD rejects; the redesign in TODO `m2-renderer-rewrite` will
-  emit a Component + Workload pair matching the canonical openchoreo
-  pattern from `~/Projects/openchoreo/samples/from-image/`.)
+- **Score rendering:** the Go `score2openchoreo` converter reads Score YAML
+  and emits OpenChoreo `Component` + `Workload` CRDs as multi-document YAML.
+  Score tools do not render raw Deployments in M2. The renderer defaults
+  namespace/project to `default`, infers `deployment/service` when Score has
+  service ports, infers `deployment/worker` otherwise, and accepts
+  `pipeline.m2/component-type` as an override.
 - **Pipeline runner:** Gitea Actions in-cluster (`act-runner` helm),
   label `ubuntu-latest` per operator convention.
 - **Docker daemon:** still Colima at `~/.colima/default/docker.sock`.
