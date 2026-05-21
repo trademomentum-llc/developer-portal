@@ -116,10 +116,9 @@ The M2 developer path is:
 6. Flux applies platform-config.
 7. OpenChoreo reconciles to ComponentRelease, Deployment, and Pod.
 
-## Current known stale item
+## Local Gitea remote
 
-The local `origin` remote historically pointed at `localhost:3002`. Gitea now
-runs through the 3333 port-forward. Prefer:
+The local `origin` remote should point at the 3333 port-forward:
 
 ```bash
 git remote set-url origin http://localhost:3333/openchoreo/developer-portal.git

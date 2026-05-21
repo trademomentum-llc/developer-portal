@@ -64,8 +64,9 @@ state store all working. Integration into the portal is deferred to M7.
 
 **Source:** `~/Projects/developer-portal/`. git repository, branch `main`.
 The 2026-05-17 M2 closeout work for score2openchoreo and local-registry trust
-is ready to land as the next local commit. Local Gitea origin is behind and
-uses the localhost:3333 port-forward.
+is implemented locally. Local Gitea origin uses the localhost:3333
+port-forward and has received `main`; gitea-com push is blocked by external
+network reachability from this environment.
 
 **Role:** The umbrella for the full self-hosted IDP build.
 
@@ -195,10 +196,9 @@ post-deploy dashboard role stays M3/M4.
 
 ### Outstanding (see TODO.md and SESSION_HANDOFF.md)
 
-- **Fresh hello-m2 CI run** -- needed to push a new image tag into local-registry and overwrite the hand-written platform-config YAML with renderer-generated Component+Workload YAML.
 - **m2i-6: OpenBao dev-mode `inmem` storage** -- production-readiness item, not M2 closeout.
-- **Push the current `main` to local Gitea origin** -- needed before using local
-  Gitea as the canonical remote for M2 pipeline assets.
+- **Fresh hello-m2 CI run** -- local Gitea now has `developer-portal`; update and
+  push the `hello-m2` seed workflow, then inspect the run.
 
 ---
 

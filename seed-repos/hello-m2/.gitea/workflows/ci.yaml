@@ -19,7 +19,7 @@ jobs:
 
       - name: Clone developer-portal and build score2openchoreo
         run: |
-          git clone --depth 1 https://gitea.com/trademomentum.net/developer-portal.git /tmp/dp
+          git clone --depth 1 http://gitea-http.gitea.svc.cluster.local:3000/openchoreo/developer-portal.git /tmp/dp
           cd /tmp/dp/tools/score2openchoreo
           go build -o /usr/local/bin/score2openchoreo .
 
@@ -60,7 +60,7 @@ jobs:
         if: github.event_name == 'push'
         run: docker push registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7}
 
-      - name: Render Component
+      - name: Render OpenChoreo resources
         if: github.event_name == 'push'
         run: |
           score2openchoreo \

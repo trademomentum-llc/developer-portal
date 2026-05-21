@@ -24,8 +24,8 @@ What was proved on 2026-05-02: a push to `openchoreo/hello-m2` triggers CI, CI b
 | T21 install-m2.sh end-to-end | DONE 2026-05-02 | Cluster healthy with all M2 namespaces; tofu apply ran successfully; m2i-1..m2i-6 closed |
 | T22 first pipeline run on hello-m2 | PARTIAL 2026-05-17 | Chain validated through Pod creation. Needs fresh CI run after renderer rewrite + registry trust so the image tag exists and the pod can run |
 | Score2openchoreo renderer rewrite | DONE 2026-05-17 | Emits Component + Workload multi-doc YAML; Go tests, score smoke, and live server-side dry-run passed |
-| Push 42b2231 to gitea-com | DONE 2026-05-02 | Pushed via one-shot ephemeral PAT; PAT then revoked by operator |
-| Push to local Gitea origin | DEFERRED | origin URL is stale (`localhost:3002`); update to 3333 and push when next convenient |
+| Push to gitea-com | BLOCKED 2026-05-21 | `git push gitea-com main` could not connect to `gitea.com:443` from this environment, even with network escalation |
+| Push to local Gitea origin | DONE 2026-05-21 | Created `openchoreo/developer-portal` in local Gitea and pushed `main` through the localhost:3333 port-forward |
 
 ---
 
@@ -129,7 +129,7 @@ The 2026-04-21 entry suggested gitea.com URL had embedded credentials. As of 202
 - gitea-com auth uses ephemeral PATs minted per-push and immediately revoked
 - osxkeychain caches credentials but expires when PATs are revoked
 
-origin (local Gitea) URL still points at port 3002; Gitea is now on 3333. Update with `git remote set-url origin http://localhost:3333/openchoreo/developer-portal.git` or similar before next push to local origin.
+origin (local Gitea) now points at `http://localhost:3333/openchoreo/developer-portal.git` and has received `main`. gitea-com push is blocked by external network reachability from this environment.
 
 ---
 

@@ -1242,10 +1242,10 @@ metadata:
   annotations:
     gitea.io/project: openchoreo/hello-m2
   links:
-    - url: http://localhost:3002/openchoreo/hello-m2
+    - url: http://localhost:3333/openchoreo/hello-m2
       title: Gitea repo
       icon: web
-    - url: http://localhost:3002/openchoreo/hello-m2/actions
+    - url: http://localhost:3333/openchoreo/hello-m2/actions
       title: CI runs
       icon: dashboard
 spec:
@@ -1280,31 +1280,32 @@ jobs:
         with:
           go-version: "1.26"
 
-      - name: Build score2openchoreo
+      - name: Clone developer-portal and build score2openchoreo
         run: |
-          cd tools/score2openchoreo
-          go build -o bin/score2openchoreo .
+          git clone --depth 1 http://gitea-http.gitea.svc.cluster.local:3000/openchoreo/developer-portal.git /tmp/dp
+          cd /tmp/dp/tools/score2openchoreo
+          go build -o /usr/local/bin/score2openchoreo .
 
       - name: Validate Score schema
-        run: ./tools/score2openchoreo/bin/score2openchoreo --validate-only --input score.yaml
+        run: score2openchoreo --validate-only --input score.yaml
 
       - name: Set up OpenTofu
-        if: contains(github.event.pull_request.changed_files, 'iac/') || github.event_name == 'push'
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'iac/')
         uses: opentofu/setup-opentofu@v1
         with:
           tofu_version: 1.9.0
 
       - name: tofu plan
-        if: contains(github.event.pull_request.changed_files, 'iac/') || github.event_name == 'push'
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'iac/')
         run: |
-          cd iac
+          cd /tmp/dp/iac
           tofu init
           tofu plan -out=plan.out
 
       - name: Infracost breakdown
         if: github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'iac/')
         run: |
-          infracost breakdown --path iac/ --format json --out-file infracost.json
+          infracost breakdown --path /tmp/dp/iac --format json --out-file infracost.json
           MONTHLY=$(jq -r '.totalMonthlyCost' infracost.json)
           BASE=$(jq -r '.pastTotalMonthlyCost // 0' infracost.json)
           DELTA=$(awk -v a="$MONTHLY" -v b="$BASE" 'BEGIN{print a-b}')
@@ -1312,7 +1313,7 @@ jobs:
 
       - name: Post Infracost PR comment
         if: github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'iac/')
-        run: ./scripts/ci/post-infracost-comment.sh "$DELTA"
+        run: /tmp/dp/scripts/ci/post-infracost-comment.sh "$DELTA"
 
       - name: Build image
         run: |
@@ -1325,7 +1326,7 @@ jobs:
       - name: Render OpenChoreo resources
         if: github.event_name == 'push'
         run: |
-          ./tools/score2openchoreo/bin/score2openchoreo \
+          score2openchoreo \
             --input score.yaml \
             --environment dev \
             --image registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7} \
@@ -1333,7 +1334,9 @@ jobs:
 
       - name: Commit to platform-config
         if: github.event_name == 'push'
-        run: ./scripts/ci/commit-to-platform-config.sh dev hello-m2 /tmp/component.yaml
+        run: /tmp/dp/scripts/ci/commit-to-platform-config.sh dev hello-m2 /tmp/component.yaml
+        env:
+          GITEA_TOKEN: ${{ secrets.PLATFORM_CONFIG_TOKEN }}
 ```
 
 The `.gitea/workflows/ci.yaml` in `hello-m2` is a copy of the above, at repo scaffold time.
@@ -1527,13 +1530,13 @@ echo "PASS"
 # scripts/smoke-actions.sh
 # Triggers the canonical hello workflow in hello-m2 and waits for it to succeed.
 RUN_ID=$(curl -s -u gitea_admin:"$(cat ~/.rational-reserve/m1-gitea-admin-password)" \
-    -X POST http://localhost:3002/api/v1/repos/openchoreo/hello-m2/actions/workflows/ci.yaml/dispatches \
+    -X POST http://localhost:3333/api/v1/repos/openchoreo/hello-m2/actions/workflows/ci.yaml/dispatches \
     -H 'Content-Type: application/json' \
     -d '{"ref":"main"}' | jq -r .id)
 # poll up to 5 minutes
 for i in $(seq 1 60); do
     STATUS=$(curl -s -u gitea_admin:"$(cat ~/.rational-reserve/m1-gitea-admin-password)" \
-        http://localhost:3002/api/v1/repos/openchoreo/hello-m2/actions/runs/"$RUN_ID" | jq -r .conclusion)
+        http://localhost:3333/api/v1/repos/openchoreo/hello-m2/actions/runs/"$RUN_ID" | jq -r .conclusion)
     [ "$STATUS" = "success" ] && { echo "PASS"; exit 0; }
     [ "$STATUS" = "failure" ] && { echo "FAIL: workflow failed"; exit 1; }
     sleep 5
