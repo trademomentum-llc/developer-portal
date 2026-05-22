@@ -18,6 +18,14 @@ backstage/.cache/
 # OS
 .DS_Store
 
+# Local Codex / agent runtime artifacts
+.codex/
+AGENTS.md
+plugins/rr-policy-guards/README.md
+plugins/rr-policy-guards/hooks/hooks.json
+plugins/rr-policy-guards/plugin.json
+plugins/rr-policy-guards/tools/verify-guard/
+
 # Secrets (never commit)
 *.env
 *.env.*
