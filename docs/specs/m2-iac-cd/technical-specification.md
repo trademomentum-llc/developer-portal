@@ -1020,7 +1020,9 @@ output "names" { value = local.environments }
 Creates ExternalSecret objects (and one ClusterSecretStore if not already present from M1) for:
 
 - `flux-system/gitea-deploy-key` -- consumed by Flux GitRepository
-- `apps/hello-m2/dev/example-secret` -- consumed by hello-m2 workload
+- `kv/apps/hello-m2/dev/example-secret` -- compatibility mirror for the older M2 demo secret wiring
+
+The live hello-m2 workload secret is materialized by OpenChoreo from the rendered `SecretReference` and the data plane's `default` ClusterSecretStore, which reads `secret/apps/hello-m2/dev/example-secret`.
 
 Exact YAML omitted here -- the file layout is the same pattern as 6.4's `runner_token`. See the file list in Section 2.
 
@@ -1520,9 +1522,10 @@ echo "PASS"
 
 ```bash
 # scripts/smoke-openbao.sh
-kubectl -n openbao exec openbao-0 -- bao kv get kv/gitea/runners/token >/dev/null
-kubectl -n openbao exec openbao-0 -- bao kv get kv/flux/gitea-deploy-key >/dev/null
-kubectl -n openbao exec openbao-0 -- bao kv get kv/apps/hello-m2/dev/example-secret >/dev/null
+kubectl -n openbao exec openbao-0 -- env VAULT_TOKEN=root bao kv get kv/gitea/runners/token >/dev/null
+kubectl -n openbao exec openbao-0 -- env VAULT_TOKEN=root bao kv get kv/flux/gitea-deploy-key >/dev/null
+kubectl -n openbao exec openbao-0 -- env VAULT_TOKEN=root bao kv get secret/apps/hello-m2/dev/example-secret >/dev/null
+kubectl -n openbao exec openbao-0 -- env VAULT_TOKEN=root bao kv get kv/apps/hello-m2/dev/example-secret >/dev/null
 echo "PASS"
 ```
 

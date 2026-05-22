@@ -2,27 +2,31 @@
 
 > Action list ordered by priority and dependency.
 
-**Snapshot date:** 2026-05-17
+**Snapshot date:** 2026-05-22
 
 ---
 
 ## M2 IaC + CD Loop -- where we actually are
 
-M2 is **architecturally validated end-to-end** through Pod creation, and the two major follow-ups from 2026-05-02 are now implemented locally:
+M2 is **validated end-to-end locally** through a fresh `hello-m2` pipeline run:
 
-- `score2openchoreo` now renders schema-valid OpenChoreo `Component` + `Workload` multi-document YAML.
+- `score2openchoreo` renders schema-valid OpenChoreo `Component` + `SecretReference` + `Workload` multi-document YAML.
 - k3d/containerd registry trust is configured through a NodePort-backed local registry mirror.
+- Gitea Actions run #24 on `hello-m2` commit `5d88625` completed successfully on 2026-05-22.
+- CI built and pushed `registry.local-registry.svc.cluster.local:5000/hello-m2:5d88625`.
+- CI committed the rendered OpenChoreo resources to `platform-config`, Flux applied them, and OpenChoreo reconciled `releasebinding.openchoreo.dev/hello-m2-development` to `Ready=True`.
+- The live data-plane deployment `hello-m2-development-95297084` is `1/1` available and pod `hello-m2-development-95297084-85c9fd7bcc-hd5qt` is `1/1 Running`.
 
-Remaining closeout is a fresh `hello-m2` CI run so the new renderer output is committed by automation and the expected image tag is pushed into the local registry. The existing live pod still uses the old `dc407cc` tag and now fails with `not found`, which means registry resolution is working but that stale image tag is absent.
+The final live issue during closeout was OpenChoreo's generated runtime ExternalSecret reading the data plane's `default` ClusterSecretStore (`secret/apps/hello-m2/dev/example-secret`) while the original M2 seed helper only populated the `kv/` mount. `scripts/seed-openbao-m2-paths.sh` now seeds the live `secret/` path and keeps `kv/apps/hello-m2/dev/example-secret` as a compatibility mirror. `scripts/smoke-openbao.sh` passes again, and the runner ExternalSecret is back to `SecretSynced=True`.
 
-What was proved on 2026-05-02: a push to `openchoreo/hello-m2` triggers CI, CI builds + pushes image, CI renders + commits the Component to `platform-config/environments/dev/`, **Flux pulls platform-config**, **Flux applies the (manually-corrected) Component+Workload+Project triplet**, **OpenChoreo creates a ComponentRelease, then a Deployment, then a Pod** in an auto-named per-environment data-plane namespace (`dp-default-default-development-<hash>`). On 2026-05-17, the renderer output and registry-trust configuration were fixed; the next proof point is a fresh CI run.
+What was proved on 2026-05-02: a push to `openchoreo/hello-m2` triggers CI, CI builds + pushes image, CI renders + commits the Component to `platform-config/environments/dev/`, **Flux pulls platform-config**, **Flux applies the (manually-corrected) Component+Workload+Project triplet**, **OpenChoreo creates a ComponentRelease, then a Deployment, then a Pod** in an auto-named per-environment data-plane namespace (`dp-default-default-development-<hash>`). On 2026-05-17, the renderer output and registry-trust configuration were fixed. On 2026-05-22, run #24 proved the full automated path without hand-corrected manifests.
 
 ### Outstanding M2 work
 
 | Task | Status | Notes |
 |------|--------|-------|
 | T21 install-m2.sh end-to-end | DONE 2026-05-02 | Cluster healthy with all M2 namespaces; tofu apply ran successfully; m2i-1..m2i-6 closed |
-| T22 first pipeline run on hello-m2 | PARTIAL 2026-05-17 | Chain validated through Pod creation. Needs fresh CI run after renderer rewrite + registry trust so the image tag exists and the pod can run |
+| T22 first pipeline run on hello-m2 | DONE 2026-05-22 | Run #24 succeeded from push through image build, platform-config commit, Flux apply, OpenChoreo Ready ReleaseBinding, and Running data-plane pod |
 | Score2openchoreo renderer rewrite | DONE 2026-05-17 | Emits Component + SecretReference + Workload multi-doc YAML; Go tests, score smoke, and live server-side dry-run passed |
 | Push to gitea-com | BLOCKED 2026-05-21 | `git push gitea-com main` could not connect to `gitea.com:443` from this environment, even with network escalation |
 | Push to local Gitea origin | DONE 2026-05-21 | Created `openchoreo/developer-portal` in local Gitea and pushed `main` through the localhost:3333 port-forward |
@@ -38,8 +42,8 @@ What was proved on 2026-05-02: a push to `openchoreo/hello-m2` triggers CI, CI b
 | m2i-3 | Stale `tofu-state` ns from 2026-04-21 | **DONE** -- imported during the successful tofu apply |
 | m2i-4 | ExternalSecret cache misses under cluster pressure | **DONE** (resolved with m2i-2) |
 | m2i-5 | Deprecated `k3d-m1-substrate` cluster | **DONE** -- archive memory: torn down |
-| m2i-6 | OpenBao dev-mode `inmem` storage loses kv on restart | **OPEN, low-priority** -- production-readiness item, not M2 closeout |
-| **m2i-7** | **k3d/containerd does not trust in-cluster local-registry** | **DONE 2026-05-17** -- `scripts/install-m1.sh` writes `/etc/rancher/k3s/registries.yaml`; local-registry Service is NodePort `30082`; k3s mirror maps `registry.local-registry.svc.cluster.local:5000` to `http://127.0.0.1:30082`. Current pod pull error is now `not found` for old tag `dc407cc`, not DNS/HTTPS trust |
+| m2i-6 | OpenBao dev-mode `inmem` storage loses kv on restart | **OPEN, low-priority** -- production-readiness item, not M2 closeout. The seed helper now restores missing M2 kv paths, can recover the runner token from the existing Kubernetes Secret, and seeds the OpenChoreo runtime app-secret path |
+| **m2i-7** | **k3d/containerd does not trust in-cluster local-registry** | **DONE 2026-05-17** -- `scripts/install-m1.sh` writes `/etc/rancher/k3s/registries.yaml`; local-registry Service is NodePort `30082`; k3s mirror maps `registry.local-registry.svc.cluster.local:5000` to `http://127.0.0.1:30082`. Run #24 proved the pod can pull the fresh `5d88625` image |
 
 ---
 

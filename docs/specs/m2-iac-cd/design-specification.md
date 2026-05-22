@@ -418,7 +418,8 @@ M2 calls the following Gitea endpoints from the runner:
 |---|---|---|
 | `kv/gitea/runners/token` | external-secrets -> runner ServiceAccount | Runner registration |
 | `kv/flux/gitea-deploy-key` | external-secrets -> flux-system Secret | Flux git auth against Gitea |
-| `kv/apps/hello-m2/dev/example-secret` | external-secrets -> Deployment env | Demo workload secret |
+| `secret/apps/hello-m2/dev/example-secret` | OpenChoreo default ClusterSecretStore -> generated ExternalSecret -> Deployment env | Demo workload secret |
+| `kv/apps/hello-m2/dev/example-secret` | M2 compatibility mirror | Keeps the older M2 ExternalSecret and smoke path populated |
 
 OpenTofu state lives separately, in a Kubernetes Secret managed by the native `kubernetes` backend, not in openbao (see Section 4.4).
 

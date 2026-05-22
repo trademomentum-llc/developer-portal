@@ -107,9 +107,9 @@ OPA/Gatekeeper is pulled forward from M6 for a narrow set of pipeline-scoped con
 ### 4.10 openbao integration
 
 - **FR-37** openbao (already running from M1) SHALL be the source of truth for:
-  - Gitea Actions runner registration token (kv v2 path `gitea/runners/token`)
-  - Demo application's example secret (kv v2 path `apps/hello-m2/dev/example-secret`)
-  - Flux Gitea deploy key (kv v2 path `flux/gitea-deploy-key`)
+  - Gitea Actions runner registration token (kv v2 path `kv/gitea/runners/token`)
+  - Demo application's example secret (OpenChoreo default-store kv v2 path `secret/apps/hello-m2/dev/example-secret`; `kv/apps/hello-m2/dev/example-secret` is seeded as a compatibility mirror)
+  - Flux Gitea deploy key (kv v2 path `kv/flux/gitea-deploy-key`)
 - **FR-38** All Kubernetes Secret objects consumed in M2 SHALL be materialized by external-secrets from openbao. No `kubectl create secret` in the install path except for the initial bootstrap of external-secrets' own auth against openbao (already present from M1).
 - **FR-39** No secret value, token, or key SHALL appear in any committed file, spec document, or log line.
 
@@ -129,7 +129,7 @@ For operator confidence and debuggability, every M2 tool SHALL have an individua
 - **FR-46** `scripts/smoke-score.sh` SHALL run `score2openchoreo < fixtures/score.yaml` and validate the output against OpenChoreo's Component CRD schema.
 - **FR-47** `scripts/smoke-infracost.sh` SHALL run `infracost breakdown --path iac/` and report a numeric monthly figure.
 - **FR-48** `scripts/smoke-gatekeeper.sh` SHALL run `kubectl get constrainttemplates` and `kubectl get constraints` and report counts.
-- **FR-49** `scripts/smoke-openbao.sh` SHALL confirm the three kv paths listed in FR-37 are reachable and populated.
+- **FR-49** `scripts/smoke-openbao.sh` SHALL confirm the kv paths listed in FR-37, including the demo app secret mirror, are reachable and populated.
 - **FR-50** A single orchestrator `scripts/smoke-m2.sh` SHALL invoke every per-tool smoke check in sequence and exit 0 only if every one passes.
 
 ### 4.13 Operational commands

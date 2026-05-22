@@ -1,10 +1,11 @@
 # external-secrets wiring module
 
-Creates ExternalSecret objects for the three M2 consumers:
+Creates ExternalSecret objects for M2-owned secret materialization:
 - Flux git auth (`flux-system/gitea-deploy-key`)
-- hello-m2 workload secret (`openchoreo-data-plane/example-secret`)
+- the legacy hello-m2 demo secret mirror (`openchoreo-data-plane/example-secret`)
 
 The Gitea Actions runner's ExternalSecret lives in the `gitea-runner` module.
 
-Assumes a `ClusterSecretStore` named `openbao-kv` already exists (provisioned
-by the external-secrets install in M1).
+Assumes a `ClusterSecretStore` named `openbao-kv` already exists. Live
+OpenChoreo workload secrets are generated from `SecretReference` resources and
+the data plane's `default` ClusterSecretStore instead.

@@ -4,7 +4,7 @@
 > state. For "what to do next" see TODO.md. For "where we stopped and what
 > changed mid-session" see SESSION_HANDOFF.md.
 
-**Snapshot date:** 2026-05-17 (score2openchoreo renderer rewrite and k3d local-registry trust implemented locally; fresh hello-m2 CI run still needed)
+**Snapshot date:** 2026-05-22 (M2 validated end-to-end locally; external gitea-com push still blocked by network reachability)
 
 ---
 
@@ -14,8 +14,7 @@ The user is building a self-hosted Internal Developer Platform (IDP) on
 their local machine, using the Platform Engineering community reference
 architecture in `~/Downloads/platform.pptx` as the blueprint. The platform
 is decomposed into seven milestones (M1 through M7); M1 substrate is
-complete and M2 (IaC + CD loop) is functionally code-complete with one
-fresh pipeline validation still pending.
+complete and M2 (IaC + CD loop) is validated end-to-end locally.
 
 Three projects on disk are involved, in dependency order:
 
@@ -63,10 +62,9 @@ state store all working. Integration into the portal is deferred to M7.
 ## 3. developer-portal (current focus)
 
 **Source:** `~/Projects/developer-portal/`. git repository, branch `main`.
-The 2026-05-17 M2 closeout work for score2openchoreo and local-registry trust
-is implemented locally. Local Gitea origin uses the localhost:3333
-port-forward and has received `main`; gitea-com push is blocked by external
-network reachability from this environment.
+The 2026-05-22 M2 closeout work is implemented locally. Local Gitea origin
+uses the localhost:3333 port-forward and has received `main`; gitea-com push
+is blocked by external network reachability from this environment.
 
 **Role:** The umbrella for the full self-hosted IDP build.
 
@@ -169,7 +167,7 @@ image tag and commits renderer-generated Component+Workload YAML.
 | Gatekeeper Rego | 6 | PASS (via `opa test --v0-compatible`) |
 | OpenTofu modules | initialized + applied | Task 21 done; Flux watching both platform-addons AND platform-config (commit 42b2231 added the platform-config watch) |
 | score2openchoreo live CRD dry-run | OpenChoreo resources | PASS 2026-05-17 via `kubectl apply --dry-run=server`; SecretReference emission added after CI exposed the missing-resource gap |
-| End-to-end pipeline | architecturally validated 2026-05-02 | CI run #17 (sha dc407cc) ran in ~88s; rendered Component delivered; Flux applied (with hand-corrected YAML); pod created. Fresh CI run still needed after renderer rewrite + registry trust |
+| End-to-end pipeline | DONE 2026-05-22 | CI run #24 (sha `5d88625`) succeeded; image pushed to local registry; platform-config commit applied by Flux; ReleaseBinding Ready=True; data-plane pod 1/1 Running |
 
 ### M2 delta from locked-in tool list (canonical)
 
@@ -197,8 +195,8 @@ post-deploy dashboard role stays M3/M4.
 ### Outstanding (see TODO.md and SESSION_HANDOFF.md)
 
 - **m2i-6: OpenBao dev-mode `inmem` storage** -- production-readiness item, not M2 closeout.
-- **Fresh hello-m2 CI run** -- local Gitea now has `developer-portal`; update and
-  push the `hello-m2` seed workflow, then inspect the run.
+- **gitea-com push** -- blocked by `gitea.com:443` reachability from this environment.
+- **M3 kickoff** -- next milestone after the local M2 proof is accepted.
 
 ---
 

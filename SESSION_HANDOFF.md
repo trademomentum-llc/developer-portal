@@ -4,14 +4,14 @@
 > what is now committed that was not before, what is still outstanding, and
 > exactly what to do first.
 
-**Last updated:** 2026-05-17
-**Reason for handoff:** M2 renderer rewrite and registry-trust implementation are now implemented locally; fresh hello-m2 CI validation remains.
+**Last updated:** 2026-05-22
+**Reason for handoff:** M2 T22 is complete locally. Fresh hello-m2 CI validation passed; gitea-com push remains blocked by external network reachability.
 
 ---
 
 ## 1. The single most important thing
 
-**M2 no longer needs the Path B renderer rewrite or the m2i-7 registry-trust code change.** Both are implemented locally.
+**M2 no longer needs the Path B renderer rewrite, the m2i-7 registry-trust code change, or the fresh T22 pipeline proof.** All three are complete locally.
 
 Current validation:
 - `score2openchoreo` emits OpenChoreo `Component` + `SecretReference` + `Workload` multi-document YAML when Score secrets are used.
@@ -20,15 +20,21 @@ Current validation:
 - `kubectl --context k3d-openchoreo apply --dry-run=server -f /private/tmp/hello-m2-rendered.yaml` accepts the generated `hello-m2` OpenChoreo resources.
 - local-registry is a NodePort Service on `30082`.
 - `/etc/rancher/k3s/registries.yaml` on `k3d-openchoreo-server-0` maps `registry.local-registry.svc.cluster.local:5000` to `http://127.0.0.1:30082`.
+- Gitea Actions run #24 on `hello-m2` commit `5d88625` completed successfully on 2026-05-22.
+- Flux applied the CI-committed `Component` + `SecretReference` + `Workload` output from platform-config.
+- `releasebinding.openchoreo.dev/hello-m2-development` is `Ready=True` and `ResourcesReady=True`.
+- `deployment.apps/hello-m2-development-95297084` is `1/1` available in `dp-default-default-development-f8e58905`; pod `hello-m2-development-95297084-85c9fd7bcc-hd5qt` is `1/1 Running`.
+- `./scripts/smoke-openbao.sh` passes after reseeding OpenBao's dev-mode kv mounts.
+- `externalsecret/gitea-runner-token` is `SecretSynced=True` again.
 
-The remaining closeout is a fresh `hello-m2` CI run. The live pod still uses old image tag `dc407cc` and now fails with `not found`, which means registry resolution works but the stale image tag is missing from the registry.
+The remaining external closeout is only `git push gitea-com main` when `gitea.com:443` is reachable from this environment. The local Gitea origin has the M2 commits.
 
 ---
 
 ## 2. Git state at handoff
 
 - **Branch:** `main`
-- **Local HEAD:** see `git log --oneline -5`; the 2026-05-17 M2 closeout work
+- **Local HEAD:** see `git log --oneline -5`; the 2026-05-22 M2 closeout work
   should be the latest local commit once this handoff is committed.
 - **gitea-com:** push attempt on 2026-05-21 failed because `gitea.com:443` was unreachable from this environment.
 - **origin (local Gitea):** URL is `http://localhost:3333/openchoreo/developer-portal.git`; `main` has been pushed there.
