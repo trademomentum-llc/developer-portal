@@ -684,7 +684,7 @@ The conversion rules are:
 
 Component type inference: Score with service ports renders `deployment/service`; Score without service ports renders `deployment/worker`; the `pipeline.m2/component-type` annotation can select another installed ClusterComponentType such as `deployment/web-application`.
 
-Secret binding: a Score `resources.<key>` with `type: secret` references a Kubernetes Secret by `metadata.name` or by the fallback `<resource-key>-secret`. The converter emits Component and Workload resources; the ExternalSecret is provisioned separately by the platform wiring.
+Secret binding: a Score `resources.<key>` with `type: secret` references a Kubernetes Secret by `metadata.name` or by the fallback `<resource-key>-secret`. For each used secret, the converter emits a matching OpenChoreo `SecretReference`. The default remote key is `apps/<component>/<environment>/<secret-name>` and the default remote property is the referenced field; `metadata.remoteRef.key`, `metadata.remoteRef.property`, and `metadata.remoteRef.version` override those defaults.
 
 ### 5.7 Test strategy
 

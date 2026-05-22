@@ -129,7 +129,7 @@ Three options were considered to get Score input into OpenChoreo's Component mod
 
 1. **Teach OpenChoreo to accept Score directly.** Would require an upstream contribution to OpenChoreo -- weeks of review, potential rejection, and creates a fork risk. Out of scope for M2.
 2. **Use `score-k8s` and render raw Deployments and Services.** Bypasses OpenChoreo entirely. Contradicts M1.
-3. **Write `score2openchoreo` as a small Go converter** (chosen). Reads Score on stdin, emits OpenChoreo Component and Workload YAML on stdout. Runs in CI as a step. No changes to OpenChoreo.
+3. **Write `score2openchoreo` as a small Go converter** (chosen). Reads Score on stdin, emits OpenChoreo Component, SecretReference, and Workload YAML on stdout. Runs in CI as a step. No changes to OpenChoreo.
 
 The converter is the bridge between the authoring surface (Score, per the user's locked-in tool list) and the orchestrator surface (OpenChoreo). It has one job and can be tested exhaustively against fixture Score files.
 
@@ -267,7 +267,7 @@ Gitea Actions workflow on main branch
     |     +-- image tag = git short SHA
     |     +-- push target = registry.local-registry.svc.cluster.local:5000/hello-m2:<sha>
     |
-    +-- render OpenChoreo Component + Workload via score2openchoreo
+    +-- render OpenChoreo Component + SecretReference + Workload via score2openchoreo
     |     +-- input: score.yaml
     |     +-- output: multi-document YAML with image ref pinned to :<sha>
     |
@@ -277,7 +277,7 @@ Gitea Actions workflow on main branch
     |     +-- push via runner's service-account token (sourced from openbao)
     |
     +-- OpenChoreo controller sees the platform-config change
-          +-- reconciles Component + Workload into Deployment + Service in dev namespace
+          +-- reconciles Component + SecretReference + Workload into Deployment + Service in dev namespace
 ```
 
 ### 5.4 Promotion flow (dev -> staging)
@@ -296,7 +296,7 @@ PR diff: environments/staging/hello-m2.yaml now points to the same image SHA as 
     |
     v
 OpenChoreo controller sees the platform-config change
-    +-- reconciles Component + Workload into Deployment + Service in staging namespace
+    +-- reconciles Component + SecretReference + Workload into Deployment + Service in staging namespace
     +-- dev remains running at whatever SHA was last promoted to dev
 ```
 

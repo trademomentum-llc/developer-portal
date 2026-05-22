@@ -168,7 +168,7 @@ image tag and commits renderer-generated Component+Workload YAML.
 | score2openchoreo golden + validate-only | 3 | PASS |
 | Gatekeeper Rego | 6 | PASS (via `opa test --v0-compatible`) |
 | OpenTofu modules | initialized + applied | Task 21 done; Flux watching both platform-addons AND platform-config (commit 42b2231 added the platform-config watch) |
-| score2openchoreo live CRD dry-run | Component + Workload | PASS 2026-05-17 via `kubectl apply --dry-run=server` |
+| score2openchoreo live CRD dry-run | OpenChoreo resources | PASS 2026-05-17 via `kubectl apply --dry-run=server`; SecretReference emission added after CI exposed the missing-resource gap |
 | End-to-end pipeline | architecturally validated 2026-05-02 | CI run #17 (sha dc407cc) ran in ~88s; rendered Component delivered; Flux applied (with hand-corrected YAML); pod created. Fresh CI run still needed after renderer rewrite + registry trust |
 
 ### M2 delta from locked-in tool list (canonical)
@@ -214,7 +214,7 @@ post-deploy dashboard role stays M3/M4.
 - **Environment model:** two OpenChoreo Environments (`dev`, `staging`)
   in the single k3d cluster. Promotion is a commit to `platform-config`.
 - **Score rendering:** the Go `score2openchoreo` converter reads Score YAML
-  and emits OpenChoreo `Component` + `Workload` CRDs as multi-document YAML.
+  and emits OpenChoreo `Component` + `SecretReference` + `Workload` CRDs as multi-document YAML.
   Score tools do not render raw Deployments in M2. The renderer defaults
   namespace/project to `default`, infers `deployment/service` when Score has
   service ports, infers `deployment/worker` otherwise, and accepts

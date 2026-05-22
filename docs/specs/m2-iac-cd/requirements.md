@@ -241,7 +241,7 @@ M2 is complete when **all** of the following are true:
 - **IaC** -- Infrastructure as Code (OpenTofu in this project)
 - **CD loop** -- Continuous Delivery loop: commit -> CI -> cost/policy gate -> merge -> render -> deploy
 - **Score** -- ScoreSpec workload specification language used as the authoring surface for workloads
-- **score2openchoreo** -- Go converter this milestone introduces; reads Score and emits OpenChoreo Component and Workload CRDs
+- **score2openchoreo** -- Go converter this milestone introduces; reads Score and emits OpenChoreo Component, SecretReference, and Workload CRDs
 - **Flux** -- GitOps controller used in M2 only for cluster add-ons drift correction
 - **Gatekeeper** -- The OPA-based admission controller; in M2 used only for pipeline-scoped constraints
 - **platform-addons** -- Gitea repo Flux watches

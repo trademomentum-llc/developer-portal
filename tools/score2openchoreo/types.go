@@ -156,8 +156,8 @@ type SecretReferenceSpec struct {
 }
 
 type SecretReferenceTemplate struct {
-	Type     string             `yaml:"type"`
-	Metadata SecretTemplateMeta `yaml:"metadata,omitempty"`
+	Type     string              `yaml:"type"`
+	Metadata *SecretTemplateMeta `yaml:"metadata,omitempty"`
 }
 
 type SecretTemplateMeta struct {
@@ -170,5 +170,7 @@ type SecretReferenceData struct {
 }
 
 type SecretRemoteRef struct {
-	Key string `yaml:"key"`
+	Key      string `yaml:"key"`
+	Property string `yaml:"property,omitempty"`
+	Version  string `yaml:"version,omitempty"`
 }

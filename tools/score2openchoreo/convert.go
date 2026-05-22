@@ -60,6 +60,10 @@ func Convert(in ScoreDocument, opts ConvertOptions) ([]OpenChoreoResource, error
 		return nil, err
 	}
 	container.Env = env
+	secretReferences, err := convertSecretReferences(in, scoreContainer, opts)
+	if err != nil {
+		return nil, err
+	}
 
 	component := OpenChoreoComponent{
 		APIVersion: "openchoreo.dev/v1alpha1",
@@ -96,7 +100,13 @@ func Convert(in ScoreDocument, opts ConvertOptions) ([]OpenChoreoResource, error
 		},
 	}
 
-	return []OpenChoreoResource{component, workload}, nil
+	resources := make([]OpenChoreoResource, 0, 2+len(secretReferences))
+	resources = append(resources, component)
+	for _, sr := range secretReferences {
+		resources = append(resources, sr)
+	}
+	resources = append(resources, workload)
+	return resources, nil
 }
 
 func singleContainer(containers map[string]ScoreContainer) ScoreContainer {
@@ -153,10 +163,7 @@ func convertEnv(in ScoreDocument, c ScoreContainer, environment string) ([]EnvVa
 			}
 			switch res.Type {
 			case "secret":
-				secretName := resKey + "-secret"
-				if n := res.Metadata["name"]; n != "" {
-					secretName = n
-				}
+				secretName := secretNameForResource(resKey, res)
 				env = append(env, EnvVarSpec{
 					Key: k,
 					ValueFrom: &EnvVarSourceSpec{
@@ -173,6 +180,91 @@ func convertEnv(in ScoreDocument, c ScoreContainer, environment string) ([]EnvVa
 		}
 	}
 	return env, nil
+}
+
+func convertSecretReferences(in ScoreDocument, c ScoreContainer, opts ConvertOptions) ([]OpenChoreoSecretReference, error) {
+	type secretData struct {
+		name string
+		data map[string]SecretRemoteRef
+	}
+	byName := map[string]secretData{}
+	for _, value := range c.Variables {
+		m := resourceRefPattern.FindStringSubmatch(value)
+		if m == nil {
+			continue
+		}
+		resKey, field := m[1], m[2]
+		res, ok := in.Resources[resKey]
+		if !ok || res.Type != "secret" {
+			continue
+		}
+		secretName := secretNameForResource(resKey, res)
+		entry := byName[secretName]
+		if entry.data == nil {
+			entry = secretData{name: secretName, data: map[string]SecretRemoteRef{}}
+		}
+		entry.data[field] = SecretRemoteRef{
+			Key:      remoteKeyForSecret(in.Metadata.Name, opts.Environment, secretName, res),
+			Property: remotePropertyForSecret(field, res),
+			Version:  res.Metadata["remoteRef.version"],
+		}
+		byName[secretName] = entry
+	}
+
+	names := make([]string, 0, len(byName))
+	for name := range byName {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+
+	out := make([]OpenChoreoSecretReference, 0, len(names))
+	for _, name := range names {
+		entry := byName[name]
+		keys := make([]string, 0, len(entry.data))
+		for key := range entry.data {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		data := make([]SecretReferenceData, 0, len(keys))
+		for _, key := range keys {
+			data = append(data, SecretReferenceData{SecretKey: key, RemoteRef: entry.data[key]})
+		}
+		out = append(out, OpenChoreoSecretReference{
+			APIVersion: "openchoreo.dev/v1alpha1",
+			Kind:       "SecretReference",
+			Metadata: ComponentMetadata{
+				Name:      entry.name,
+				Namespace: opts.Namespace,
+			},
+			Spec: SecretReferenceSpec{
+				RefreshInterval: "1h",
+				Template:        SecretReferenceTemplate{Type: "Opaque"},
+				Data:            data,
+			},
+		})
+	}
+	return out, nil
+}
+
+func secretNameForResource(resourceKey string, res ScoreResource) string {
+	if n := strings.TrimSpace(res.Metadata["name"]); n != "" {
+		return n
+	}
+	return resourceKey + "-secret"
+}
+
+func remoteKeyForSecret(componentName, environment, secretName string, res ScoreResource) string {
+	if key := strings.TrimSpace(res.Metadata["remoteRef.key"]); key != "" {
+		return key
+	}
+	return "apps/" + componentName + "/" + environment + "/" + secretName
+}
+
+func remotePropertyForSecret(field string, res ScoreResource) string {
+	if property := strings.TrimSpace(res.Metadata["remoteRef.property"]); property != "" {
+		return property
+	}
+	return field
 }
 
 func convertEndpoints(service *ScoreService) map[string]WorkloadEndpoint {

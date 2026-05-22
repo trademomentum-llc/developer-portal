@@ -59,10 +59,10 @@ M2 lands Flux (cluster add-ons drift correction), Gatekeeper (three pipeline
 constraints), and the Gitea Actions runner. The developer path: push to
 `openchoreo/hello-m2`, CI validates Score, runs `tofu plan` + Infracost,
 builds and pushes the image to the in-cluster local registry, renders
-OpenChoreo Component and Workload resources via `score2openchoreo`, and
+OpenChoreo Component, SecretReference, and Workload resources via `score2openchoreo`, and
 commits them to
 `openchoreo/platform-config/environments/dev/`. OpenChoreo reconciles the
-Component and Workload into a running pod. Promote to staging by committing
+Component, SecretReference, and Workload into a running pod. Promote to staging by committing
 the same rendered resources into `environments/staging/`. All three M2 repos
 live under the
 Gitea `openchoreo` organization. Run `scripts/install-m2.sh` to set up,

@@ -1,9 +1,10 @@
 # score2openchoreo
 
 Converts a [Score](https://score.dev) YAML document to OpenChoreo
-`openchoreo.dev/v1alpha1` resources. The renderer emits a `Component` and a
-matching `Workload` as a multi-document YAML stream. Used by the M2 CI pipeline
-after schema validation, before committing the rendered resources to
+`openchoreo.dev/v1alpha1` resources. The renderer emits a `Component`, any
+needed `SecretReference` resources, and a matching `Workload` as a
+multi-document YAML stream. Used by the M2 CI pipeline after schema validation,
+before committing the rendered resources to
 `openchoreo/platform-config/environments/<env>/`.
 
 ## Full spec
@@ -48,8 +49,9 @@ resources:
     type: secret
 ```
 
-...produces `SecretKeyRef{name: "db-secret", key: <field>}`. Override by
-setting `resources.db.metadata.name`:
+...produces `SecretKeyRef{name: "db-secret", key: <field>}` and a
+`SecretReference` named `db-secret`. Override by setting
+`resources.db.metadata.name`:
 
 ```yaml
 resources:
@@ -59,10 +61,11 @@ resources:
       name: my-db-credentials   # -> SecretKeyRef{name: "my-db-credentials"}
 ```
 
-This convention pairs with the platform's External-Secrets sync, which
-creates per-app Kubernetes Secrets named `<resource-key>-secret` from the
-OpenBao `kv/<env>/<resource-key>/` path. Override when the upstream secret
-already has a different Kubernetes name.
+This convention pairs with OpenChoreo's `SecretReference` flow. The default
+remote key is `apps/<component>/<environment>/<secret-name>` and the default
+remote property is the referenced field. Override the remote key with
+`resources.db.metadata.remoteRef.key`; override the remote property with
+`resources.db.metadata.remoteRef.property`.
 
 ### 3. Supported resource types
 

@@ -195,7 +195,32 @@ func TestConvertSecretResourceBecomesSecretKeyRef(t *testing.T) {
 	if err != nil {
 		t.Fatalf("convert: %v", err)
 	}
-	env := got[1].(OpenChoreoWorkload).Spec.Container.Env[0]
+	if len(got) != 3 {
+		t.Fatalf("resources=%d want 3", len(got))
+	}
+	secretReference, ok := got[1].(OpenChoreoSecretReference)
+	if !ok {
+		t.Fatalf("resource[1]=%T want OpenChoreoSecretReference", got[1])
+	}
+	if secretReference.Metadata.Name != "example-secret" || secretReference.Metadata.Namespace != "default" {
+		t.Fatalf("bad secret reference metadata: %+v", secretReference.Metadata)
+	}
+	if secretReference.Spec.Template.Type != "Opaque" || secretReference.Spec.RefreshInterval != "1h" {
+		t.Fatalf("bad secret reference spec: %+v", secretReference.Spec)
+	}
+	if len(secretReference.Spec.Data) != 1 {
+		t.Fatalf("secret reference data=%+v", secretReference.Spec.Data)
+	}
+	if secretReference.Spec.Data[0].SecretKey != "password" {
+		t.Fatalf("secretKey=%q", secretReference.Spec.Data[0].SecretKey)
+	}
+	if secretReference.Spec.Data[0].RemoteRef.Key != "apps/hello/dev/example-secret" {
+		t.Fatalf("remote key=%q", secretReference.Spec.Data[0].RemoteRef.Key)
+	}
+	if secretReference.Spec.Data[0].RemoteRef.Property != "password" {
+		t.Fatalf("remote property=%q", secretReference.Spec.Data[0].RemoteRef.Property)
+	}
+	env := got[2].(OpenChoreoWorkload).Spec.Container.Env[0]
 	if env.Key != "TOKEN" {
 		t.Fatalf("env key=%q", env.Key)
 	}
@@ -207,6 +232,54 @@ func TestConvertSecretResourceBecomesSecretKeyRef(t *testing.T) {
 	}
 	if env.ValueFrom.SecretKeyRef.Key != "password" {
 		t.Fatalf("secret key=%q", env.ValueFrom.SecretKeyRef.Key)
+	}
+}
+
+func TestConvertSecretReferenceMetadataOverrides(t *testing.T) {
+	in := ScoreDocument{
+		APIVersion: "score.dev/v1b1",
+		Metadata:   ScoreMetadata{Name: "hello"},
+		Containers: map[string]ScoreContainer{
+			"web": {
+				Image: "i",
+				Variables: map[string]string{
+					"PASSWORD": "${resources.db.password}",
+					"USER":     "${resources.db.username}",
+				},
+			},
+		},
+		Resources: map[string]ScoreResource{
+			"db": {
+				Type: "secret",
+				Metadata: map[string]string{
+					"name":              "database-secret",
+					"remoteRef.key":     "shared/database",
+					"remoteRef.version": "v2",
+				},
+			},
+		},
+	}
+	got, err := Convert(in, ConvertOptions{Environment: "staging", Namespace: "default", Project: "default"})
+	if err != nil {
+		t.Fatalf("convert: %v", err)
+	}
+	secretReference := got[1].(OpenChoreoSecretReference)
+	if secretReference.Metadata.Name != "database-secret" {
+		t.Fatalf("name=%q", secretReference.Metadata.Name)
+	}
+	if len(secretReference.Spec.Data) != 2 {
+		t.Fatalf("data=%+v", secretReference.Spec.Data)
+	}
+	if secretReference.Spec.Data[0].SecretKey != "password" || secretReference.Spec.Data[1].SecretKey != "username" {
+		t.Fatalf("data order=%+v", secretReference.Spec.Data)
+	}
+	for _, data := range secretReference.Spec.Data {
+		if data.RemoteRef.Key != "shared/database" || data.RemoteRef.Version != "v2" {
+			t.Fatalf("remote ref=%+v", data.RemoteRef)
+		}
+		if data.RemoteRef.Property != data.SecretKey {
+			t.Fatalf("remote property=%q secretKey=%q", data.RemoteRef.Property, data.SecretKey)
+		}
 	}
 }
 

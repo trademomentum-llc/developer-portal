@@ -23,7 +23,7 @@ What was proved on 2026-05-02: a push to `openchoreo/hello-m2` triggers CI, CI b
 |------|--------|-------|
 | T21 install-m2.sh end-to-end | DONE 2026-05-02 | Cluster healthy with all M2 namespaces; tofu apply ran successfully; m2i-1..m2i-6 closed |
 | T22 first pipeline run on hello-m2 | PARTIAL 2026-05-17 | Chain validated through Pod creation. Needs fresh CI run after renderer rewrite + registry trust so the image tag exists and the pod can run |
-| Score2openchoreo renderer rewrite | DONE 2026-05-17 | Emits Component + Workload multi-doc YAML; Go tests, score smoke, and live server-side dry-run passed |
+| Score2openchoreo renderer rewrite | DONE 2026-05-17 | Emits Component + SecretReference + Workload multi-doc YAML; Go tests, score smoke, and live server-side dry-run passed |
 | Push to gitea-com | BLOCKED 2026-05-21 | `git push gitea-com main` could not connect to `gitea.com:443` from this environment, even with network escalation |
 | Push to local Gitea origin | DONE 2026-05-21 | Created `openchoreo/developer-portal` in local Gitea and pushed `main` through the localhost:3333 port-forward |
 

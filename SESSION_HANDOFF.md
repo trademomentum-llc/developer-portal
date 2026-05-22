@@ -14,10 +14,10 @@
 **M2 no longer needs the Path B renderer rewrite or the m2i-7 registry-trust code change.** Both are implemented locally.
 
 Current validation:
-- `score2openchoreo` emits OpenChoreo `Component` + `Workload` multi-document YAML.
+- `score2openchoreo` emits OpenChoreo `Component` + `SecretReference` + `Workload` multi-document YAML when Score secrets are used.
 - `go test ./...` and `go build -o bin/score2openchoreo .` pass under `tools/score2openchoreo`.
 - `./scripts/smoke-score.sh` passes.
-- `kubectl --context k3d-openchoreo apply --dry-run=server -f /private/tmp/hello-m2-rendered.yaml` accepts the generated `hello-m2` Component and Workload.
+- `kubectl --context k3d-openchoreo apply --dry-run=server -f /private/tmp/hello-m2-rendered.yaml` accepts the generated `hello-m2` OpenChoreo resources.
 - local-registry is a NodePort Service on `30082`.
 - `/etc/rancher/k3s/registries.yaml` on `k3d-openchoreo-server-0` maps `registry.local-registry.svc.cluster.local:5000` to `http://127.0.0.1:30082`.
 
