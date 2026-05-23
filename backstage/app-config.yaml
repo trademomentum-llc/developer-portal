@@ -1,5 +1,5 @@
 app:
-  title: Scaffolded Backstage App
+  title: Developer Portal
   baseUrl: http://localhost:3000
 
   # Enable all packages by default, this will discover packages from packages/app/package.json
@@ -86,10 +86,10 @@ catalog:
     - allow: [Component, System, API, Resource, Location]
   providers: {}
   locations:
-    - type: url
-      target: http://localhost:3002/gitea_admin/demo-service/raw/branch/main/catalog-info.yaml
     - type: file
-      target: ../../examples/entities.yaml
+      target: ../../../catalog-info.yaml
+    - type: file
+      target: ../../../seed-repos/hello-m2/catalog-info.yaml
     - type: file
       target: ../../examples/template/template.yaml
       rules:

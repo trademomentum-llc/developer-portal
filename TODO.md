@@ -2,7 +2,7 @@
 
 > Action list ordered by priority and dependency.
 
-**Snapshot date:** 2026-05-22
+**Snapshot date:** 2026-05-23
 
 ---
 
@@ -28,7 +28,7 @@ What was proved on 2026-05-02: a push to `openchoreo/hello-m2` triggers CI, CI b
 | T21 install-m2.sh end-to-end | DONE 2026-05-02 | Cluster healthy with all M2 namespaces; tofu apply ran successfully; m2i-1..m2i-6 closed |
 | T22 first pipeline run on hello-m2 | DONE 2026-05-22 | Run #24 succeeded from push through image build, platform-config commit, Flux apply, OpenChoreo Ready ReleaseBinding, and Running data-plane pod |
 | Score2openchoreo renderer rewrite | DONE 2026-05-17 | Emits Component + SecretReference + Workload multi-doc YAML; Go tests, score smoke, and live server-side dry-run passed |
-| Push to gitea-com | BLOCKED 2026-05-21 | `git push gitea-com main` could not connect to `gitea.com:443` from this environment, even with network escalation |
+| Push to gitea-com | BLOCKED 2026-05-23 | 2026-05-21 push could not connect to `gitea.com:443`; 2026-05-23 retry reached `gitea.com` but failed authentication. Refresh the cloud Gitea credential/PAT before retrying. |
 | Push to local Gitea origin | DONE 2026-05-21 | Created `openchoreo/developer-portal` in local Gitea and pushed `main` through the localhost:3333 port-forward |
 
 ---
@@ -105,6 +105,7 @@ spec:
 | **Complete CRD-group migration: score2openchoreo + gatekeeper + flux platform-config watch** | **42b2231** | **2026-05-02** |
 | Implement score2openchoreo Component+Workload renderer rewrite | M2 closeout commit | 2026-05-17 |
 | Implement k3d/containerd local-registry trust via NodePort mirror | M2 closeout commit | 2026-05-17 |
+| Wire Backstage catalog to local developer-portal and hello-m2 entities | pending commit | 2026-05-22 |
 
 ---
 
@@ -133,7 +134,15 @@ The 2026-04-21 entry suggested gitea.com URL had embedded credentials. As of 202
 - gitea-com auth uses ephemeral PATs minted per-push and immediately revoked
 - osxkeychain caches credentials but expires when PATs are revoked
 
-origin (local Gitea) now points at `http://localhost:3333/openchoreo/developer-portal.git` and has received `main`. gitea-com push is blocked by external network reachability from this environment.
+origin (local Gitea) now points at `http://localhost:3333/openchoreo/developer-portal.git` and has received `main`. gitea-com push is blocked by cloud authentication as of 2026-05-23; the remote is reachable but rejected the cached credential.
+
+---
+
+## Open dependency/security backlog
+
+| Item | Status | Notes |
+|---|---|---|
+| Backstage dependency audit remediation | OPEN 2026-05-23 | `yarn npm audit --all --recursive` reaches the registry with network escalation and reports existing critical/high transitive advisories, including `vm2`, `protobufjs`, `axios`, `tar`, `undici`, `fast-uri`, `fast-xml-builder`, and `basic-ftp`. No dependency files changed in the Backstage catalog commit. Treat this as a dedicated dependency-upgrade and Backstage-version alignment task before production hardening. |
 
 ---
 

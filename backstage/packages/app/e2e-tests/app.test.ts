@@ -16,14 +16,17 @@
 
 import { test, expect } from '@playwright/test';
 
-test('App should render the welcome page', async ({ page }) => {
+test('catalog should show local developer portal components', async ({
+  page,
+}) => {
   await page.goto('/');
 
-  const enterButton = page.getByRole('button', { name: 'Enter' });
-  await expect(enterButton).toBeVisible();
-  await enterButton.click();
+  await page.getByRole('button', { name: 'Enter' }).click();
 
-  const nav = page.getByRole('navigation');
-  await expect(nav.getByRole('link', { name: 'Catalog' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'APIs' })).toBeVisible();
+  await expect(
+    page.locator('a[href="/catalog/default/component/developer-portal"]'),
+  ).toBeVisible();
+  await expect(
+    page.locator('a[href="/catalog/default/component/hello-m2"]'),
+  ).toBeVisible();
 });

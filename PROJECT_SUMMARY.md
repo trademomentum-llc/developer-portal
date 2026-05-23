@@ -4,7 +4,7 @@
 > state. For "what to do next" see TODO.md. For "where we stopped and what
 > changed mid-session" see SESSION_HANDOFF.md.
 
-**Snapshot date:** 2026-05-22 (M2 validated end-to-end locally; external gitea-com push still blocked by network reachability)
+**Snapshot date:** 2026-05-23 (M2 validated end-to-end locally; external gitea-com push now blocked by cloud auth)
 
 ---
 
@@ -63,23 +63,31 @@ state store all working. Integration into the portal is deferred to M7.
 
 **Source:** `~/Projects/developer-portal/`. git repository, branch `main`.
 The 2026-05-22 M2 closeout work is implemented locally. Local Gitea origin
-uses the localhost:3333 port-forward and has received `main`; gitea-com push
-is blocked by external network reachability from this environment.
+uses the localhost:3333 port-forward and has received `main`; the latest
+gitea-com push reached `gitea.com` but failed authentication, so a fresh
+valid cloud credential/PAT is needed.
 
 **Role:** The umbrella for the full self-hosted IDP build.
 
-**Build status:** M1 substrate complete and healthy. **M2 is implemented
-through schema-valid renderer output and registry-trust bootstrap.** Push ->
-CI -> render -> commit -> Flux pulls -> Flux applies -> OpenChoreo reconciles
--> ComponentRelease -> Deployment -> Pod was validated through Pod creation
-on 2026-05-02. On 2026-05-17, the renderer rewrite was validated with Go
-tests, score smoke, and a live server-side dry-run against the OpenChoreo
-CRDs. The k3d node now has a containerd mirror for the in-cluster registry.
+**Build status:** M1 substrate complete and healthy. **M2 is validated
+end-to-end locally.** Push -> CI -> render -> commit -> Flux pulls -> Flux
+applies -> OpenChoreo reconciles -> ComponentRelease -> Deployment -> Pod
+was validated through a fresh `hello-m2` Gitea Actions run on 2026-05-22.
+The live data-plane deployment is available and the `hello-m2` pod is
+`1/1 Running`. External `gitea-com` push remains blocked by cloud
+authentication, not by current network reachability.
 
-The existing live `hello-m2` pod still uses the stale `dc407cc` image tag and
-now fails with `not found`, which means registry resolution is working but the
-old tag is absent. Remaining M2 closeout is a fresh CI run that pushes a new
-image tag and commits renderer-generated Component+Workload YAML.
+Backstage local development is also wired to the repo catalog now. The app
+title is `Developer Portal`; the catalog loads the root `catalog-info.yaml`
+and `seed-repos/hello-m2/catalog-info.yaml`; and the Playwright smoke test
+signs in as Guest and verifies both `developer-portal` and `hello-m2`
+component links.
+
+Open dependency-security gap: `yarn npm audit --all --recursive` reaches the
+registry with network escalation but fails on existing critical/high
+transitive advisories in the Backstage dependency tree. No dependency files
+changed in the Backstage catalog commit; remediation needs a dedicated
+Backstage dependency-alignment pass before production hardening.
 
 ### Repository layout (current)
 
@@ -168,6 +176,8 @@ image tag and commits renderer-generated Component+Workload YAML.
 | OpenTofu modules | initialized + applied | Task 21 done; Flux watching both platform-addons AND platform-config (commit 42b2231 added the platform-config watch) |
 | score2openchoreo live CRD dry-run | OpenChoreo resources | PASS 2026-05-17 via `kubectl apply --dry-run=server`; SecretReference emission added after CI exposed the missing-resource gap |
 | End-to-end pipeline | DONE 2026-05-22 | CI run #24 (sha `5d88625`) succeeded; image pushed to local registry; platform-config commit applied by Flux; ReleaseBinding Ready=True; data-plane pod 1/1 Running |
+| Backstage catalog smoke | PASS 2026-05-22 | `PLAYWRIGHT_URL=http://127.0.0.1:3001 CI=1 yarn test:e2e --reporter=line --project=app` verifies Guest sign-in and the `developer-portal` + `hello-m2` component links |
+| Backstage dependency audit | FAIL 2026-05-23 | Existing critical/high transitive advisories remain in the dependency tree; catalog commit does not modify dependencies |
 
 ### M2 delta from locked-in tool list (canonical)
 
@@ -195,7 +205,7 @@ post-deploy dashboard role stays M3/M4.
 ### Outstanding (see TODO.md and SESSION_HANDOFF.md)
 
 - **m2i-6: OpenBao dev-mode `inmem` storage** -- production-readiness item, not M2 closeout.
-- **gitea-com push** -- blocked by `gitea.com:443` reachability from this environment.
+- **gitea-com push** -- 2026-05-23 retry reached `gitea.com` but failed authentication; refresh cloud credentials before retry.
 - **M3 kickoff** -- next milestone after the local M2 proof is accepted.
 
 ---

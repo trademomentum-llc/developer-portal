@@ -2,11 +2,24 @@ apiVersion: backstage.io/v1alpha1
 kind: System
 metadata:
   name: developer-portal
-  description: Self-hosted Internal Developer Platform (IDP) -- M1 Substrate
+  description: Self-hosted Internal Developer Platform (IDP) -- M1 substrate and M2 delivery loop
   annotations:
     backstage.io/techdocs-ref: dir:.
 spec:
   owner: gitea_admin
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: developer-portal
+  description: Umbrella Backstage catalog entry for the self-hosted Internal Developer Platform
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: website
+  lifecycle: experimental
+  owner: gitea_admin
+  system: developer-portal
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
