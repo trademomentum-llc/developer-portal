@@ -5,7 +5,7 @@
 > exactly what to do first.
 
 **Last updated:** 2026-05-23
-**Reason for handoff:** M2 T22 is complete locally. Backstage catalog validation now shows the developer portal entities; gitea-com push needs refreshed cloud authentication and the Backstage dependency audit has existing critical/high advisories.
+**Reason for handoff:** M2 T22 is complete locally. Backstage catalog validation now shows the developer portal entities; M3 observability kickoff specs have started; gitea-com push needs refreshed cloud authentication; and the Backstage dependency audit has existing critical/high advisories.
 
 ---
 
@@ -29,6 +29,7 @@ Current validation:
 - Backstage local dev runs on `http://127.0.0.1:3001` with backend `http://127.0.0.1:7008` in this workstation's current port layout.
 - The Backstage catalog loads the repo root `catalog-info.yaml` plus `seed-repos/hello-m2/catalog-info.yaml`; rendered catalog smoke confirms `Component:default/developer-portal` and `Component:default/hello-m2`.
 - `yarn npm audit --all --recursive` reaches the registry with network escalation but fails on existing transitive advisories, including critical/high `vm2`, `protobufjs`, `axios`, `tar`, `undici`, `fast-uri`, `fast-xml-builder`, and `basic-ftp` findings. No dependency files changed in the Backstage catalog work.
+- M3 observability kickoff specs are added under `docs/specs/m3-observability/`; no M3 cluster resources have been installed.
 
 The remaining external closeout is `git push gitea-com main` after refreshing the cloud Gitea credential/PAT. The 2026-05-23 retry reached `gitea.com` but failed authentication. The local Gitea origin has the M2 commits.
 
@@ -136,6 +137,10 @@ Still open and low-priority. It is production-readiness work, not M2 closeout.
 
 `yarn npm audit --all --recursive` currently fails on existing critical/high transitive advisories. This needs a dedicated Backstage dependency alignment task before production hardening; it is not introduced by the catalog/dev-server validation change.
 
+### M3 preflight and version inventory
+
+M3 has specs only. The next implementation step is a read-only `scripts/preflight-m3.sh`, followed by pinned SigNoz, SigNoz K8s Infra, and OpenTelemetry Collector chart-version inventory. Do not install SigNoz or collector resources before that preflight is reviewed.
+
 ---
 
 ## 5. Live state at handoff
@@ -166,6 +171,7 @@ In this exact order:
 5. Confirm cluster is still healthy: `kubectl --context k3d-openchoreo get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded` should not show a stale `hello-m2` ImagePullBackOff after run #24.
 6. If Gitea port-forward is no longer running: `kubectl --context k3d-openchoreo -n gitea port-forward svc/gitea-http 3333:3000 &`
 7. For portal UI work, use `./scripts/start-backstage.sh`; on this workstation it defaults to `127.0.0.1:3001` and backend `127.0.0.1:7008`.
+8. For M3, read `docs/specs/m3-observability/` and implement read-only `scripts/preflight-m3.sh` before any install work.
 
 ---
 
@@ -173,4 +179,4 @@ In this exact order:
 
 - **openchoreo** (`/Users/nnos/Projects/openchoreo/`): unchanged, cluster healthy, used as reference for canonical Component+Workload patterns.
 - **rational-reserve** (`/Users/nnos/Projects/rational-reserve/`): unchanged this session.
-- **developer-portal** (`/Users/nnos/Projects/developer-portal/`): M1 + M2 architecturally complete and locally validated; Backstage catalog now exposes developer-portal plus hello-m2; external gitea-com push needs refreshed cloud auth.
+- **developer-portal** (`/Users/nnos/Projects/developer-portal/`): M1 + M2 architecturally complete and locally validated; Backstage catalog now exposes developer-portal plus hello-m2; M3 observability specs started; external gitea-com push needs refreshed cloud auth.

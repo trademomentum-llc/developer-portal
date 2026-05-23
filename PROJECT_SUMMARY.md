@@ -4,7 +4,7 @@
 > state. For "what to do next" see TODO.md. For "where we stopped and what
 > changed mid-session" see SESSION_HANDOFF.md.
 
-**Snapshot date:** 2026-05-23 (M2 validated end-to-end locally; external gitea-com push now blocked by cloud auth)
+**Snapshot date:** 2026-05-23 (M2 validated end-to-end locally; M3 observability kickoff specs added; external gitea-com push blocked by cloud auth)
 
 ---
 
@@ -88,6 +88,12 @@ registry with network escalation but fails on existing critical/high
 transitive advisories in the Backstage dependency tree. No dependency files
 changed in the Backstage catalog commit; remediation needs a dedicated
 Backstage dependency-alignment pass before production hardening.
+
+M3 has started at the specification/preflight stage. The spec package lives
+at `docs/specs/m3-observability/` and defines OpenTelemetry, SigNoz, and
+post-deploy Infracost visibility. No M3 cluster resources have been
+installed yet; the next step is a read-only preflight plus chart/version
+inventory.
 
 ### Repository layout (current)
 
@@ -206,7 +212,7 @@ post-deploy dashboard role stays M3/M4.
 
 - **m2i-6: OpenBao dev-mode `inmem` storage** -- production-readiness item, not M2 closeout.
 - **gitea-com push** -- 2026-05-23 retry reached `gitea.com` but failed authentication; refresh cloud credentials before retry.
-- **M3 kickoff** -- next milestone after the local M2 proof is accepted.
+- **M3 kickoff** -- specs added; next step is read-only preflight before any cluster mutation.
 
 ---
 

@@ -2,7 +2,8 @@
 
 Self-hosted Internal Developer Platform (IDP) built on k3d, Gitea,
 Backstage, OpenTofu, Flux, Gatekeeper, and OpenChoreo. M1 substrate is
-complete. M2 is validated through OpenChoreo Pod creation and is in closeout.
+complete. M2 is validated end-to-end locally through a running OpenChoreo
+workload. M3 observability is in kickoff/specification.
 
 ## Prerequisites
 
@@ -23,7 +24,7 @@ Resumes from the last completed task. Use `--fresh` to start over.
 
 | Service | URL | Notes |
 |---------|-----|-------|
-| Backstage | http://localhost:3000 | Frontend + backend |
+| Backstage | http://127.0.0.1:3001 | Frontend + backend in current local dev layout |
 | Gitea | http://localhost:3333 | Git hosting, admin: gitea_admin |
 | OpenChoreo API | http://localhost:9090 | Port-forwarded from k3d-openchoreo |
 | k3d cluster | -- | Name: k3d-openchoreo (shared) |
@@ -38,17 +39,20 @@ Stops all services, deletes the k3d cluster, removes credentials. Preserves sour
 
 ## Policy Guards
 
-Three PreToolUse hooks enforce safety in Claude Code sessions:
+Four PreToolUse hooks enforce safety in Claude Code sessions:
 
 - **rr-emoji-guard** -- blocks non-ASCII in file writes
 - **rr-bash-guard** -- blocks bare $VAR expansion, suggests safe syntax
 - **rr-brew-guard** -- blocks dangerous brew flags, URL installs, untrusted taps
+- **rr-tofu-guard** -- blocks direct mutating OpenTofu commands
 
 All hooks are Go binaries in `plugins/rr-policy-guards/bin/`.
 
 ## Project Structure
 
 - `docs/specs/m1-substrate/` -- Requirements, Design Spec, Technical Spec
+- `docs/specs/m2-iac-cd/` -- M2 Requirements, Design Spec, Technical Spec
+- `docs/specs/m3-observability/` -- M3 kickoff Requirements, Design Spec, Technical Spec
 - `plugins/rr-policy-guards/` -- Policy guard hooks (Go)
 - `scripts/` -- Install, teardown, and helper scripts
 - `backstage/` -- Backstage app (scaffolded, wired to Gitea)
@@ -69,3 +73,12 @@ Gitea `openchoreo` organization. Run `scripts/install-m2.sh` to set up,
 `scripts/teardown-m2.sh` to remove, `scripts/smoke-m2.sh` to verify.
 Direct `tofu apply` from a Bash tool use is blocked by `rr-tofu-guard`;
 use the install script.
+
+## M3 -- Observability kickoff
+
+M3 is scoped to OpenTelemetry, SigNoz, and post-deploy Infracost visibility.
+The first M3 deliverable is the spec package in `docs/specs/m3-observability/`.
+No M3 cluster resources are installed yet; the next implementation step is a
+read-only preflight that inventories cluster headroom, storage classes, and
+existing OpenChoreo observability-plane resources before selecting pinned
+chart versions.

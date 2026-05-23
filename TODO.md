@@ -146,11 +146,26 @@ origin (local Gitea) now points at `http://localhost:3333/openchoreo/developer-p
 
 ---
 
-## M3-M7 (unchanged)
+## M3 Observability -- kickoff
+
+M3 is now active at the specification/preflight stage. No M3 cluster resources
+have been installed.
+
+| Task | Status | Notes |
+|---|---|---|
+| M3 spec package | DONE pending commit | Added `docs/specs/m3-observability/{requirements,design-specification,technical-specification}.md` |
+| M3 preflight script | NEXT | Add read-only `scripts/preflight-m3.sh` to inventory cluster headroom, storage classes, existing OpenChoreo observability-plane resources, and current non-running pods |
+| M3 chart/version inventory | TODO | Record pinned SigNoz, SigNoz K8s Infra, and OpenTelemetry Collector chart versions before any install script mutates cluster state |
+| M3 install/teardown scripts | TODO | Add `scripts/install-m3.sh` and `scripts/teardown-m3.sh` only after preflight and version pins are complete |
+| M3 smoke suite | TODO | Add `scripts/smoke-m3.sh` plus SigNoz, OTLP, Backstage telemetry, `hello-m2`, and Infracost artifact checks |
+| M3 Backstage dependency audit | BLOCKED | Existing critical/high Backstage audit advisories should be handled before treating Backstage observability as production-ready |
+
+---
+
+## M4-M7
 
 | Milestone | Scope | Status |
 |---|---|---|
-| M3 | OpenTelemetry + SigNoz + Infracost post-deploy dashboards | deferred |
 | M4 | OpenCost + Cilium + Envoy Gateway | deferred |
 | M5 | RabbitMQ or Kafka + OpenResty front-door | deferred |
 | M6 | OPA/Gatekeeper runtime policies + MISP + TheHive + Cortex + Velociraptor + Cloud Custodian | deferred |
