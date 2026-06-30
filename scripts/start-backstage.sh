@@ -15,6 +15,14 @@ if [ -d "$NODE24_BIN" ]; then
     export PATH="$NODE24_BIN:$PATH"
 fi
 
+# Load Gitea OAuth credentials for the Backstage auth provider if they exist.
+if [ -f "$RUNTIME_DIR/backstage-oauth-client-id" ]; then
+    export GITEA_OAUTH_CLIENT_ID=$(cat "$RUNTIME_DIR/backstage-oauth-client-id")
+fi
+if [ -f "$RUNTIME_DIR/backstage-oauth-client-secret" ]; then
+    export GITEA_OAUTH_CLIENT_SECRET=$(cat "$RUNTIME_DIR/backstage-oauth-client-secret")
+fi
+
 ensure_gitea_port() {
     local local_port="$1"
     local pid_file="$RUNTIME_DIR/gitea-portforward-${local_port}.pid"

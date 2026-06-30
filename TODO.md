@@ -274,7 +274,19 @@ See final subagent report for complete proposals, code examples, and 3-spec tria
 
 | Milestone | Scope | Status |
 |---|---|---|
-| M4 | OpenCost + Cilium + Envoy Gateway | deferred |
+| M4 | OpenCost cost visibility | **DONE 2026-06-30** |
+| M4 | Cilium + Envoy Gateway networking | deferred |
 | M5 | RabbitMQ or Kafka + OpenResty front-door | deferred |
 | M6 | OPA/Gatekeeper runtime policies + MISP + TheHive + Cortex + Velociraptor + Cloud Custodian | deferred |
 | M7 | MCP plugin surfacing Backstage + RR to OpenChoreo + per-agent Gitea tokens | deferred |
+
+**Next candidate priorities (after this session):**
+- M4 networking: Envoy Gateway ingress on k3d-openchoreo.
+  - **DONE 2026-06-30** -- `iac/modules/networking/` added to root `iac/main.tf`; Envoy Gateway deploys HTTPRoutes for `gitea.local`, `signoz.local`, and `opencost.local`; `scripts/install-m4-networking.sh`, `scripts/teardown-m4-networking.sh`, `scripts/smoke-m4-networking.sh`, and `scripts/update-local-hosts.sh` added; `smoke-m4-networking.sh` passes 3/3 routes.
+  - Cilium as the CNI remains a documented fresh-cluster rebuild path (`docs/specs/2026-06-30-M4-Networking-Technical-Specification.md`) rather than an in-place Flannel swap.
+- Backstage non-guest auth: custom Gitea OAuth provider module (generic OAuth2/OIDC modules are blocked by Gitea's userinfo behavior / session requirements).
+- Backstage non-guest auth: custom Gitea OAuth provider module (generic OAuth2/OIDC modules are blocked by Gitea's userinfo behavior / session requirements).
+  - **DONE 2026-06-30** -- backend module `packages/backend/src/modules/giteaAuth.ts`, frontend module `packages/app/src/modules/giteaSignIn.tsx`, `scripts/smoke-auth.sh`, and `scripts/smoke-all.sh` added; `yarn tsc` passes and `smoke-auth.sh` confirms `/api/auth/gitea/start` redirects to Gitea.
+  - Guest provider remains available in local dev; production config uses Gitea only.
+- Production hardening: move Backstage from SQLite to PostgreSQL, deploy behind a reverse proxy, and switch off the guest provider.
+  - **DONE 2026-06-30 (partial)** -- PostgreSQL deployed in `backstage` namespace via `iac/modules/postgres/`; `scripts/install-backstage-production.sh`, `scripts/start-backstage-production.sh`, `scripts/stop-backstage-production.sh`, and `scripts/smoke-backstage-production.sh` added; production config now validated end-to-end with `NODE_ENV=production`, guest disabled, Gitea auth enabled, and permissions enabled. Containerizing Backstage and adding a reverse proxy remain for a future milestone.

@@ -3,6 +3,7 @@ import catalogPlugin from '@backstage/plugin-catalog/alpha';
 import { navModule } from './modules/nav';
 import { openchoreoCardsModule } from './modules/openchoreo-cards/index.tsx';
 import { openchoreoEntityPageModule } from './modules/openchoreo-entity-page/index.tsx';
+import { giteaSignInModule } from './modules/giteaSignIn.tsx';
 
 export default createApp({
   features: [
@@ -10,5 +11,6 @@ export default createApp({
     navModule,
     openchoreoCardsModule,
     openchoreoEntityPageModule,
+    giteaSignInModule,
   ],
 });

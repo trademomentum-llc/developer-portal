@@ -12,8 +12,25 @@ backend:
       directory: ${HOME}/.rational-reserve/backstage-db
 
 auth:
+  environment: development
   providers:
     guest: {}
+    gitea:
+      development:
+        clientId: ${GITEA_OAUTH_CLIENT_ID}
+        clientSecret: ${GITEA_OAUTH_CLIENT_SECRET}
+        # Authenticate against the local Gitea instance. Both Backstage and
+        # Gitea are on localhost, so the OAuth nonce cookie is same-site and
+        # the flow works without a proxy.
+        hostname: localhost:3333
+        secure: false
+
+app:
+  extensions:
+    # Replace the default Backstage sign-in page with the custom Gitea + guest page.
+    # Backstage logs an INVALID_EXTENSION_CONFIG_KEY warning for this key, but
+    # without it the default sign-in page collides with the custom one.
+    - app/sign-in-page: false
 
 permission:
   enabled: false

@@ -4,7 +4,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SUITES=(m2 m3 m4)
+SUITES=(auth m2 m3 m4)
 FAILED=()
 
 for suite in "${SUITES[@]}"; do
@@ -19,8 +19,19 @@ for suite in "${SUITES[@]}"; do
     echo
 done
 
+# Production Backstage smoke is separate because it requires PostgreSQL.
+script="${ROOT_DIR}/scripts/smoke-backstage-production.sh"
+echo "=== Running smoke-backstage-production.sh ==="
+if "$script"; then
+    echo "=== smoke-backstage-production.sh PASSED ==="
+else
+    echo "=== smoke-backstage-production.sh FAILED ===" >&2
+    FAILED+=("backstage-production")
+fi
+echo
+
 if [ ${#FAILED[@]} -eq 0 ]; then
-    echo "ALL SMOKE SUITES PASSED (M2, M3, M4)"
+    echo "ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4, BACKSTAGE-PRODUCTION)"
     exit 0
 else
     echo "SMOKE FAILURES: ${FAILED[*]}" >&2

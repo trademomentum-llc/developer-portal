@@ -38,3 +38,11 @@ module "observability" {
 module "cost" {
   source = "./modules/cost"
 }
+
+module "networking" {
+  source = "./modules/networking"
+}
+
+module "postgres" {
+  source = "./modules/postgres"
+}

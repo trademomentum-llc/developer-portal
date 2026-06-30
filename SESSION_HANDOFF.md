@@ -5,13 +5,13 @@
 > exactly what to do first.
 
 **Last updated:** 2026-06-30
-**Reason for handoff:** M3 Production Multi-Angle Visibility is live and `smoke-m3.sh` passes 16/16. Backstage now auto-discovers Components from the local Gitea `openchoreo` org, the dependency audit is clear of high/critical advisories, and `start-backstage.sh` ensures both required Gitea port-forwards are active.
+**Reason for handoff:** M3 Production Multi-Angle Visibility and M4 cost visibility are live. `./scripts/smoke-all.sh` reports `ALL SMOKE SUITES PASSED (M2, M3, M4)`. `AGENTS.md` has been refreshed with current commands, module list, and port-forwards.
 
 ---
 
 ## 1. The single most important thing
 
-M3 is now live and validated end-to-end:
+M3 and M4 cost visibility are now live and validated end-to-end:
 
 - SigNoz v0.130.1 installed in namespace `signoz`.
 - Standalone OpenTelemetry Collector v0.155.0 installed in namespace `otel-system` and forwarding OTLP/gRPC to SigNoz.
@@ -23,6 +23,10 @@ M3 is now live and validated end-to-end:
   - `OPENCHOREO_ENVIRONMENT=development`
   - `GIT_SHA=a6eaf5a`
 - Live trace verified in ClickHouse `signoz_traces.signoz_index_v3` with `serviceName='hello-m2'`, `resources_string['openchoreo.runtime_namespace']='dp-default-default-development-f8e58905'`, and `resources_string['git.commit.sha']='a6eaf5a'`.
+- `./scripts/smoke-all.sh` reports `ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4, BACKSTAGE-PRODUCTION)`.
+- Backstage production runtime is validated: PostgreSQL-backed, `NODE_ENV=production`, guest disabled, Gitea auth enabled.
+- Backstage Gitea OAuth provider is implemented: backend module `packages/backend/src/modules/giteaAuth.ts`, frontend sign-in module `packages/app/src/modules/giteaSignIn.tsx`, and `scripts/smoke-auth.sh` verifies `/api/auth/gitea/start` redirects to Gitea.
+- `AGENTS.md` was refreshed to list M3/M4/auth/production scripts, the current root `iac/main.tf` modules, required port-forwards, and the Node 24 / guest-auth / production config notes.
 - `./scripts/smoke-m3.sh` now passes 22/22 checks, including live Backstage catalog entity import, a live trace-ingestion assertion, and the post-deploy cost artifact.
 - Backstage `yarn tsc` passes and the five OpenChoreo entity cards render on the live `hello-m2` catalog page after converting them to `EntityCardBlueprint.make` extension definitions (the initial `convertLegacyEntityCardExtension` attempt failed because the plain card components lacked legacy extension metadata).
 - Backstage catalog provider auto-imports `hello-m2` and `developer-portal` from the local Gitea `openchoreo` org via `@backstage/plugin-catalog-backend-module-gitea`; Gitea integrations are configured for both `localhost:3333` (API) and `localhost:3002` (raw file URLs).
@@ -161,12 +165,37 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 - `scripts/start-backstage.sh` now ensures the OpenCost port-forward (`localhost:29003 -> svc/opencost:9090`) is active before the dev server starts.
 - `scripts/smoke-m3.sh` continues to pass 22/22 with OpenCost installed.
 
+### M4 networking (Envoy Gateway ingress)
+
+- Added `docs/specs/2026-06-30-M4-Networking-Requirements.md`, `docs/specs/2026-06-30-M4-Networking-Design-Specification.md`, and `docs/specs/2026-06-30-M4-Networking-Technical-Specification.md`.
+- Added `iac/modules/networking/` (Envoy Gateway Helm, GatewayClass, Gateway, EnvoyProxy NodePort config, HTTPRoutes) and wired it into root `iac/main.tf`.
+- Added `scripts/install-m4-networking.sh`, `scripts/teardown-m4-networking.sh`, `scripts/smoke-m4-networking.sh`, and `scripts/update-local-hosts.sh`.
+- Deployed Envoy Gateway on k3d-openchoreo; `scripts/smoke-m4-networking.sh` passes HTTP 200 for `gitea.local`, `signoz.local`, and `opencost.local`.
+- Cilium as the CNI remains a documented fresh-cluster rebuild path rather than an in-place Flannel replacement.
+
+### Backstage production runtime
+
+- Added the spec triad `docs/specs/2026-06-30-Backstage-Production-Runtime-*`.
+- Added `iac/modules/postgres/` to deploy PostgreSQL in the `backstage` namespace with a NodePort service and a Terraform-generated password stored in a Kubernetes Secret.
+- Added `scripts/install-backstage-production.sh`, `scripts/teardown-backstage-production.sh`, `scripts/start-backstage-production.sh`, `scripts/stop-backstage-production.sh`, and `scripts/smoke-backstage-production.sh`.
+- `start-backstage-production.sh` sets `NODE_ENV=production`, loads `app-config.production.yaml`, forwards PostgreSQL to a local port, and runs the built backend on port 7009 with guest disabled and Gitea auth enabled.
+- `smoke-backstage-production.sh` validates the production backend returns HTTP 200.
+
+### Backstage Gitea authentication provider
+
+- Added the spec triad `docs/specs/2026-06-30-Backstage-Gitea-Auth-Provider-*` per project governance.
+- Implemented backend module `backstage/packages/backend/src/modules/giteaAuth.ts` using `createOAuthAuthenticator` and `createOAuthProviderFactory`; it exchanges the authorization code with Gitea, fetches `/api/v1/user`, and issues a Backstage user token mapped to `user:default/<gitea-login>` with `group:default/openchoreo` ownership.
+- Implemented frontend module `backstage/packages/app/src/modules/giteaSignIn.tsx` with a custom `giteaAuthApiRef`, `ApiBlueprint`-registered `OAuth2` implementation, and a `SignInPageBlueprint` that adds a Gitea option alongside guest sign-in.
+- Wired the modules into `packages/backend/src/index.ts` and `packages/app/src/App.tsx`.
+- Updated `app-config.local.yaml.example` and `app-config.production.yaml` with Gitea provider blocks, and updated `scripts/start-backstage.sh` to export `GITEA_OAUTH_CLIENT_ID`/`GITEA_OAUTH_CLIENT_SECRET` from `~/.rational-reserve/backstage-oauth-client-*`.
+- Added `scripts/smoke-auth.sh` and included it in `scripts/smoke-all.sh`; it validates that `/api/auth/gitea/start` redirects to the local Gitea OAuth authorize URL.
+
 ### Unified smoke validation
 
-- Added `scripts/smoke-all.sh` to run M2, M3, and M4 smoke suites end-to-end.
+- Added `scripts/smoke-all.sh` to run AUTH, M2, M3, and M4 smoke suites end-to-end.
 - Made `scripts/smoke-infracost.sh` skip gracefully when no local `INFRACOST_API_KEY` is configured, avoiding a false failure in local dev.
 - Reseeded OpenBao so `scripts/smoke-openbao.sh` passes.
-- `scripts/smoke-all.sh` now reports `ALL SMOKE SUITES PASSED (M2, M3, M4)`.
+- `scripts/smoke-all.sh` now reports `ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4)`.
 
 ### Entity-page tab polish
 
@@ -240,8 +269,8 @@ In this exact order:
 3. Read `PROJECT_SUMMARY.md`.
 4. `git status` and `git log --oneline origin/main..HEAD` to verify state.
 5. Confirm cluster health: `kubectl --context k3d-openchoreo get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded`.
-6. Run `./scripts/smoke-m3.sh` to confirm the live smoke cycle still passes.
-7. TODO.md items 7-9 are complete. Ask the user for the next priority.
+6. Run `./scripts/smoke-all.sh` to confirm the live AUTH + M2/M3/M4 + BACKSTAGE-PRODUCTION smoke cycle still passes.
+7. Review `TODO.md` "Next candidate priorities" and ask the user which to tackle next. Remaining backlog is primarily containerizing Backstage in-cluster, adding a reverse proxy/TLS, or the Cilium fresh-cluster rebuild.
 
 ---
 
@@ -249,4 +278,4 @@ In this exact order:
 
 - **openchoreo** (`/Users/nnos/Projects/openchoreo/`): unchanged, cluster healthy, used as reference for namespace algorithm and CRD shapes.
 - **rational-reserve** (`/Users/nnos/Projects/rational-reserve/`): unchanged this session.
-- **developer-portal** (`/Users/nnos/Projects/developer-portal/`): M3 Production Multi-Angle Visibility installed and smoke-validated on k3d-openchoreo; Backstage guest sign-in repaired, multi-angle entity-page tabs verified, and post-deploy cost artifact wired; next step is user-prioritized.
+- **developer-portal** (`/Users/nnos/Projects/developer-portal/`): M3 Production Multi-Angle Visibility, M4 cost visibility, and Backstage Gitea auth provider installed and smoke-validated on k3d-openchoreo (`smoke-all.sh` passes AUTH/M2/M3/M4); next step is user-prioritized from TODO.md candidates.

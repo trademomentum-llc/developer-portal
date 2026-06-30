@@ -4,6 +4,12 @@
 # --config app-config.yaml --config app-config.production.yaml to the backend.
 app:
   baseUrl: ${APP_BASE_URL}
+  extensions:
+    # Disable the default Backstage sign-in page so the custom Gitea page
+    # from giteaSignInModule is rendered. The config key matches the legacy
+    # extension id; Backstage logs an INVALID_EXTENSION_CONFIG_KEY warning
+    # in this frontend-system version, but the override still works.
+    - app/sign-in-page: false
 
 backend:
   baseUrl: ${BACKEND_BASE_URL}
@@ -20,9 +26,15 @@ backend:
       database: ${POSTGRES_DATABASE:-backstage_plugin_db}
 
 auth:
-  # Production disables the guest provider. Replace with a real IdP such as
-  # Gitea OIDC, GitHub, GitLab, or OIDC once one is provisioned.
-  providers: {}
+  environment: production
+  # Production disables the guest provider.
+  providers:
+    gitea:
+      production:
+        clientId: ${GITEA_OAUTH_CLIENT_ID}
+        clientSecret: ${GITEA_OAUTH_CLIENT_SECRET}
+        hostname: ${GITEA_HOSTNAME}
+        secure: true
 
 permission:
   enabled: true
