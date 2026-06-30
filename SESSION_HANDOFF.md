@@ -126,6 +126,7 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 
 - `backstage/app-config.local.yaml` now uses a file-backed `better-sqlite3` database directory at `~/.rational-reserve/backstage-db` instead of the in-memory database configured in `app-config.yaml`.
 - Catalog, search, auth, and plugin state now survive dev-server restarts.
+- `backstage/app-config.local.yaml.example` is tracked; `scripts/start-backstage.sh` copies it to `app-config.local.yaml` on first run so a fresh checkout starts with the correct local overrides.
 
 ### Backstage guest sign-in / catalog fix
 

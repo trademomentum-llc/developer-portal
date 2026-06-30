@@ -43,6 +43,16 @@ ensure_gitea_port 3333
 ensure_gitea_port 3002
 
 cd "$BACKSTAGE_DIR"
+
+# Ensure local dev overrides exist; the tracked example supplies guest auth,
+# disabled permission framework, and a persistent SQLite database directory.
+if [ ! -f "app-config.local.yaml" ]; then
+    if [ -f "app-config.local.yaml.example" ]; then
+        cp "app-config.local.yaml.example" "app-config.local.yaml"
+        echo "Created app-config.local.yaml from example"
+    fi
+fi
+
 GITEA_ADMIN_PASSWORD=$(cat "$RUNTIME_DIR/m1-gitea-admin-password")
 export GITEA_ADMIN_PASSWORD
 if [ -f "$RUNTIME_DIR/m1-gitea-token" ]; then
