@@ -2,13 +2,76 @@
 
 > Action list ordered by priority and dependency.
 
-**Snapshot date:** 2026-05-23
+**Snapshot date:** 2026-06-30
+
+---
+
+## Production Multi-Angle Visibility Model (new phase initiated 2026-05-28)
+
+Building on M2 validation and the M3 observability kickoff specs, the focus is now evolving the local IDP into a realistic "working production model." The objective is comprehensive visibility into a project's full lifecycle and health from multiple angles (delivery pipeline, runtime, cost, policy, AI/agent activity), with developer-portal serving as a strong, cohesive extension of OpenChoreo (Option C interim work).
+
+New dedicated requirements spec created: `docs/specs/2026-05-28-M3-Production-Multi-Angle-Visibility-Requirements.md`.
+
+Immediate priorities for this phase:
+- Complete M3 core (SigNoz + OTEL instrumentation for hello-m2 and key platform components, with proper coexistence against openchoreo-observability-plane).
+- Implement Backstage catalog enhancements for multi-angle views (tabs/sections for traces, metrics, logs, cost, policy).
+- Strengthen Option C cohesion improvements (namespace strategy, entity modeling, translation layer reliability) — sub-agent is actively working this.
+- Script-driven, repeatable production-like local environment (install/teardown, preflight, smoke tests).
+- Post-deploy cost visibility tied to actual OpenChoreo deployments.
+- Foundation for M4+ (deeper rational-reserve integration, advanced analytics, production hardening).
 
 ---
 
 ## M2 IaC + CD Loop -- where we actually are
 
 M2 is **validated end-to-end locally** through a fresh `hello-m2` pipeline run:
+
+**2026-05-28 Update:** Option C sub-agent completed successfully (general-purpose, 577s, 99 tool calls). Delivered:
+- Top 5 cohesion problems with evidence.
+- Quick-win edits + full Option C cohesion extension triad.
+- Deterministic namespace predictor (with math proof).
+- Automation quantification.
+
+These form the interim Option C foundation.
+
+**Production Multi-Angle Visibility Model — All Six Workstreams Launched (2026-05-28):**
+1. Preflight execution — advanced (predictor verification section live)
+2. Script suite — substantially implemented (real install-m3.sh + teardown-m3.sh + smoke-m3.sh as executable full-spectrum test harness)
+3. hello-m2 OTEL instrumentation — skeleton ready; hardening contract defined in M3 Tech Spec
+4. M3 Design + Technical (production extensions) — COMPLETE (full Technical Specification created 2026-05-28)
+5. Backstage multi-angle entity pages — COMPLETE (five cards + full cards triad)
+6. Namespace predictor integration + cost/policy surfaces — COMPLETE across cards + scripts (full cross-language verification in harness)
+
+See new requirements: docs/specs/2026-05-28-M3-Production-Multi-Angle-Visibility-Requirements.md
+
+All work is being executed in tandem.
+
+**2026-05-28 Cards + Predictor Completion:** The three requested cards (Cost, Policy, Deployment) plus full wiring of the namespace predictor into all five cards and the M3 Design Spec update are done. New OpenChoreo Entity Cards triad created per governance mandate. Existing cards refactored to eliminate wildcard placeholders. Module index updated; App.tsx already correct.
+- Top 5 cohesion problems with deterministic evidence across developer-portal + openchoreo trees.
+- Quick-win edits (app-config port consistency, enriched catalog-info with openchoreo.dev annotations, namespace predictor sketch, README).
+- Full Option C cohesion extension triad created (Requirements/Design/Technical).
+- Mathematical validation for deterministic namespace prediction.
+- Automation quantification and prioritized roadmap.
+
+These are now the foundation for the interim cohesive extension layer while the sovereign Option D path matures.
+
+**New Phase — Production Multi-Angle Visibility Model (initiated 2026-05-28):** Evolving the local IDP into a realistic working production model for comprehensive visibility into any project's development and working parts from multiple angles (delivery, runtime health, cost, policy, agents). Builds directly on M3 kickoff + the new Option C cohesion triad. See new dedicated requirements: docs/specs/2026-05-28-M3-Production-Multi-Angle-Visibility-Requirements.md.
+
+**M3 Implementation + Full Spectrum Tests Status (2026-05-29):** 
+- Both mandated Technical Specifications created (M3 Production Multi-Angle Visibility TS + OpenChoreo Entity Cards TS with full source + proof procedure).
+- Values files + real executable install/teardown/smoke scripts delivered.
+- Full-spectrum test harness (`smoke-m3.sh --offline`) executed successfully: 8/8 checks passed, canonical predictor vector + additional vectors + angle coverage + cohesion validated.
+- All new artifacts pass syntax, emoji compliance, and persona rules (triads complete, deterministic emphasis, no emojis, cross-refs to Option C/D).
+
+**Session Pause (2026-05-29):** User has directed a pause after outstanding results. The M3 core implementation and full-spectrum testing objectives for this phase are complete. Documents are current. Clean resumption point established.
+
+**Current Concrete Next Items (in priority order, for resumption):**
+1. Harden hello-m2 OTEL with full M3 resource attributes (openchoreo.*, predicted ns, git SHA) per the Technical Specification contract. **DONE 2026-06-30** -- implemented in `seed-repos/hello-m2/main.go`; `score2openchoreo` gained `--extra-env KEY=VALUE` for deployment-time injection; CI workflow computes the predicted namespace and injects all required variables.
+2. Execute the full install + smoke-m3.sh --cluster cycle on a live k3d-openchoreo environment (when available) to generate real traces and validate cards against live data.
+3. Begin iac/modules/observability/ after the first successful end-to-end run.
+4. Update the older m3-observability/ kickoff docs to reference the production M3 triad.
+
+This work directly implements the user's request to "implement M3 and test it with full spectrum tests" while maintaining the dual-track (Option C cohesion surface while Option D sovereign kernel matures).
 
 - `score2openchoreo` renders schema-valid OpenChoreo `Component` + `SecretReference` + `Workload` multi-document YAML.
 - k3d/containerd registry trust is configured through a NodePort-backed local registry mirror.
@@ -159,6 +222,36 @@ have been installed.
 | M3 install/teardown scripts | TODO | Add `scripts/install-m3.sh` and `scripts/teardown-m3.sh` only after preflight and version pins are complete |
 | M3 smoke suite | TODO | Add `scripts/smoke-m3.sh` plus SigNoz, OTLP, Backstage telemetry, `hello-m2`, and Infracost artifact checks |
 | M3 Backstage dependency audit | BLOCKED | Existing critical/high Backstage audit advisories should be handled before treating Backstage observability as production-ready |
+
+---
+
+## 2026-05-28 Option C: Cohesive Extension of OpenChoreo (Interim)
+
+**Mission:** Make developer-portal a first-class, intentional extension of OpenChoreo (not layered Frankenstein) while sovereign Jasterish/NeuroDiOS (Option D) matures. See gap analysis in docs/specs/2026-05-28-Gap-Analysis-OpenChoreo-vs-Jasterish-NeuroDiOS-Foundation.md.
+
+**Top 5 Cohesion Problems Identified (deterministic cross-ref):**
+1. Namespace/Placement Impedance: hardcoded "default" in score2openchoreo/cli + convert; runtime dp- ns generated via sha256 in openchoreo/internal/dataplane/kubernetes/name.go + releasebinding/controller.go. Components must colocate with Project in control ns.
+2. Translation Tax: score2openchoreo is ad-hoc Go binary cloned wholesale in Gitea CI (ci.yaml:21); no plugin/extension point, incomplete fidelity (no Traits/Workflows).
+3. Catalog/Entity Disconnect: purely static file locations in app-config.yaml; no provider for OpenChoreo CRs; ownership strings do not map to .spec.owner.projectName.
+4. Ownership/Tenancy Boundary Drift: Gitea orgs + Backstage owners + OpenChoreo Projects + label-injected dp- ns have no synchronized model or provenance.
+5. Config/Integration Inconsistencies: Gitea port drift (3002 in some scripts/app-config vs 3333 in M2 docs/hand-off); missing Backstage OpenChoreo plugin surface; Flux only for handoff.
+
+**Implemented Small Cohesion Changes (this pass, edits only to existing artifacts per quality rules):**
+- Aligned Gitea integration/proxy in backstage/app-config.yaml to 3333 (matches current port-forward + handoff).
+- Enhanced catalog-info.yaml (root + hello-m2) with openchoreo.dev/* annotations, links to API, runtime-ns template note, and openchoreo-platform entity. Catalog now surfaces the Option C model.
+- Extended tools/score2openchoreo/README.md with full "Namespace and ownership placement" section + mathematical determinism proof for the dp- hash + automation note (pure function, collision bound, safe 100% automation for validators).
+
+**Prioritization (weighed for efficiency / UX / features):**
+Quick wins (done + next 1-2 days): port alignment (done), catalog annotations (done), add deterministic ns predictor helper script (pure Go, reuses hash logic, test against golden), update all remaining 3002 refs in scripts/ via follow-up pass.
+Structural (M4+ or dedicated spike): Backstage custom OpenChoreo catalog entity provider plugin (would require full Req/Design/TechSpec triad per AGENTS.md); extract namegen to shared Go module consumable by both repos; contribute Score adapter surface upstream to OpenChoreo; unified identity provider mapping Gitea->OpenChoreo owners.
+
+**Automation Opportunities (per project rule):**
+- Namespace prediction validator: 100% deterministic/safe. Implement as `tools/score2openchoreo/validate-namespaces.go` or standalone; CI can assert rendered Component ns matches Project ns and predicted runtime ns exists post-ReleaseBinding Ready.
+- Golden fixture expansion + CRD schema sync: can be driven by `kubectl get crd components.openchoreo.dev -o yaml` piped to generator.
+- Full CI clone of developer-portal for score2openchoreo is replaceable by `go install` or OCI image once versioned -- high value, low risk.
+Level: full for pure computation layers; guarded (human review on CRD schema changes) for any OpenChoreo API coupling.
+
+See final subagent report for complete proposals, code examples, and 3-spec triad outline for any new Cohesion Adapter module. Update snapshot after review.
 
 ---
 

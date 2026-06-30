@@ -1,0 +1,26 @@
+#!/bin/sh
+# rr-commit-guard pre-commit hook.
+#
+# Delegates to the rr-commit-guard binary in --scan-staged mode. The binary
+# applies the Never-list (block) and Grey-list (warn) rule catalogue against
+# `git diff --cached`. Exits 0 on allow, 2 on block, 1 on internal error.
+#
+# Bypass: set RR_COMMIT_GUARD_BYPASS=1 (still audit-logged).
+# Override binary path: set RR_COMMIT_GUARD_BIN=/abs/path/to/rr-commit-guard.
+
+set -eu
+
+GUARD="${RR_COMMIT_GUARD_BIN:-rr-commit-guard}"
+
+if ! command -v "${GUARD}" >/dev/null 2>&1; then
+  cat >&2 <<EOF
+rr-commit-guard: binary not found on PATH (${GUARD}).
+Install or set RR_COMMIT_GUARD_BIN to the absolute path.
+
+To skip this check for one commit:
+  RR_COMMIT_GUARD_BYPASS=1 git commit ...
+EOF
+  exit 1
+fi
+
+exec "${GUARD}" --scan-staged

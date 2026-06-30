@@ -1,0 +1,77 @@
+# collector-values.local.yaml
+# Standalone OpenTelemetry Collector for M3.
+# Receives OTLP from instrumented workloads (hello-m2 and future platform components),
+# enriches with k8s attributes and the deterministic openchoreo.* labels,
+# then exports to the SigNoz collector.
+#
+# This collector must be deployed in `otel-system` (or signoz) and must not
+# interfere with any collector that OpenChoreo itself may run in its planes.
+
+mode: deployment   # Simple deployment for local demo (daemonset possible later)
+
+image:
+  repository: otel/opentelemetry-collector-contrib
+  tag: "0.155.0"
+
+command:
+  name: otelcol-contrib
+
+clusterRole:
+  create: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+          cors:
+            allowed_origins:
+              - "*"
+
+  processors:
+    batch: {}
+    # Minimal k8s_attributes config for local demo stability. The workload's own
+    # resource attributes are the preferred source for openchoreo.* keys.
+    k8s_attributes:
+      passthrough: true
+    resource:
+      attributes:
+        # These will be overridden / supplemented by the workload's own
+        # resource attributes (the preferred source for openchoreo.* keys).
+        - key: deployment.environment
+          value: "local-k3d-m3"
+          action: upsert
+
+  exporters:
+    otlp/signoz:
+      # Export to the SigNoz in-cluster collector, which writes to ClickHouse.
+      endpoint: "signoz-otel-collector.signoz.svc.cluster.local:4317"
+      tls:
+        insecure: true
+      # Future: add API token when auth is enabled in SigNoz
+
+  service:
+    pipelines:
+      traces:
+        receivers: [otlp]
+        processors: [k8s_attributes, batch]
+        exporters: [otlp/signoz]
+      metrics:
+        receivers: [otlp]
+        processors: [k8s_attributes, batch]
+        exporters: [otlp/signoz]
+      logs:
+        receivers: [otlp]
+        processors: [k8s_attributes, batch]
+        exporters: [otlp/signoz]

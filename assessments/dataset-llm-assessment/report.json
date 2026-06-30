@@ -1,0 +1,1337 @@
+[
+  {
+    "canonical_path": "omni/PixelAgent/data/adb_commands.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_nested",
+    "size_bytes": 77926,
+    "duplicate_copies": [],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "119 rows x ~7 flattened cols",
+    "notes": [
+      "Nested list-heavy schema; standard tabular primitives do not apply directly."
+    ],
+    "sample_columns": [
+      "timestamp",
+      "command",
+      "intent",
+      "stdout",
+      "stderr",
+      "return_code",
+      "duration_ms"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/PixelAgent/data/calibration.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_flat",
+    "size_bytes": 8927,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "38 rows x ~11 flattened cols",
+    "notes": [],
+    "sample_columns": [
+      "timestamp",
+      "action",
+      "metric",
+      "pre_value",
+      "post_value",
+      "elapsed_sec",
+      "delta",
+      "rate",
+      "action_params.level",
+      "action_params.threads"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/PixelAgent/data/hypotheses.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_nested",
+    "size_bytes": 3238,
+    "duplicate_copies": [],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "3 rows x ~29 flattened cols",
+    "notes": [
+      "Nested list-heavy schema; standard tabular primitives do not apply directly."
+    ],
+    "sample_columns": [
+      "id",
+      "created_at",
+      "action",
+      "action_intent",
+      "predictions",
+      "state",
+      "started_at",
+      "completed_at",
+      "accuracy_score",
+      "complexity"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/PixelAgent/data/state_log.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_event_log",
+    "size_bytes": 2034,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE TIME TRAVELER",
+    "shape": "7 rows x ~33 flattened cols",
+    "notes": [
+      "Event log with timestamps; requires time-series/event aggregation before classic EDA."
+    ],
+    "sample_columns": [
+      "timestamp",
+      "cycle",
+      "event",
+      "data.model",
+      "data.manufacturer",
+      "data.android_version",
+      "data.sdk_version",
+      "data.build_id",
+      "data.device",
+      "data.timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/PixelAgent/data/state_log_v2.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_event_log",
+    "size_bytes": 2573,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE TIME TRAVELER",
+    "shape": "7 rows x ~30 flattened cols",
+    "notes": [
+      "Event log with timestamps; requires time-series/event aggregation before classic EDA."
+    ],
+    "sample_columns": [
+      "timestamp",
+      "cycle",
+      "event",
+      "data.model",
+      "data.manufacturer",
+      "data.android_version",
+      "data.sdk_version",
+      "data.build_id",
+      "data.device",
+      "data.timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/PixelAgent/data/telemetry_history.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_nested",
+    "size_bytes": 11201,
+    "duplicate_copies": [],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "26 rows x ~12 flattened cols",
+    "notes": [
+      "Nested list-heavy schema; standard tabular primitives do not apply directly."
+    ],
+    "sample_columns": [
+      "timestamp",
+      "cpu_temps",
+      "gpu_temp",
+      "battery_temp",
+      "skin_temp",
+      "skin_throttle_threshold",
+      "skin_shutdown_threshold",
+      "battery_shutdown_threshold",
+      "fan_speeds",
+      "cpu_temp_avg"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/cali/jeff/tri-mar/Trident_Markets_Operating_Budget.xlsx",
+    "ext": ".xlsx",
+    "format_kind": "xlsx_workbook",
+    "size_bytes": 10964,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "1 sheets",
+    "notes": [
+      "Workbook metadata parsed via ZIP/XML; cell-level profiling not run."
+    ],
+    "sample_columns": [],
+    "tables_or_sheets": [
+      "Startup Phase (A1:E65)"
+    ]
+  },
+  {
+    "canonical_path": "omni/distributed-ai-cluster/proposals/doe-hep/potential-co-pis.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 5994,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "14 rows x 11 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak.",
+      "Top missingness: Phone=71%.",
+      "Contains direct contact fields; do not send blindly to third-party LLMs."
+    ],
+    "sample_columns": [
+      "Name",
+      "Institution",
+      "Department",
+      "Title",
+      "Expertise",
+      "Recent Publications/Awards",
+      "Contact Email",
+      "Phone"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/eight-layer-pqc/docs/00637599.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 1773,
+    "duplicate_copies": [
+      "omni/neurodivergence.works/security-architecture/eight-layer-pqc/docs/00637599.csv"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "5 rows x 4 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Level",
+      "Characteristics",
+      "Actions Required",
+      "Risk Profile"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/eight-layer-pqc/docs/102737b2.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 1347,
+    "duplicate_copies": [
+      "omni/neurodivergence.works/security-architecture/eight-layer-pqc/docs/102737b2.csv"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "5 rows x 4 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Investment Category",
+      "Typical Range (USD)",
+      "Key Components",
+      "ROI Considerations"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/eight-layer-pqc/docs/53919eaa.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 1742,
+    "duplicate_copies": [
+      "omni/neurodivergence.works/security-architecture/eight-layer-pqc/docs/53919eaa.csv"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "6 rows x 4 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Capability Domain",
+      "Current State Questions",
+      "Target State",
+      "Gap Analysis Questions"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/eight-layer-pqc/docs/5ef3c051.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 1487,
+    "duplicate_copies": [
+      "omni/neurodivergence.works/security-architecture/eight-layer-pqc/docs/5ef3c051.csv"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "5 rows x 4 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Phase",
+      "Timeframe",
+      "Key Actions",
+      "Success Metrics"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/eight-layer-pqc/docs/cae830c0.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 1518,
+    "duplicate_copies": [
+      "omni/neurodivergence.works/security-architecture/eight-layer-pqc/docs/cae830c0.csv"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "6 rows x 4 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Role/Committee",
+      "Responsibilities",
+      "Reporting Structure",
+      "Key Deliverables"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/health-insights/docs/income-generation-for-ihep-sustainability-v1-evals.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 98357,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "7 rows x 3 cols",
+    "notes": [
+      "Contains long-form text blobs; classic numeric EDA is only a partial fit.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "CURRENT_PLAN",
+      "Model Output",
+      "Rating"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/docs/compliance/IHEP_Compliance_Mapping.xlsx",
+    "ext": ".xlsx",
+    "format_kind": "xlsx_workbook",
+    "size_bytes": 7179,
+    "duplicate_copies": [
+      "omni/health-insights/docs/compliance/IHEP_Compliance_Mapping.xlsx",
+      "omni/health-insights/ihep-application/docs/compliance/IHEP_Compliance_Mapping.xlsx"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "1 sheets",
+    "notes": [
+      "Workbook metadata parsed via ZIP/XML; cell-level profiling not run."
+    ],
+    "sample_columns": [],
+    "tables_or_sheets": [
+      "Sheet1 (A1:C32)"
+    ]
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/docs/runbooks/PZdataset.xlsx",
+    "ext": ".xlsx",
+    "format_kind": "xlsx_workbook",
+    "size_bytes": 1733040,
+    "duplicate_copies": [
+      "omni/health-insights/docs/runbooks/PZdataset.xlsx",
+      "omni/health-insights/ihep-application/docs/runbooks/PZdataset.xlsx"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "1 sheets",
+    "notes": [
+      "Workbook metadata parsed via ZIP/XML; cell-level profiling not run."
+    ],
+    "sample_columns": [],
+    "tables_or_sheets": [
+      "Urban Promise Zone Application (A1:IB112)"
+    ]
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/adherence/processed/adherence_training.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_placeholder_training",
+    "size_bytes": 232782,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/adherence/processed/adherence_training.jsonl",
+      "omni/health-insights/training_datasets/adherence/processed/adherence_training.jsonl"
+    ],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "400 rows x ~9 flattened cols",
+    "notes": [
+      "Outputs are placeholders rather than labels or gold responses.",
+      "All sampled outputs are identical."
+    ],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.barrier",
+      "metadata.condition",
+      "metadata.generated",
+      "metadata.source",
+      "metadata.gender_balanced"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/adherence/raw/medication_adherence_patterns.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_flat",
+    "size_bytes": 92181,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/adherence/raw/medication_adherence_patterns.jsonl",
+      "omni/health-insights/training_datasets/adherence/raw/medication_adherence_patterns.jsonl"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "26 rows x ~10 flattened cols",
+    "notes": [],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.condition",
+      "metadata.severity",
+      "metadata.intervention_type",
+      "metadata.adherence_barrier",
+      "metadata.source",
+      "metadata.gender_balanced"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/clinical/processed/clinical_training.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_placeholder_training",
+    "size_bytes": 234736,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/clinical/processed/clinical_training.jsonl",
+      "omni/health-insights/training_datasets/clinical/processed/clinical_training.jsonl"
+    ],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "400 rows x ~9 flattened cols",
+    "notes": [
+      "Outputs are placeholders rather than labels or gold responses.",
+      "All sampled outputs are identical."
+    ],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.scenario",
+      "metadata.condition",
+      "metadata.generated",
+      "metadata.source",
+      "metadata.gender_balanced"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/clinical/raw/chronic_disease_management.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_flat",
+    "size_bytes": 96798,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/clinical/raw/chronic_disease_management.jsonl",
+      "omni/health-insights/training_datasets/clinical/raw/chronic_disease_management.jsonl"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "24 rows x ~10 flattened cols",
+    "notes": [],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.condition",
+      "metadata.severity",
+      "metadata.evidence_level",
+      "metadata.clinical_domain",
+      "metadata.source",
+      "metadata.gender_balanced"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/clinical/raw/hiv_care_continuum.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_flat",
+    "size_bytes": 84980,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/clinical/raw/hiv_care_continuum.jsonl",
+      "omni/health-insights/training_datasets/clinical/raw/hiv_care_continuum.jsonl"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "36 rows x ~10 flattened cols",
+    "notes": [],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.condition",
+      "metadata.severity",
+      "metadata.evidence_level",
+      "metadata.clinical_domain",
+      "metadata.source",
+      "metadata.gender_balanced"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/conversational/raw/patient_dialogues.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_nested",
+    "size_bytes": 141008,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/conversational/raw/patient_dialogues.jsonl",
+      "omni/health-insights/training_datasets/conversational/raw/patient_dialogues.jsonl"
+    ],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "24 rows x ~14 flattened cols",
+    "notes": [
+      "Nested list-heavy schema; standard tabular primitives do not apply directly."
+    ],
+    "sample_columns": [
+      "conversation_id",
+      "turns",
+      "metadata.scenario_type",
+      "metadata.condition",
+      "metadata.emotional_tone",
+      "metadata.outcome",
+      "metadata.source",
+      "metadata.category",
+      "metadata.gender_balanced",
+      "metadata.issue"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/evaluation/raw/bias_eval.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_nested",
+    "size_bytes": 10044,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/evaluation/raw/bias_eval.jsonl",
+      "omni/health-insights/training_datasets/evaluation/raw/bias_eval.jsonl"
+    ],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "24 rows x ~8 flattened cols",
+    "notes": [
+      "Nested list-heavy schema; standard tabular primitives do not apply directly.",
+      "Duplicate rows observed in sample."
+    ],
+    "sample_columns": [
+      "id",
+      "category",
+      "input_a",
+      "input_b",
+      "evaluation_criteria",
+      "expected",
+      "check_for",
+      "source"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/evaluation/raw/clinical_eval.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_nested",
+    "size_bytes": 11648,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/evaluation/raw/clinical_eval.jsonl",
+      "omni/health-insights/training_datasets/evaluation/raw/clinical_eval.jsonl"
+    ],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "30 rows x ~6 flattened cols",
+    "notes": [
+      "Nested list-heavy schema; standard tabular primitives do not apply directly.",
+      "Duplicate rows observed in sample."
+    ],
+    "sample_columns": [
+      "id",
+      "category",
+      "input",
+      "expected_topics",
+      "accuracy_requirements",
+      "source"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/evaluation/raw/safety_eval.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_nested",
+    "size_bytes": 10763,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/evaluation/raw/safety_eval.jsonl",
+      "omni/health-insights/training_datasets/evaluation/raw/safety_eval.jsonl"
+    ],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "24 rows x ~8 flattened cols",
+    "notes": [
+      "Nested list-heavy schema; standard tabular primitives do not apply directly.",
+      "Duplicate rows observed in sample."
+    ],
+    "sample_columns": [
+      "id",
+      "category",
+      "input",
+      "expected_behavior",
+      "required_elements",
+      "unsafe_elements",
+      "severity",
+      "source"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/financial_health/raw/financial_navigation.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_flat",
+    "size_bytes": 61212,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/financial_health/raw/financial_navigation.jsonl",
+      "omni/health-insights/training_datasets/financial_health/raw/financial_navigation.jsonl"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "10 rows x ~10 flattened cols",
+    "notes": [],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.domain",
+      "metadata.condition",
+      "metadata.intervention_type",
+      "metadata.source",
+      "metadata.gender_balanced",
+      "metadata.severity"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/mental_health/processed/mental_health_training.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_placeholder_training",
+    "size_bytes": 173058,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/mental_health/processed/mental_health_training.jsonl",
+      "omni/health-insights/training_datasets/mental_health/processed/mental_health_training.jsonl"
+    ],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "300 rows x ~10 flattened cols",
+    "notes": [
+      "Outputs are placeholders rather than labels or gold responses.",
+      "All sampled outputs are identical."
+    ],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.assessment",
+      "metadata.score",
+      "metadata.severity",
+      "metadata.generated",
+      "metadata.source",
+      "metadata.gender_balanced"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/mental_health/raw/mental_health_assessments.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_flat",
+    "size_bytes": 123526,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/mental_health/raw/mental_health_assessments.jsonl",
+      "omni/health-insights/training_datasets/mental_health/raw/mental_health_assessments.jsonl"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "24 rows x ~17 flattened cols",
+    "notes": [],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.assessment",
+      "metadata.severity",
+      "metadata.score_range",
+      "metadata.intervention_type",
+      "metadata.source",
+      "metadata.gender_balanced"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/processed_for_training/train.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_placeholder_training",
+    "size_bytes": 490,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/processed_for_training/train.jsonl",
+      "omni/health-insights/ihep-application/ml/training/datasets/processed_for_training/validation.jsonl",
+      "omni/health-insights/training_datasets/processed_for_training/train.jsonl",
+      "omni/health-insights/training_datasets/processed_for_training/validation.jsonl",
+      "omni/ihep-app/ihep/training_datasets/processed_for_training/validation.jsonl"
+    ],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "10 rows x ~1 flattened cols",
+    "notes": [
+      "Text rows are synthetic placeholders rather than meaningful training content.",
+      "Validation split is byte-identical to the training file."
+    ],
+    "sample_columns": [
+      "text"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/risk_prediction/processed/risk_training.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_placeholder_training",
+    "size_bytes": 247644,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/risk_prediction/processed/risk_training.jsonl",
+      "omni/health-insights/training_datasets/risk_prediction/processed/risk_training.jsonl"
+    ],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "200 rows x ~22 flattened cols",
+    "notes": [
+      "Outputs are placeholders rather than labels or gold responses.",
+      "All sampled outputs are identical.",
+      "Repeated patient IDs detected in sample/full file (100 repeated IDs).",
+      "Contains patient-profile features; treat as sensitive even if synthetic."
+    ],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.patient_profile.patient_id",
+      "metadata.patient_profile.age",
+      "metadata.patient_profile.gender",
+      "metadata.patient_profile.conditions",
+      "metadata.patient_profile.hiv_status",
+      "metadata.patient_profile.viral_load"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/risk_prediction/raw/risk_stratification_training.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_flat",
+    "size_bytes": 130910,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/risk_prediction/raw/risk_stratification_training.jsonl",
+      "omni/health-insights/training_datasets/risk_prediction/raw/risk_stratification_training.jsonl"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "16 rows x ~11 flattened cols",
+    "notes": [],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.risk_type",
+      "metadata.risk_level",
+      "metadata.patient_population",
+      "metadata.source",
+      "metadata.gender_balanced",
+      "metadata.comorbidity"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/social_determinants/processed/sdoh_training.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_placeholder_training",
+    "size_bytes": 15542,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/social_determinants/processed/sdoh_training.jsonl",
+      "omni/health-insights/training_datasets/social_determinants/processed/sdoh_training.jsonl"
+    ],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "24 rows x ~9 flattened cols",
+    "notes": [
+      "Outputs are placeholders rather than labels or gold responses.",
+      "All sampled outputs are identical."
+    ],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.domain",
+      "metadata.condition",
+      "metadata.generated",
+      "metadata.source",
+      "metadata.gender_balanced"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/social_determinants/raw/sdoh_interventions.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_flat",
+    "size_bytes": 138283,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/social_determinants/raw/sdoh_interventions.jsonl",
+      "omni/health-insights/training_datasets/social_determinants/raw/sdoh_interventions.jsonl"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "22 rows x ~10 flattened cols",
+    "notes": [],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.domain",
+      "metadata.severity",
+      "metadata.condition",
+      "metadata.intervention_type",
+      "metadata.source",
+      "metadata.gender_balanced"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/wearables/processed/wearables_training.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_placeholder_training",
+    "size_bytes": 128226,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/wearables/processed/wearables_training.jsonl",
+      "omni/health-insights/training_datasets/wearables/processed/wearables_training.jsonl"
+    ],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "200 rows x ~8 flattened cols",
+    "notes": [
+      "Outputs are placeholders rather than labels or gold responses.",
+      "All sampled outputs are identical."
+    ],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.data_type",
+      "metadata.generated",
+      "metadata.source",
+      "metadata.gender_balanced"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/ihep-app/ihep/training_datasets/wearables/raw/wearable_data_interpretation.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_flat",
+    "size_bytes": 54996,
+    "duplicate_copies": [
+      "omni/health-insights/ihep-application/ml/training/datasets/wearables/raw/wearable_data_interpretation.jsonl",
+      "omni/health-insights/training_datasets/wearables/raw/wearable_data_interpretation.jsonl"
+    ],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "10 rows x ~11 flattened cols",
+    "notes": [],
+    "sample_columns": [
+      "instruction",
+      "input",
+      "output",
+      "metadata.category",
+      "metadata.data_type",
+      "metadata.condition",
+      "metadata.severity",
+      "metadata.intervention_type",
+      "metadata.source",
+      "metadata.gender_balanced"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/jarmacz.com/aesthetic_errors_analysis.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 2636,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "10 rows x 5 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Issue",
+      "Severity",
+      "Location",
+      "Description",
+      "Recommended Fix"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_0fd1056b-2f0e-4482-8062-06d17b804e2d_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 484,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "2 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_29df166a-9386-40b5-8326-9c73901d292f_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 289,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "1 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_3cd019bc-a7e4-49fe-9e61-3ef61a92c5d8_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 275,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "1 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_52a3d7d1-bbfe-4a61-af73-8ce9a8a8178e_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 289,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "1 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_5571af03-3faf-49c9-90cc-4d48bff1f789_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 289,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "1 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_55d05e02-1e92-4475-aa90-3b43e7b7ffcb_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 484,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "2 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_5636504e-c1a9-4b56-9626-4042366de181_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 275,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "1 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_a8086a5d-eee8-4ef1-87cb-e75b47dcab64_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 484,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "2 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_adcc1803-9ada-4c0a-8167-054a84806bd1_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 289,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "1 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_b0c51747-b0ac-4db7-a368-6f672608c469_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 289,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "1 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_bdde8e40-8320-4d2b-99ec-0b7c86bc7b49_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 484,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "2 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_d277871d-13f1-4951-8a3f-e04a5393302e_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 275,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "1 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_df557fb6-f6e9-4641-90d3-582c5677284a_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 484,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "2 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_e876a125-b25e-49dd-86dd-b45cb399776f_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 275,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "1 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/agent_fed4022a-2c6f-45f0-89f7-0e51a58a5079_closure_ledger.csv",
+    "ext": ".csv",
+    "format_kind": "tabular_csv",
+    "size_bytes": 275,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "1 rows x 7 cols",
+    "notes": [
+      "Mostly categorical/text fields; plotting and correlation steps are limited.",
+      "Very small sample size; inferential workflows are weak."
+    ],
+    "sample_columns": [
+      "Loop ID",
+      "Topic",
+      "Hypothesis",
+      "Pattern",
+      "Structure",
+      "Why Closed",
+      "Timestamp"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/curated_hf_datasets.csv",
+    "ext": ".csv",
+    "format_kind": "markdown_table_disguised_as_csv",
+    "size_bytes": 2395,
+    "duplicate_copies": [],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "",
+    "notes": [
+      "File is a Markdown table saved with .csv extension."
+    ],
+    "sample_columns": [],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/multimodal-agent-builder/train-test-validate/ML-Validation/open_images_validation_asr.jsonl",
+    "ext": ".jsonl",
+    "format_kind": "jsonl_nested",
+    "size_bytes": 74608705,
+    "duplicate_copies": [],
+    "fit": "low",
+    "recommended_workflow": "THE DATA JANITOR",
+    "shape": "41691 rows x ~4 flattened cols",
+    "notes": [
+      "Nested list-heavy schema; standard tabular primitives do not apply directly."
+    ],
+    "sample_columns": [
+      "dataset_id",
+      "image_id",
+      "annotator_id",
+      "asr"
+    ],
+    "tables_or_sheets": []
+  },
+  {
+    "canonical_path": "omni/security-workspace/logs/security_fragments.db",
+    "ext": ".db",
+    "format_kind": "sqlite_db",
+    "size_bytes": 1445888,
+    "duplicate_copies": [],
+    "fit": "medium",
+    "recommended_workflow": "THE KNOCKOUT EDA",
+    "shape": "3 tables",
+    "notes": [
+      "Table sizes: audit_log=3687, fragments=3692, synergies=0",
+      "Requires table selection and joins before any LLM-style workflow."
+    ],
+    "sample_columns": [],
+    "tables_or_sheets": [
+      "audit_log",
+      "fragments",
+      "synergies"
+    ]
+  }
+]

@@ -399,6 +399,35 @@ func TestConvertInlineResourceRefErrors(t *testing.T) {
 	}
 }
 
+func TestConvertExtraEnvOverridesAndSorts(t *testing.T) {
+	in := ScoreDocument{
+		APIVersion: "score.dev/v1b1",
+		Metadata:   ScoreMetadata{Name: "hello"},
+		Containers: map[string]ScoreContainer{
+			"web": {Image: "i", Variables: map[string]string{"FOO": "bar"}},
+		},
+	}
+	got, err := Convert(in, ConvertOptions{
+		Environment: "dev",
+		Namespace:   "default",
+		Project:     "default",
+		ExtraEnv:    map[string]string{"OTEL": "on", "FOO": "overridden"},
+	})
+	if err != nil {
+		t.Fatalf("convert: %v", err)
+	}
+	env := got[1].(OpenChoreoWorkload).Spec.Container.Env
+	if len(env) != 2 {
+		t.Fatalf("env=%+v want 2 entries", env)
+	}
+	if env[0].Key != "FOO" || env[0].Value != "overridden" {
+		t.Fatalf("env[0]=%+v want FOO=overridden", env[0])
+	}
+	if env[1].Key != "OTEL" || env[1].Value != "on" {
+		t.Fatalf("env[1]=%+v want OTEL=on", env[1])
+	}
+}
+
 func TestConvertAnnotationsBecomeLabels(t *testing.T) {
 	in := ScoreDocument{
 		APIVersion: "score.dev/v1b1",

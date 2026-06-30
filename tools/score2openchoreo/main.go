@@ -38,6 +38,7 @@ func main() {
 		Namespace:   opts.Namespace,
 		ImageRef:    opts.Image,
 		Project:     opts.Project,
+		ExtraEnv:    opts.ExtraEnv,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "score2openchoreo: %s\n", err)

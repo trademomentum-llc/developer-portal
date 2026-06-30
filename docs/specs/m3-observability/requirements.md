@@ -3,6 +3,11 @@
 > **Milestone:** M3 -- Observability
 > **Version:** 0.1
 > **Date:** 2026-05-23
+>
+> **Status:** Superseded by the Production Multi-Angle Visibility triad in
+> `docs/specs/2026-05-28-M3-Production-Multi-Angle-Visibility-*`. This kickoff
+> draft remains for historical context; use the 2026-05-28 documents for current
+> implementation contracts.
 > **Status:** Kickoff draft
 > **Companion docs:** [design-specification.md](./design-specification.md), [technical-specification.md](./technical-specification.md)
 

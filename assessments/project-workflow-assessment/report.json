@@ -1,0 +1,6652 @@
+[
+  {
+    "path": "agents/OpenHands-CLI",
+    "name": "openhands",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "AGENTS.md",
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "Shell"
+    ],
+    "code_files": 250,
+    "test_files": 218,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in agents/OpenHands-CLI/tests/test_agent_context_os_info.py",
+      "api_key in agents/OpenHands-CLI/tests/conftest.py",
+      "api_key in agents/OpenHands-CLI/tests/test_directory_separation.py",
+      "api_key in agents/OpenHands-CLI/tests/auth/test_api_client.py",
+      "api_key in agents/OpenHands-CLI/tests/auth/test_login_command.py",
+      "api_key in agents/OpenHands-CLI/tests/tui/modals/settings/test_settings_utils.py",
+      "api_key in agents/OpenHands-CLI/tests/tui/modals/settings/test_settings_screen.py",
+      "api_key in agents/OpenHands-CLI/tests/tui/modals/settings/test_settings_tab.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest",
+      "ruff check .",
+      "make build",
+      "make test",
+      "make clean"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "agents/agentkit",
+    "name": "agentkit",
+    "kind": "docs_or_code_project",
+    "manifests": [],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "Shell"
+    ],
+    "code_files": 23,
+    "test_files": 3,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 95,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/coinbase-agentkit",
+    "name": "coinbase-agentkit",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 292,
+    "test_files": 161,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [
+      "agents/agentkit/python/coinbase-agentkit/tests/action_providers/ssh/test_ssh_connect.py"
+    ],
+    "secret_hits": [
+      "api_key in agents/agentkit/python/coinbase-agentkit/tests/action_providers/twitter/test_action_provider.py",
+      "password in agents/agentkit/python/coinbase-agentkit/tests/action_providers/ssh/conftest.py",
+      "password in agents/agentkit/python/coinbase-agentkit/tests/action_providers/ssh/test_connection.py",
+      "password in agents/agentkit/python/coinbase-agentkit/tests/action_providers/ssh/test_connection_pool.py",
+      "password in agents/agentkit/python/coinbase-agentkit/tests/action_providers/ssh/test_keys.py",
+      "password in agents/agentkit/python/coinbase-agentkit/tests/action_providers/ssh/test_params.py",
+      "password in agents/agentkit/python/coinbase-agentkit/tests/action_providers/ssh/test_sftp.py",
+      "api_key in agents/agentkit/python/coinbase-agentkit/tests/action_providers/hyperboliclabs/conftest.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest",
+      "ruff check .",
+      "mypy .",
+      "make test"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER"
+    ],
+    "score": 50,
+    "status": "critical",
+    "notes": [
+      "Private key material appears inside the project tree.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/coinbase-agentkit/docs",
+    "name": "docs",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/create-onchain-agent",
+    "name": "create-onchain-agent",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/advertisements-agent-with-strands-agents-x402-cdp-chatbot",
+    "name": "ads-agent",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 2,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/autogen-cdp-chatbot",
+    "name": "chatbot-python",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/langchain-cdp-chatbot",
+    "name": "chatbot-python",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/langchain-cdp-chatbot-with-amazon-bedrock",
+    "name": "chatbot-python",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/langchain-cdp-smart-wallet-chatbot",
+    "name": "chatbot-python",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/langchain-cdp-solana-chatbot",
+    "name": "langchain-cdp-solana-chatbot",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/langchain-eth-account-chatbot",
+    "name": "chatbot-python",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/langchain-nillion-secretvault-chatbot",
+    "name": "chatbot-python-with-nillion-secretvault",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/langchain-twitter-chatbot",
+    "name": "chatbot-python",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/openai-agents-sdk-cdp-chatbot",
+    "name": "openai-agents-sdk-chatbot-python",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/openai-agents-sdk-cdp-voice-chatbot",
+    "name": "openai-agents-cdp-voice-chatbot",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 2,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/openai-agents-sdk-smart-wallet-chatbot",
+    "name": "openai-agents-sdk-chatbot-python",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/pydantic-ai-cdp-chatbot",
+    "name": "pydantic-ai-chatbot-python",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 3,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/examples/strands-agents-cdp-server-chatbot",
+    "name": "chatbot-python",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check ."
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/framework-extensions/autogen",
+    "name": "coinbase-agentkit-autogen",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 6,
+    "test_files": 4,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest",
+      "ruff check .",
+      "mypy .",
+      "make test"
+    ],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "agents/agentkit/python/framework-extensions/langchain",
+    "name": "coinbase-agentkit-langchain",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 2,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check .",
+      "mypy .",
+      "make test"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/framework-extensions/langchain/docs",
+    "name": "docs",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/framework-extensions/openai-agents-sdk",
+    "name": "coinbase-agentkit-openai-agents-sdk",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 6,
+    "test_files": 4,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest",
+      "ruff check .",
+      "mypy .",
+      "make test"
+    ],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "agents/agentkit/python/framework-extensions/pydantic-ai",
+    "name": "coinbase-agentkit-pydantic-ai",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 6,
+    "test_files": 4,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest",
+      "ruff check .",
+      "mypy .",
+      "make test"
+    ],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "agents/agentkit/python/framework-extensions/strands-agents",
+    "name": "coinbase-agentkit-strands-agents",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 2,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "ruff check .",
+      "mypy .",
+      "make test"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "agents/agentkit/python/framework-extensions/strands-agents/docs",
+    "name": "docs",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript",
+    "name": "agentkit-typescript-monorepo",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [],
+    "code_files": 0,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pnpm run dev",
+      "pnpm run build",
+      "pnpm run lint",
+      "pnpm run test"
+    ],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "agents/agentkit/typescript/agentkit",
+    "name": "@coinbase/agentkit",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 269,
+    "test_files": 59,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [
+      "agents/agentkit/typescript/agentkit/src/wallet-providers/privyEvmDelegatedEmbeddedWalletProvider.ts"
+    ],
+    "secret_hits": [
+      "api_key in agents/agentkit/typescript/agentkit/src/action-providers/farcaster/farcasterActionProvider.ts",
+      "api_key in agents/agentkit/typescript/agentkit/src/action-providers/farcaster/farcasterActionProvider.test.ts"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER"
+    ],
+    "score": 50,
+    "status": "critical",
+    "notes": [
+      "Private key material appears inside the project tree.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/create-onchain-agent",
+    "name": "create-onchain-agent",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 21,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 85,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/create-onchain-agent/templates/mcp",
+    "name": "mcp",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 11,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/create-onchain-agent/templates/next",
+    "name": "next-template",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 20,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 85,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/examples/langchain-cdp-chatbot",
+    "name": "@coinbase/cdp-v2-evm-langchain-chatbot-example",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/examples/langchain-cdp-smart-wallet-chatbot",
+    "name": "@coinbase/smart-wallet-langchain-chatbot-example",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/examples/langchain-farcaster-chatbot",
+    "name": "@coinbase/farcaster-langchain-chatbot-example",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/examples/langchain-privy-chatbot",
+    "name": "@coinbase/langchain-privy-chatbot-example",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/examples/langchain-solana-chatbot",
+    "name": "@coinbase/solana-langchain-chatbot-example",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/examples/langchain-twitter-chatbot",
+    "name": "@coinbase/twitter-langchain-chatbot-example",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/examples/langchain-xmtp-chatbot",
+    "name": "@coinbase/langchain-xmtp-chatbot-example",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 2,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/examples/langchain-zerodev-chatbot",
+    "name": "@coinbase/langchain-zerodev-chatbot-example",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/examples/model-context-protocol-smart-wallet-server",
+    "name": "@coinbase/cdp-model-context-protocol-server-example",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/examples/vercel-ai-sdk-smart-wallet-chatbot",
+    "name": "@coinbase/cdp-vercel-ai-sdk-chatbot-example",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/agentkit/typescript/framework-extensions/langchain",
+    "name": "@coinbase/agentkit-langchain",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 3,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "agents/agentkit/typescript/framework-extensions/model-context-protocol",
+    "name": "@coinbase/agentkit-model-context-protocol",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 3,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "agents/agentkit/typescript/framework-extensions/vercel-ai-sdk",
+    "name": "@coinbase/agentkit-vercel-ai-sdk",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 4,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "agents/claude-plugins-official",
+    "name": "claude-plugins-official",
+    "kind": "docs_or_code_project",
+    "manifests": [],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "Shell",
+      "TypeScript"
+    ],
+    "code_files": 36,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "agents/software-agent-sdk",
+    "name": "software-agent-sdk",
+    "kind": "python_project",
+    "manifests": [
+      "Makefile",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "AGENTS.md",
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "Shell",
+      "JavaScript"
+    ],
+    "code_files": 534,
+    "test_files": 452,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in agents/software-agent-sdk/tests/conftest.py",
+      "api_key in agents/software-agent-sdk/tests/test_agent_step_bounded_scan.py",
+      "api_key in agents/software-agent-sdk/tests/tools/test_builtin_agents.py",
+      "api_key in agents/software-agent-sdk/tests/tools/test_working_dir_standardization.py",
+      "api_key in agents/software-agent-sdk/tests/tools/file_editor/test_file_editor_tool.py",
+      "api_key in agents/software-agent-sdk/tests/tools/terminal/test_terminal_reset.py",
+      "api_key in agents/software-agent-sdk/tests/tools/terminal/test_secrets_masking.py",
+      "api_key in agents/software-agent-sdk/tests/tools/terminal/test_shell_path_configuration.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest",
+      "ruff check .",
+      "make build",
+      "make clean"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "agents/software-agent-sdk/openhands-agent-server",
+    "name": "openhands-agent-server",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [
+      "AGENTS.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 35,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in agents/software-agent-sdk/openhands-agent-server/openhands/agent_server/conversation_router.py",
+      "api_key in agents/software-agent-sdk/openhands-agent-server/openhands/agent_server/conversation_router_acp.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 65,
+    "status": "watch",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "agents/software-agent-sdk/openhands-agent-server/openhands/agent_server/vscode_extensions/openhands-settings",
+    "name": "openhands-settings",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts."
+    ]
+  },
+  {
+    "path": "agents/software-agent-sdk/openhands-sdk",
+    "name": "openhands-sdk",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 203,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in agents/software-agent-sdk/openhands-sdk/openhands/sdk/llm/llm.py",
+      "api_key in agents/software-agent-sdk/openhands-sdk/openhands/sdk/llm/auth/openai.py",
+      "api_key in agents/software-agent-sdk/openhands-sdk/openhands/sdk/llm/utils/litellm_provider.py",
+      "api_key in agents/software-agent-sdk/openhands-sdk/openhands/sdk/security/grayswan/analyzer.py",
+      "api_key in agents/software-agent-sdk/openhands-sdk/openhands/sdk/workspace/workspace.py",
+      "api_key in agents/software-agent-sdk/openhands-sdk/openhands/sdk/workspace/remote/remote_workspace_mixin.py",
+      "secret in agents/software-agent-sdk/openhands-sdk/openhands/sdk/utils/cipher.py",
+      "api_key in agents/software-agent-sdk/openhands-sdk/openhands/sdk/agent/agent.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "agents/software-agent-sdk/openhands-tools",
+    "name": "openhands-tools",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [],
+    "languages": [
+      "Python",
+      "JavaScript"
+    ],
+    "code_files": 85,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in agents/software-agent-sdk/openhands-tools/openhands/tools/tom_consult/definition.py",
+      "api_key in agents/software-agent-sdk/openhands-tools/openhands/tools/tom_consult/executor.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 65,
+    "status": "watch",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "agents/software-agent-sdk/openhands-workspace",
+    "name": "openhands-workspace",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 10,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in agents/software-agent-sdk/openhands-workspace/openhands/workspace/remote_api/workspace.py",
+      "api_key in agents/software-agent-sdk/openhands-workspace/openhands/workspace/cloud/workspace.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "engine",
+    "name": "engine",
+    "kind": "compiled_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [],
+    "languages": [
+      "C",
+      "C++"
+    ],
+    "code_files": 21,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 1,
+    "inferred_commands": [
+      "make",
+      "make clean"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 77,
+    "status": "watch",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Hardcoded workspace paths found: 1."
+    ]
+  },
+  {
+    "path": "frameworks",
+    "name": "foundational-frameworks",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 65,
+    "test_files": 9,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "frameworks/.pytest_cache",
+      "frameworks/__pycache__",
+      "frameworks/code_check/__pycache__",
+      "frameworks/compliance/__pycache__",
+      "frameworks/core/__pycache__",
+      "frameworks/core/license_attribution/__pycache__",
+      "frameworks/engine/__pycache__",
+      "frameworks/examples/__pycache__",
+      "frameworks/lifecycle/__pycache__",
+      "frameworks/morphogenetic/__pycache__",
+      "frameworks/pqc/__pycache__",
+      "frameworks/procedural/__pycache__",
+      "frameworks/risk/__pycache__",
+      "frameworks/safety/__pycache__",
+      "frameworks/security/__pycache__",
+      "frameworks/tests/__pycache__",
+      "frameworks/traceability/__pycache__"
+    ],
+    "private_key_paths": [
+      "frameworks/.pqc-keys/0ffd8b8855d5b18f1baa1dae83c499cc.key",
+      "frameworks/.pqc-keys/c9e2c66609d33db6d0a46fab4638ca74.key",
+      "frameworks/.pqc-keys/e4e12033bf6b31a8e11ddfdd36eda46d.key",
+      "frameworks/.pqc-keys/a3f0c25ffb40aa20b263c99eabea7b3f.key",
+      "frameworks/.pqc-keys/a136c9ccb494dd149a82964a88b6a3e1.key",
+      "frameworks/.pqc-keys/689de817cf3fae2c65bbde9c125eff07.key"
+    ],
+    "secret_hits": [
+      "secret in frameworks/pqc/hybrid_crypto.py"
+    ],
+    "absolute_path_hits": 12,
+    "inferred_commands": [
+      "pytest"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 32,
+    "status": "critical",
+    "notes": [
+      "Checked-in artifact dirs: 17.",
+      "Hardcoded workspace paths found: 12.",
+      "Private key material appears inside the project tree.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "infra/Conscious Living System",
+    "name": "conscious-os",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 18,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "infra/Conscious Living System/.pytest_cache",
+      "infra/Conscious Living System/examples/__pycache__",
+      "infra/Conscious Living System/src/conscious_os/__pycache__",
+      "infra/Conscious Living System/src/conscious_os/core/__pycache__",
+      "infra/Conscious Living System/src/conscious_os/engines/__pycache__",
+      "infra/Conscious Living System/src/conscious_os/frameworks/__pycache__",
+      "infra/Conscious Living System/src/conscious_os/registries/__pycache__",
+      "infra/Conscious Living System/src/conscious_os/security/__pycache__",
+      "infra/Conscious Living System/src/conscious_os/utils/__pycache__",
+      "infra/Conscious Living System/tests/__pycache__"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest",
+      "ruff check .",
+      "black --check .",
+      "mypy ."
+    ],
+    "primary_workflow": "THE ARTIFACT PURGE",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Checked-in artifact dirs: 10."
+    ]
+  },
+  {
+    "path": "infra/frameworks",
+    "name": "frameworks",
+    "kind": "docs_or_code_project",
+    "manifests": [],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 14,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "infra/frameworks/__pycache__",
+      "infra/frameworks/core/__pycache__",
+      "infra/frameworks/security/__pycache__"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 4,
+    "inferred_commands": [],
+    "primary_workflow": "THE ARTIFACT PURGE",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 77,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 3.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Hardcoded workspace paths found: 4."
+    ]
+  },
+  {
+    "path": "omni/agentxfoundry",
+    "name": "agentxfoundry",
+    "kind": "docs_or_code_project",
+    "manifests": [],
+    "docs": [
+      "CLAUDE.md",
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "SQL"
+    ],
+    "code_files": 38,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/agentxfoundry/__pycache__",
+      "omni/agentxfoundry/agent_env",
+      "omni/agentxfoundry/agents/__pycache__",
+      "omni/agentxfoundry/agents/predictive/__pycache__",
+      "omni/agentxfoundry/backups/rr_code_backup/__pycache__",
+      "omni/agentxfoundry/fragments/reference_clones",
+      "omni/agentxfoundry/llm_integrations/__pycache__",
+      "omni/agentxfoundry/rr/__pycache__",
+      "omni/agentxfoundry/utils/__pycache__",
+      "omni/agentxfoundry/venv",
+      "omni/agentxfoundry/venv_new"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in omni/agentxfoundry/fragments/training_examples/render_workflow_optimization.py.txt",
+      "api_key in omni/agentxfoundry/fragments/training_examples/3D_model_training.py.txt",
+      "api_key in omni/agentxfoundry/llm_integrations/clients.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 65,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 11.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/agentxfoundry/legacy",
+    "name": "js-character-generator",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Shell",
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 3,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/agentxfoundry/legacy/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/agentxfoundry/legacy/Jasteri.sh"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 1.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/arch-alive/qenv/lib/python3.14/site-packages/mistralai/extra",
+    "name": "extra",
+    "kind": "docs_or_code_project",
+    "manifests": [],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 21,
+    "test_files": 3,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/arch-alive/qenv/lib/python3.14/site-packages/mistralai/extra/__pycache__",
+      "omni/arch-alive/qenv/lib/python3.14/site-packages/mistralai/extra/mcp/__pycache__",
+      "omni/arch-alive/qenv/lib/python3.14/site-packages/mistralai/extra/observability/__pycache__",
+      "omni/arch-alive/qenv/lib/python3.14/site-packages/mistralai/extra/run/__pycache__",
+      "omni/arch-alive/qenv/lib/python3.14/site-packages/mistralai/extra/tests/__pycache__",
+      "omni/arch-alive/qenv/lib/python3.14/site-packages/mistralai/extra/utils/__pycache__"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in omni/arch-alive/qenv/lib/python3.14/site-packages/mistralai/extra/README.md"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 65,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 6.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/deepfiat",
+    "name": "deepfiat",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Shell"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "make build",
+      "make clean"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/deepfiat/backend",
+    "name": "fiat-btc-backend-c",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript",
+      "SQL"
+    ],
+    "code_files": 20,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "secret in omni/cali/jeff/deepfiat/backend/src/modules/auth/auth.module.ts"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/deepfiat/backend/c",
+    "name": "c",
+    "kind": "compiled_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [],
+    "languages": [
+      "C"
+    ],
+    "code_files": 19,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "make",
+      "make clean"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/deepfiat/frontend",
+    "name": "fiat-btc-frontend",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 24,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/cali/jeff/deepfiat/frontend/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/cali/jeff/deepfiat/frontend/src/pages/admin/Login.tsx"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 55,
+    "status": "critical",
+    "notes": [
+      "Checked-in artifact dirs: 1.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/deepfiat/zk",
+    "name": "fiat-btc-zk-circuit",
+    "kind": "node_app",
+    "manifests": [
+      "Makefile",
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript",
+      "Shell"
+    ],
+    "code_files": 4,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build",
+      "make",
+      "make build",
+      "make test",
+      "make clean"
+    ],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "omni/cali/jeff/theratouch+",
+    "name": "theratouch+",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "JavaScript",
+      "Shell",
+      "SQL"
+    ],
+    "code_files": 18,
+    "test_files": 160,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/cali/jeff/theratouch+/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "secret in omni/cali/jeff/theratouch+/vendor/pragmarx/google2fa/README.md",
+      "password in omni/cali/jeff/theratouch+/vendor/phpunit/php-code-coverage/src/Report/Html/Renderer/Template/js/jquery.min.js",
+      "password in omni/cali/jeff/theratouch+/vendor/dflydev/dot-access-data/README.md",
+      "password in omni/cali/jeff/theratouch+/vendor/psr/http-message/docs/PSR7-Interfaces.md",
+      "password in omni/cali/jeff/theratouch+/vendor/laravel/sail/database/mariadb/create-testing-database.sh",
+      "password in omni/cali/jeff/theratouch+/vendor/laravel/sail/database/mysql/create-testing-database.sh"
+    ],
+    "absolute_path_hits": 20,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 62,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 1.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Hardcoded workspace paths found: 20.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/theratouch+/vendor/laravel/framework/src/Illuminate/Foundation/resources/exceptions/renderer",
+    "name": "renderer",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 2,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/cali/jeff/theratouch+/vendor/laravel/framework/src/Illuminate/Foundation/resources/exceptions/renderer/dist"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build"
+    ],
+    "primary_workflow": "THE ARTIFACT PURGE",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Checked-in artifact dirs: 1.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/theratouch+/vendor/mockery/mockery/docs",
+    "name": "docs",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "make clean"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar",
+    "name": "tri-mar",
+    "kind": "docs_or_code_project",
+    "manifests": [],
+    "docs": [
+      "AGENTS.md"
+    ],
+    "languages": [
+      "Shell"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 1,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 24,
+    "inferred_commands": [],
+    "primary_workflow": "THE DATA PREFLIGHT",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE DATA PREFLIGHT",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 87,
+    "status": "healthy",
+    "notes": [
+      "Datasets: 1 unique groups, 0 low-fit for raw LLM analysis.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Hardcoded workspace paths found: 24."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform",
+    "name": "platform",
+    "kind": "compiled_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "C",
+      "Python",
+      "Shell",
+      "Go"
+    ],
+    "code_files": 78,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/cali/jeff/tri-mar/platform/vps/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/chaos/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/crypto/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/crypto/hybrid/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/crypto/jwt/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/crypto/kem/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/crypto/keystore/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/crypto/sig/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/dashboard/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/healer/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/healer/healer/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/monitoring/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/trading/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/trading/reconciler/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/trading/router/__pycache__",
+      "omni/cali/jeff/tri-mar/platform/vps/trading/strategy/__pycache__"
+    ],
+    "private_key_paths": [
+      "omni/cali/jeff/tri-mar/platform/base/cdp_api_key.json"
+    ],
+    "secret_hits": [
+      "password in omni/cali/jeff/tri-mar/platform/README.md",
+      "password in omni/cali/jeff/tri-mar/platform/infra/helm/fiat-btc/templates/secrets.yaml",
+      "secret in omni/cali/jeff/tri-mar/platform/vps/crypto/kem/kyber.c",
+      "secret in omni/cali/jeff/tri-mar/platform/vps/crypto/kem/kyber.py",
+      "secret in omni/cali/jeff/tri-mar/platform/vps/crypto/kem/kyber.h",
+      "api_key in omni/cali/jeff/tri-mar/platform/vps/healer/healer/config.py",
+      "api_key in omni/cali/jeff/tri-mar/platform/vps/healer/healer/dca_engine.py",
+      "secret in omni/cali/jeff/tri-mar/platform/vps/dashboard/billing.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "make",
+      "make build",
+      "make test",
+      "make clean"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 40,
+    "status": "critical",
+    "notes": [
+      "Checked-in artifact dirs: 16.",
+      "Private key material appears inside the project tree.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/backend",
+    "name": "fiat-btc-backend",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript",
+      "Shell"
+    ],
+    "code_files": 101,
+    "test_files": 13,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/cali/jeff/tri-mar/platform/backend/dist",
+      "omni/cali/jeff/tri-mar/platform/backend/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/cali/jeff/tri-mar/platform/backend/src/app.module.ts",
+      "password in omni/cali/jeff/tri-mar/platform/backend/src/database/data-source.ts",
+      "secret in omni/cali/jeff/tri-mar/platform/backend/src/config/app.config.ts",
+      "password in omni/cali/jeff/tri-mar/platform/backend/src/config/app.config.ts",
+      "secret in omni/cali/jeff/tri-mar/platform/backend/src/common/interceptors/audit-log.interceptor.ts",
+      "secret in omni/cali/jeff/tri-mar/platform/backend/src/common/guards/internal-api.guard.ts",
+      "secret in omni/cali/jeff/tri-mar/platform/backend/src/events/events.gateway.ts",
+      "secret in omni/cali/jeff/tri-mar/platform/backend/src/events/events.module.ts"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run test",
+      "npm run test:coverage"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 2.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/cmd/fiat-btc",
+    "name": "fiat-btc",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 5,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/forge-std",
+    "name": "forge-std",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 23,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts",
+    "name": "openzeppelin-solidity",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "JavaScript",
+      "Shell"
+    ],
+    "code_files": 269,
+    "test_files": 228,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts/scripts/fetch-common-contracts.js"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts/contracts",
+    "name": "@openzeppelin/contracts",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [],
+    "code_files": 0,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts/fv",
+    "name": "fv",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "make clean"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts/lib/forge-std",
+    "name": "forge-std",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 23,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts/scripts/solhint-custom",
+    "name": "solhint-plugin-openzeppelin",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts-upgradeable",
+    "name": "openzeppelin-solidity",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "JavaScript",
+      "Shell"
+    ],
+    "code_files": 269,
+    "test_files": 228,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts-upgradeable/scripts/fetch-common-contracts.js"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts-upgradeable/contracts",
+    "name": "@openzeppelin/contracts-upgradeable",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [],
+    "code_files": 0,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts-upgradeable/fv",
+    "name": "fv",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "make clean"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts-upgradeable/lib/forge-std",
+    "name": "forge-std",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 23,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts",
+    "name": "openzeppelin-solidity",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "JavaScript",
+      "Shell"
+    ],
+    "code_files": 269,
+    "test_files": 228,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/fetch-common-contracts.js"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts",
+    "name": "@openzeppelin/contracts",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [],
+    "code_files": 0,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/fv",
+    "name": "fv",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "make clean"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/lib/forge-std",
+    "name": "forge-std",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 23,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/solhint-custom",
+    "name": "solhint-plugin-openzeppelin",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/contracts/lib/openzeppelin-contracts-upgradeable/scripts/solhint-custom",
+    "name": "solhint-plugin-openzeppelin",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/frontend",
+    "name": "fiat-btc-frontend",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 48,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/cali/jeff/tri-mar/platform/frontend/.next",
+      "omni/cali/jeff/tri-mar/platform/frontend/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run test",
+      "npm run test:coverage"
+    ],
+    "primary_workflow": "THE ARTIFACT PURGE",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 75,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 2.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/vps/network",
+    "name": "network",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/vps/network/ebpf",
+    "name": "ebpf",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "C",
+      "Go"
+    ],
+    "code_files": 3,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/vps/network/tor",
+    "name": "tor",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/vps/orchestrator",
+    "name": "orchestrator",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 6,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/vps/proto",
+    "name": "proto",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/cali/jeff/tri-mar/platform/zk",
+    "name": "fiat-btc-zk",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "JavaScript",
+      "Shell"
+    ],
+    "code_files": 3,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/cali/jeff/tri-mar/platform/zk/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE ARTIFACT PURGE",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Checked-in artifact dirs: 1.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/crdroid-source/.repo/repo",
+    "name": "repo",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 82,
+    "test_files": 26,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/crdroid-source/.repo/repo/__pycache__",
+      "omni/crdroid-source/.repo/repo/subcmds/__pycache__"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/crdroid-source/.repo/repo/main.py",
+      "password in omni/crdroid-source/.repo/repo/subcmds/sync.py",
+      "password in omni/crdroid-source/.repo/repo/docs/smart-sync.md"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest",
+      "black --check ."
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 2.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/distributed-ai-cluster",
+    "name": "ihep-enterprise",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [
+      "CLAUDE.md"
+    ],
+    "languages": [
+      "Python",
+      "Shell",
+      "SQL"
+    ],
+    "code_files": 148,
+    "test_files": 5,
+    "dataset_groups": 1,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/distributed-ai-cluster/agent_env",
+      "omni/distributed-ai-cluster/agents/predictive/__pycache__",
+      "omni/distributed-ai-cluster/enterprise/__pycache__",
+      "omni/distributed-ai-cluster/enterprise/approval/__pycache__",
+      "omni/distributed-ai-cluster/enterprise/audit/__pycache__",
+      "omni/distributed-ai-cluster/enterprise/auth/__pycache__",
+      "omni/distributed-ai-cluster/enterprise/connections/__pycache__",
+      "omni/distributed-ai-cluster/enterprise/departments/__pycache__",
+      "omni/distributed-ai-cluster/enterprise/examples/__pycache__",
+      "omni/distributed-ai-cluster/enterprise/integrations/__pycache__",
+      "omni/distributed-ai-cluster/enterprise/memory/__pycache__",
+      "omni/distributed-ai-cluster/enterprise/models/__pycache__",
+      "omni/distributed-ai-cluster/enterprise/scheduler/__pycache__",
+      "omni/distributed-ai-cluster/enterprise/workflows/__pycache__",
+      "omni/distributed-ai-cluster/fragments/reference_clones",
+      "omni/distributed-ai-cluster/llm_integrations/__pycache__",
+      "omni/distributed-ai-cluster/rr/__pycache__",
+      "omni/distributed-ai-cluster/swarm/__pycache__",
+      "omni/distributed-ai-cluster/tests/__pycache__",
+      "omni/distributed-ai-cluster/utils/__pycache__",
+      "omni/distributed-ai-cluster/venv"
+    ],
+    "private_key_paths": [
+      "omni/distributed-ai-cluster/google-credentials.json"
+    ],
+    "secret_hits": [
+      "PGPASSWORD in omni/distributed-ai-cluster/PROCEDURAL_REGISTRY_GUIDE.md",
+      "api_key in omni/distributed-ai-cluster/CODE_CONSOLIDATION_DEMO.md",
+      "api_key in omni/distributed-ai-cluster/K3S_CLUSTER.md",
+      "PGPASSWORD in omni/distributed-ai-cluster/PROCEDURAL_REGISTRY_IMPLEMENTATION.md",
+      "PGPASSWORD in omni/distributed-ai-cluster/SESSION_HANDOFF.md",
+      "PGPASSWORD in omni/distributed-ai-cluster/TODO.md",
+      "PGPASSWORD in omni/distributed-ai-cluster/CONTRACT_TODO.md",
+      "api_key in omni/distributed-ai-cluster/CODE_CONSOLIDATION_MIGRATION.md"
+    ],
+    "absolute_path_hits": 9,
+    "inferred_commands": [
+      "pytest",
+      "ruff check .",
+      "mypy ."
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE DATA PREFLIGHT"
+    ],
+    "score": 32,
+    "status": "critical",
+    "notes": [
+      "Checked-in artifact dirs: 21.",
+      "Datasets: 1 unique groups, 0 low-fit for raw LLM analysis.",
+      "Contains contact-style data fields; redact before external model use.",
+      "Hardcoded workspace paths found: 9.",
+      "Private key material appears inside the project tree.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/distributed-ai-cluster/dashboard",
+    "name": "dashboard",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "SQL",
+      "JavaScript"
+    ],
+    "code_files": 138,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/distributed-ai-cluster/dashboard/.next",
+      "omni/distributed-ai-cluster/dashboard/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/distributed-ai-cluster/dashboard/src/lib/db.ts"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run type-check",
+      "npm run test",
+      "npm run test:coverage"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 2.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/distributed-ai-cluster/legacy",
+    "name": "js-character-generator",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Shell",
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 3,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/distributed-ai-cluster/legacy/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/distributed-ai-cluster/legacy/Jasteri.sh"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 1.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/eight-layer-pqc",
+    "name": "eight-layer-pqc",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "Shell",
+      "JavaScript",
+      "SQL"
+    ],
+    "code_files": 16,
+    "test_files": 3,
+    "dataset_groups": 5,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 5,
+    "artifact_paths": [
+      "omni/eight-layer-pqc/.venv",
+      "omni/eight-layer-pqc/venv"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "secret in omni/eight-layer-pqc/code/python/layer4_encryption.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest",
+      "black --check .",
+      "mypy ."
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE DATA PREFLIGHT",
+      "THE DUPLICATE TREE HUNTER"
+    ],
+    "score": 60,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 2.",
+      "Datasets: 5 unique groups, 0 low-fit for raw LLM analysis.",
+      "Cross-project duplicate dataset groups: 5.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/eight-layer-pqc/code/go",
+    "name": "go",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 3,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/eight-layer-pqc/code/rust",
+    "name": "rust",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Cargo.toml"
+    ],
+    "docs": [],
+    "languages": [
+      "Rust"
+    ],
+    "code_files": 3,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/health-insights",
+    "name": "health-insights",
+    "kind": "docs_or_code_project",
+    "manifests": [],
+    "docs": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "Python",
+      "Shell",
+      "JavaScript"
+    ],
+    "code_files": 214,
+    "test_files": 5,
+    "dataset_groups": 22,
+    "low_fit_dataset_groups": 11,
+    "cross_project_duplicate_groups": 21,
+    "artifact_paths": [
+      "omni/health-insights/.next",
+      "omni/health-insights/.pytest_cache",
+      "omni/health-insights/.venv",
+      "omni/health-insights/node_modules",
+      "omni/health-insights/venv"
+    ],
+    "private_key_paths": [
+      "omni/health-insights/docs/ihep-app.2025-12-01.private-key.pem"
+    ],
+    "secret_hits": [
+      "PGPASSWORD in omni/health-insights/setup.sh",
+      "password in omni/health-insights/python/ihep-auth-api-service.py",
+      "secret in omni/health-insights/markdown/IHEP_Phase_III_Security_Architecture copy.md",
+      "password in omni/health-insights/markdown/IHEP_Phase_III_Security_Architecture copy.md",
+      "secret in omni/health-insights/markdown/IHEP_Phase_III_Security_Architecture.md",
+      "password in omni/health-insights/markdown/IHEP_Phase_III_Security_Architecture.md",
+      "secret in omni/health-insights/markdown/IHEP_Communication_NIST_Control_Mapping.md",
+      "password in omni/health-insights/shared/schema.ts"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE DATA PREFLIGHT",
+      "THE DUPLICATE TREE HUNTER",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 5,
+    "status": "critical",
+    "notes": [
+      "Checked-in artifact dirs: 5.",
+      "Datasets: 22 unique groups, 11 low-fit for raw LLM analysis.",
+      "Cross-project duplicate dataset groups: 21.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Contains placeholder or synthetic training data that should be cleaned before LLM use.",
+      "Contains patient-profile fields; treat the data as sensitive.",
+      "Private key material appears inside the project tree.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/health-insights/app_backup",
+    "name": "ihep-application",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "Python"
+    ],
+    "code_files": 24,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/health-insights/app_backup/auth/signup/page.tsx",
+      "password in omni/health-insights/app_backup/auth/login/page.tsx",
+      "password in omni/health-insights/app_backup/backend/shared/utils/validation.py",
+      "password in omni/health-insights/app_backup/backend/auth-service/app.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 65,
+    "status": "watch",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/health-insights/applications",
+    "name": "@ihep/frontend",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "SQL",
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 35,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/health-insights/applications/backend/.pytest_cache",
+      "omni/health-insights/applications/backend/.venv-security",
+      "omni/health-insights/applications/backend/node_modules",
+      "omni/health-insights/applications/backend/venv"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/health-insights/applications/backend/app.py",
+      "password in omni/health-insights/applications/backend/shared/utils/validation.py",
+      "password in omni/health-insights/applications/backend/auth-service/app.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run type-check",
+      "npm run test",
+      "npm run test:coverage"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 4.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/health-insights/applications/frontend",
+    "name": "@ihep/frontend",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 9,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/health-insights/applications/frontend/.next",
+      "omni/health-insights/applications/frontend/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/health-insights/applications/frontend/src/components/auth/AuthProvider.tsx"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run type-check",
+      "npm run test",
+      "npm run test:coverage"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 2.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/health-insights/ihep-application",
+    "name": "ihep-platform",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "Python",
+      "Shell",
+      "JavaScript"
+    ],
+    "code_files": 351,
+    "test_files": 13,
+    "dataset_groups": 21,
+    "low_fit_dataset_groups": 11,
+    "cross_project_duplicate_groups": 21,
+    "artifact_paths": [
+      "omni/health-insights/ihep-application/.next",
+      "omni/health-insights/ihep-application/node_modules",
+      "omni/health-insights/ihep-application/services/clinical-twin-service/__pycache__"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "PGPASSWORD in omni/health-insights/ihep-application/setup.sh",
+      "password in omni/health-insights/ihep-application/MOCK_DATA_REPLACEMENT_SUMMARY.md",
+      "password in omni/health-insights/ihep-application/migrations/001_users_providers.sql",
+      "secret in omni/health-insights/ihep-application/docs/SECURITY_STATUS_FINAL.md",
+      "api_key in omni/health-insights/ihep-application/docs/INFRASTRUCTURE_CONNECTIONS.md",
+      "secret in omni/health-insights/ihep-application/docs/IHEP_Phase_III_Security_Architecture copy.md",
+      "password in omni/health-insights/ihep-application/docs/IHEP_Phase_III_Security_Architecture copy.md",
+      "secret in omni/health-insights/ihep-application/docs/IHEP_Financial_Uplift_Peer_Mediator_Curriculum_Framework.md"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run test",
+      "npm run test:coverage"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE DATA PREFLIGHT",
+      "THE DUPLICATE TREE HUNTER"
+    ],
+    "score": 40,
+    "status": "critical",
+    "notes": [
+      "Checked-in artifact dirs: 3.",
+      "Datasets: 21 unique groups, 11 low-fit for raw LLM analysis.",
+      "Cross-project duplicate dataset groups: 21.",
+      "Contains placeholder or synthetic training data that should be cleaned before LLM use.",
+      "Contains patient-profile fields; treat the data as sensitive.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/health-insights/ihep-application/hub/gateway",
+    "name": "@ihep/frontend",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "Shell"
+    ],
+    "code_files": 19,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/health-insights/ihep-application/hub/gateway/ehr/__pycache__",
+      "omni/health-insights/ihep-application/hub/gateway/ehr/sync/__pycache__",
+      "omni/health-insights/ihep-application/hub/gateway/ehr/transformers/__pycache__",
+      "omni/health-insights/ihep-application/hub/gateway/ehr/webhooks/__pycache__"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in omni/health-insights/ihep-application/hub/gateway/ehr/config/ehr-partners/allscripts-example.yaml",
+      "api_key in omni/health-insights/ihep-application/hub/gateway/ehr/adapters/allscripts_adapter.py",
+      "api_key in omni/health-insights/ihep-application/hub/gateway/ehr/adapters/base_adapter.py",
+      "secret in omni/health-insights/ihep-application/hub/gateway/ehr/webhooks/handler.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run type-check",
+      "npm run test",
+      "npm run test:coverage"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 4.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/autokey-org-policy-gcp-restrict-cmek-crypto-key-projects",
+    "name": "autokey-org-policy-gcp-restrict-cmek-crypto-key-projects",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [],
+    "code_files": 0,
+    "test_files": 23,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/autokey-org-policy-gcp-restrict-cmek-crypto-key-projects/test/integration",
+    "name": "integration",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 2,
+    "test_files": 12,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-autokey",
+    "name": "cs-autokey",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Shell"
+    ],
+    "code_files": 4,
+    "test_files": 11,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-autokey/test/integration",
+    "name": "integration",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 4,
+    "test_files": 6,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-common",
+    "name": "cs-common",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 12,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-folders-iam-0-computeinstanceAdminv1",
+    "name": "cs-folders-iam-0-computeinstanceAdminv1",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [],
+    "code_files": 0,
+    "test_files": 44,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-folders-iam-0-computeinstanceAdminv1/test/integration",
+    "name": "integration",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [],
+    "code_files": 0,
+    "test_files": 16,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-gg-lifescien-concept-nonprod-svc",
+    "name": "cs-gg-lifescien-concept-nonprod-svc",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [],
+    "code_files": 0,
+    "test_files": 11,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-kms-projects",
+    "name": "cs-kms-projects",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "Shell"
+    ],
+    "code_files": 9,
+    "test_files": 41,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-kms-projects/test/integration",
+    "name": "integration",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 4,
+    "test_files": 30,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-logging-destination",
+    "name": "cs-logging-destination",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "SQL"
+    ],
+    "code_files": 9,
+    "test_files": 49,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-logging-destination/modules/bq-log-alerting/logging/cloud_function",
+    "name": "cloud_function",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts."
+    ]
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-logging-destination/test/integration",
+    "name": "integration",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 4,
+    "test_files": 36,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-vpc-dev-shared",
+    "name": "cs-vpc-dev-shared",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 32,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/health-insights/terraform/.terraform/modules/cs-vpc-dev-shared/test/integration",
+    "name": "integration",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 15,
+    "test_files": 17,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/health-insights/workspaces",
+    "name": "ihep-application",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "TypeScript"
+    ],
+    "code_files": 15,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/health-insights/workspaces/backend/shared/utils/validation.py",
+      "password in omni/health-insights/workspaces/backend/auth-service/app.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/health-insights/workspaces/frontend",
+    "name": "@ihep/frontend",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 8,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/health-insights/workspaces/frontend/src/components/auth/AuthProvider.tsx"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run type-check",
+      "npm run test",
+      "npm run test:coverage"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/ihep-app",
+    "name": "ihep-app",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "C",
+      "Shell",
+      "JavaScript",
+      "Python"
+    ],
+    "code_files": 5113,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/ihep-app/.pytest_cache",
+      "omni/ihep-app/.venv",
+      "omni/ihep-app/.venv-audit",
+      "omni/ihep-app/actions-runner/externals/node20/lib/node_modules",
+      "omni/ihep-app/actions-runner/externals/node24/lib/node_modules",
+      "omni/ihep-app/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in omni/ihep-app/ihep-fintech-training.py.txt",
+      "password in omni/ihep-app/pu-to-docker.txt",
+      "secret in omni/ihep-app/markdown/IHEP_Phase_III_Security_Architecture.md",
+      "password in omni/ihep-app/markdown/IHEP_Phase_III_Security_Architecture.md",
+      "secret in omni/ihep-app/markdown/IHEP_Communication_NIST_Control_Mapping.md",
+      "password in omni/ihep-app/actions-runner/bin/hashFiles/index.js",
+      "password in omni/ihep-app/yaml/api-endpoints.yaml",
+      "password in omni/ihep-app/yaml/ihep-iam-service.yaml"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 45,
+    "status": "critical",
+    "notes": [
+      "Checked-in artifact dirs: 6.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep",
+    "name": "ihep-web",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript",
+      "Python",
+      "Shell",
+      "JavaScript"
+    ],
+    "code_files": 221,
+    "test_files": 10,
+    "dataset_groups": 21,
+    "low_fit_dataset_groups": 11,
+    "cross_project_duplicate_groups": 21,
+    "artifact_paths": [
+      "omni/ihep-app/ihep/.next",
+      "omni/ihep-app/ihep/.pytest_cache",
+      "omni/ihep-app/ihep/.venv",
+      "omni/ihep-app/ihep/models/medgemma-4b-it/venv",
+      "omni/ihep-app/ihep/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "PGPASSWORD in omni/ihep-app/ihep/setup.sh",
+      "password in omni/ihep-app/ihep/python/ihep-auth-api-service.py",
+      "secret in omni/ihep-app/ihep/markdown/IHEP_Phase_III_Security_Architecture copy.md",
+      "password in omni/ihep-app/ihep/markdown/IHEP_Phase_III_Security_Architecture copy.md",
+      "secret in omni/ihep-app/ihep/markdown/IHEP_Phase_III_Security_Architecture.md",
+      "password in omni/ihep-app/ihep/markdown/IHEP_Phase_III_Security_Architecture.md",
+      "secret in omni/ihep-app/ihep/markdown/IHEP_Communication_NIST_Control_Mapping.md",
+      "password in omni/ihep-app/ihep/shared/schema.ts"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run test"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE DATA PREFLIGHT",
+      "THE DUPLICATE TREE HUNTER"
+    ],
+    "score": 40,
+    "status": "critical",
+    "notes": [
+      "Checked-in artifact dirs: 5.",
+      "Datasets: 21 unique groups, 11 low-fit for raw LLM analysis.",
+      "Cross-project duplicate dataset groups: 21.",
+      "Contains placeholder or synthetic training data that should be cleaned before LLM use.",
+      "Contains patient-profile fields; treat the data as sensitive.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/app",
+    "name": "ihep-application",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "TypeScript"
+    ],
+    "code_files": 15,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/ihep-app/ihep/app/backend/shared/utils/validation.py",
+      "password in omni/ihep-app/ihep/app/backend/auth-service/app.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/app/frontend",
+    "name": "@ihep/frontend",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 8,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/ihep-app/ihep/app/frontend/src/components/auth/AuthProvider.tsx"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run type-check",
+      "npm run test",
+      "npm run test:coverage"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/applications",
+    "name": "@ihep/frontend",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "SQL",
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 35,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/ihep-app/ihep/applications/backend/.pytest_cache",
+      "omni/ihep-app/ihep/applications/backend/.venv-security",
+      "omni/ihep-app/ihep/applications/backend/__pycache__",
+      "omni/ihep-app/ihep/applications/backend/node_modules",
+      "omni/ihep-app/ihep/applications/backend/venv",
+      "omni/ihep-app/ihep/applications/path/to/venv"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/ihep-app/ihep/applications/backend/app.py",
+      "password in omni/ihep-app/ihep/applications/backend/shared/utils/validation.py",
+      "password in omni/ihep-app/ihep/applications/backend/auth-service/app.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run type-check",
+      "npm run test",
+      "npm run test:coverage"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 6.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/applications/frontend",
+    "name": "@ihep/frontend",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 9,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/ihep-app/ihep/applications/frontend/.next",
+      "omni/ihep-app/ihep/applications/frontend/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/ihep-app/ihep/applications/frontend/src/components/auth/AuthProvider.tsx"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint",
+      "npm run type-check",
+      "npm run test",
+      "npm run test:coverage"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 2.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/autokey-org-policy-gcp-restrict-cmek-crypto-key-projects",
+    "name": "autokey-org-policy-gcp-restrict-cmek-crypto-key-projects",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [],
+    "code_files": 0,
+    "test_files": 23,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/autokey-org-policy-gcp-restrict-cmek-crypto-key-projects/test/integration",
+    "name": "integration",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 2,
+    "test_files": 12,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-autokey",
+    "name": "cs-autokey",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Shell"
+    ],
+    "code_files": 4,
+    "test_files": 11,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-autokey/test/integration",
+    "name": "integration",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 4,
+    "test_files": 6,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-common",
+    "name": "cs-common",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 12,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-folders-iam-0-computeinstanceAdminv1",
+    "name": "cs-folders-iam-0-computeinstanceAdminv1",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [],
+    "code_files": 0,
+    "test_files": 44,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-folders-iam-0-computeinstanceAdminv1/test/integration",
+    "name": "integration",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [],
+    "code_files": 0,
+    "test_files": 16,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-gg-lifescien-concept-nonprod-svc",
+    "name": "cs-gg-lifescien-concept-nonprod-svc",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [],
+    "code_files": 0,
+    "test_files": 11,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE PROJECT RECON BLITZ",
+    "workflows": [
+      "THE PROJECT RECON BLITZ"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": []
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-kms-projects",
+    "name": "cs-kms-projects",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "Shell"
+    ],
+    "code_files": 9,
+    "test_files": 41,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-kms-projects/test/integration",
+    "name": "integration",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 4,
+    "test_files": 30,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-logging-destination",
+    "name": "cs-logging-destination",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "SQL"
+    ],
+    "code_files": 9,
+    "test_files": 49,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-logging-destination/modules/bq-log-alerting/logging/cloud_function",
+    "name": "cloud_function",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-logging-destination/test/integration",
+    "name": "integration",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 4,
+    "test_files": 36,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-vpc-dev-shared",
+    "name": "cs-vpc-dev-shared",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Makefile"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 32,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/ihep-app/ihep/terraform/.terraform/modules/cs-vpc-dev-shared/test/integration",
+    "name": "integration",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 15,
+    "test_files": 17,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/jarmacz.com",
+    "name": "jarmacz-com",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "AGENTS.md",
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python"
+    ],
+    "code_files": 42,
+    "test_files": 0,
+    "dataset_groups": 1,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/jarmacz.com/.next",
+      "omni/jarmacz.com/node_modules",
+      "omni/jarmacz.com/path/to/venv"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/jarmacz.com/out/_next/static/chunks/249261e921aeebba.js",
+      "password in omni/jarmacz.com/out/_next/static/chunks/a6dad97d9634a72d.js",
+      "password in omni/jarmacz.com/api/app.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run dev",
+      "npm run build",
+      "npm run lint"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE DATA PREFLIGHT",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 55,
+    "status": "critical",
+    "notes": [
+      "Checked-in artifact dirs: 3.",
+      "Datasets: 1 unique groups, 0 low-fit for raw LLM analysis.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/multimodal-agent-builder",
+    "name": "multimodal-agent-builder",
+    "kind": "mixed_node_python",
+    "manifests": [
+      "package.json",
+      "pyproject.toml"
+    ],
+    "docs": [
+      "AGENTS.md",
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "Python",
+      "Shell",
+      "JavaScript"
+    ],
+    "code_files": 185,
+    "test_files": 12,
+    "dataset_groups": 17,
+    "low_fit_dataset_groups": 2,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/multimodal-agent-builder/.venv",
+      "omni/multimodal-agent-builder/config/__pycache__",
+      "omni/multimodal-agent-builder/node_modules",
+      "omni/multimodal-agent-builder/src/__pycache__",
+      "omni/multimodal-agent-builder/src/agents/__pycache__",
+      "omni/multimodal-agent-builder/src/models/__pycache__",
+      "omni/multimodal-agent-builder/src/utils/__pycache__",
+      "omni/multimodal-agent-builder/tests/__pycache__"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in omni/multimodal-agent-builder/NEURO_INSIGHT_ENGINE_REMOTE_BUILD_SPEC.md",
+      "api_key in omni/multimodal-agent-builder/tests/conftest.py",
+      "api_key in omni/multimodal-agent-builder/tests/unit/test_llm_clients_basic.py",
+      "api_key in omni/multimodal-agent-builder/tests/unit/test_llm_clients_old.py",
+      "api_key in omni/multimodal-agent-builder/tests/unit/test_llm_clients.py",
+      "password in omni/multimodal-agent-builder/server/routes.ts",
+      "secret in omni/multimodal-agent-builder/server/replitAuth.ts",
+      "secret in omni/multimodal-agent-builder/server/services/twoFactorAuth.ts"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest",
+      "ruff check .",
+      "black --check .",
+      "mypy ."
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE DATA PREFLIGHT"
+    ],
+    "score": 62,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 8.",
+      "Datasets: 17 unique groups, 2 low-fit for raw LLM analysis.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/neurodivergence.works/security-architecture/eight-layer-pqc",
+    "name": "eight-layer-pqc",
+    "kind": "docs_or_code_project",
+    "manifests": [],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "Shell",
+      "SQL"
+    ],
+    "code_files": 14,
+    "test_files": 3,
+    "dataset_groups": 5,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 5,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "secret in omni/neurodivergence.works/security-architecture/eight-layer-pqc/code/python/layer4_encryption.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE DATA PREFLIGHT",
+      "THE DUPLICATE TREE HUNTER",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 65,
+    "status": "watch",
+    "notes": [
+      "Datasets: 5 unique groups, 0 low-fit for raw LLM analysis.",
+      "Cross-project duplicate dataset groups: 5.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "omni/neurodivergence.works/security-architecture/eight-layer-pqc/code/go",
+    "name": "go",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 3,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/neurodivergence.works/security-architecture/eight-layer-pqc/code/rust",
+    "name": "rust",
+    "kind": "generic_build_project",
+    "manifests": [
+      "Cargo.toml"
+    ],
+    "docs": [],
+    "languages": [
+      "Rust"
+    ],
+    "code_files": 3,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "omni/provenance-engine",
+    "name": "provenance-engine",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Shell",
+      "Python"
+    ],
+    "code_files": 18,
+    "test_files": 3,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/provenance-engine/__pycache__",
+      "omni/provenance-engine/dist",
+      "omni/provenance-engine/venv"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest"
+    ],
+    "primary_workflow": "THE ARTIFACT PURGE",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Checked-in artifact dirs: 3."
+    ]
+  },
+  {
+    "path": "omni/provenance-engine/build/pkg/payload/opt/provenance-engine",
+    "name": "provenance-engine",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Shell",
+      "Python"
+    ],
+    "code_files": 3,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "omni/security-workspace",
+    "name": "security-workspace",
+    "kind": "docs_or_code_project",
+    "manifests": [],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "Shell"
+    ],
+    "code_files": 8,
+    "test_files": 0,
+    "dataset_groups": 1,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "omni/security-workspace/__pycache__"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in omni/security-workspace/security_convergence.py"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE DATA PREFLIGHT",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 65,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 1.",
+      "Datasets: 1 unique groups, 0 low-fit for raw LLM analysis.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "tools/foundational-frameworks",
+    "name": "@tools/foundational-frameworks",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 32,
+    "test_files": 2,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "tools/foundational-frameworks/dist",
+      "tools/foundational-frameworks/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build",
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE ARTIFACT PURGE",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Checked-in artifact dirs: 2."
+    ]
+  },
+  {
+    "path": "tools/gemini-cli-0.22.2",
+    "name": "@google/gemini-cli",
+    "kind": "node_app",
+    "manifests": [
+      "Makefile",
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Shell"
+    ],
+    "code_files": 73,
+    "test_files": 32,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "tools/gemini-cli-0.22.2/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in tools/gemini-cli-0.22.2/.github/workflows/gemini-scheduled-issue-dedup.yml",
+      "password in tools/gemini-cli-0.22.2/.github/workflows/gemini-automated-issue-dedup.yml",
+      "secret in tools/gemini-cli-0.22.2/.github/workflows/chained_e2e.yml",
+      "secret in tools/gemini-cli-0.22.2/.github/workflows/release-sandbox.yml",
+      "secret in tools/gemini-cli-0.22.2/.github/workflows/ci.yml",
+      "password in tools/gemini-cli-0.22.2/.github/workflows/eval.yml",
+      "secret in tools/gemini-cli-0.22.2/.github/actions/push-sandbox/action.yml",
+      "password in tools/gemini-cli-0.22.2/.github/actions/push-sandbox/action.yml"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build",
+      "npm run lint",
+      "npm run test",
+      "make build",
+      "make test",
+      "make clean"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 1.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "tools/gemini-cli-0.22.2/packages/a2a-server",
+    "name": "@google/gemini-cli-a2a-server",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 30,
+    "test_files": 9,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "tools/gemini-cli-0.22.2/packages/a2a-server/dist",
+      "tools/gemini-cli-0.22.2/packages/a2a-server/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build",
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE ARTIFACT PURGE",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Checked-in artifact dirs: 2."
+    ]
+  },
+  {
+    "path": "tools/gemini-cli-0.22.2/packages/cli",
+    "name": "@google/gemini-cli",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 649,
+    "test_files": 339,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "tools/gemini-cli-0.22.2/packages/cli/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "secret in tools/gemini-cli-0.22.2/packages/cli/src/config/extensions/extensionSettings.ts"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build",
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 1.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "tools/gemini-cli-0.22.2/packages/cli/src/commands/extensions/examples/mcp-server",
+    "name": "mcp-server-example",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 2,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "tools/gemini-cli-0.22.2/packages/core",
+    "name": "@google/gemini-cli-core",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 449,
+    "test_files": 199,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "tools/gemini-cli-0.22.2/packages/core/node_modules"
+    ],
+    "private_key_paths": [
+      "tools/gemini-cli-0.22.2/packages/core/src/telemetry/sdk.test.ts"
+    ],
+    "secret_hits": [
+      "password in tools/gemini-cli-0.22.2/packages/core/src/mcp/token-storage/keychain-token-storage.test.ts",
+      "password in tools/gemini-cli-0.22.2/packages/core/src/mcp/token-storage/keychain-token-storage.ts",
+      "api_key in tools/gemini-cli-0.22.2/packages/core/src/telemetry/sanitize.ts",
+      "api_key in tools/gemini-cli-0.22.2/packages/core/src/telemetry/sanitize.test.ts",
+      "api_key in tools/gemini-cli-0.22.2/packages/core/src/telemetry/metrics.test.ts"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build",
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 40,
+    "status": "critical",
+    "notes": [
+      "Checked-in artifact dirs: 1.",
+      "Private key material appears inside the project tree.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "tools/gemini-cli-0.22.2/packages/test-utils",
+    "name": "@google/gemini-cli-test-utils",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "TypeScript"
+    ],
+    "code_files": 4,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "tools/gemini-cli-0.22.2/packages/vscode-ide-companion",
+    "name": "gemini-cli-vscode-ide-companion",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 11,
+    "test_files": 3,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "tools/gemini-cli-0.22.2/packages/vscode-ide-companion/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run build",
+      "npm run lint",
+      "npm run test"
+    ],
+    "primary_workflow": "THE ARTIFACT PURGE",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Checked-in artifact dirs: 1."
+    ]
+  },
+  {
+    "path": "tools/gemini-cli-0.22.2/third_party/get-ripgrep",
+    "name": "@lvce-editor/ripgrep",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 2,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "npm run test"
+    ],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands."
+    ]
+  },
+  {
+    "path": "tools/github-mcp-server",
+    "name": "github-mcp-server",
+    "kind": "generic_build_project",
+    "manifests": [
+      "go.mod"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Go"
+    ],
+    "code_files": 58,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in tools/github-mcp-server/.github/workflows/docker-publish.yml"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "tools/mcp-server",
+    "name": "mcp-server",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 63,
+    "test_files": 51,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in tools/mcp-server/.github/workflows/push_to_docker_hub.yml"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "pytest"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER"
+    ],
+    "score": 80,
+    "status": "watch",
+    "notes": [
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "tools/mcpb",
+    "name": "@anthropic-ai/mcpb",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [
+      "CLAUDE.md",
+      "README.md"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "code_files": 39,
+    "test_files": 11,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "tools/mcpb/dist",
+      "tools/mcpb/node_modules"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "api_key in tools/mcpb/test/schemas.test.ts",
+      "api_key in tools/mcpb/test/init.test.ts"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [
+      "yarn dev",
+      "yarn build",
+      "yarn lint",
+      "yarn test"
+    ],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE"
+    ],
+    "score": 70,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 2.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  },
+  {
+    "path": "tools/mcpb/examples/file-manager-python",
+    "name": "file-manager-python",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "tools/mcpb/examples/file-system-node",
+    "name": "ant.dir.ant.anthropic.filesystem",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts."
+    ]
+  },
+  {
+    "path": "tools/mcpb/examples/hello-world-node",
+    "name": "hello-world-node",
+    "kind": "node_app",
+    "manifests": [
+      "package.json"
+    ],
+    "docs": [],
+    "languages": [
+      "JavaScript"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 90,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "package.json exists but defines no scripts."
+    ]
+  },
+  {
+    "path": "tools/mcpb/examples/hello-world-uv",
+    "name": "hello-world-uv",
+    "kind": "python_project",
+    "manifests": [
+      "pyproject.toml"
+    ],
+    "docs": [
+      "README.md"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "code_files": 1,
+    "test_files": 0,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [],
+    "private_key_paths": [],
+    "secret_hits": [],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE BUILD TRUTH SERUM",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 100,
+    "status": "healthy",
+    "notes": [
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "pyproject exists but no test files were detected in the owned tree."
+    ]
+  },
+  {
+    "path": "tools/skills",
+    "name": "skills",
+    "kind": "docs_or_code_project",
+    "manifests": [],
+    "docs": [
+      "CLAUDE.md",
+      "README.md"
+    ],
+    "languages": [
+      "Python",
+      "JavaScript",
+      "Shell"
+    ],
+    "code_files": 49,
+    "test_files": 1,
+    "dataset_groups": 0,
+    "low_fit_dataset_groups": 0,
+    "cross_project_duplicate_groups": 0,
+    "artifact_paths": [
+      "tools/skills/dist",
+      "tools/skills/skills/skill-creator/scripts/__pycache__"
+    ],
+    "private_key_paths": [],
+    "secret_hits": [
+      "password in tools/skills/skills/pdf/reference.md",
+      "password in tools/skills/skills/pdf/SKILL.md",
+      "api_key in tools/skills/skills/mcp-builder/reference/python_mcp_server.md"
+    ],
+    "absolute_path_hits": 0,
+    "inferred_commands": [],
+    "primary_workflow": "THE SECRET HUNTER",
+    "workflows": [
+      "THE PROJECT RECON BLITZ",
+      "THE SECRET HUNTER",
+      "THE ARTIFACT PURGE",
+      "THE BUILD TRUTH SERUM"
+    ],
+    "score": 65,
+    "status": "watch",
+    "notes": [
+      "Checked-in artifact dirs: 2.",
+      "Code is present but test coverage surface is thin or not wired into inferred commands.",
+      "Literal credential-like assignments were detected in text files."
+    ]
+  }
+]

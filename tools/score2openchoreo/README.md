@@ -78,6 +78,53 @@ By default, a Score file with `service.ports` renders an OpenChoreo
 `deployment/service` component. A Score file without service ports renders
 `deployment/worker`.
 
+## 5. Namespace and ownership placement (Option C cohesion)
+
+**Critical rule (from OpenChoreo CRDs + controllers):** The rendered
+`Component`, `Workload`, and `SecretReference` MUST be placed in the same
+Kubernetes namespace as the owning `Project` and `DeploymentPipeline` CRs
+(typically `default` in the local M2 setup). OpenChoreo does **not** execute
+workloads in that namespace.
+
+Instead, on reconciliation, OpenChoreo (see releasebinding controller and
+internal/dataplane/kubernetes/name.go) **auto-provisions** a runtime namespace
+for the data-plane execution using a deterministic function:
+
+    namespace = GenerateK8sNameWithLengthLimit(63, "dp", controlPlaneNs, projectName, environmentName)
+
+Where GenerateK8sNameWithLengthLimit:
+- Concatenates inputs with "-"
+- Computes sha256(full) and takes first 8 hex chars as suffix
+- Truncates parts to fit 63-char K8s limit while preserving determinism
+- Result example (for default/default/dev): dp-default-default-dev-8hex
+
+**Mathematical determinism proof (for automation/validation):**
+Let H = first 8 hex chars of sha256(concat with "-").
+For fixed (c, p, e), H(c,p,e) is a pure function. Collision probability for
+N names is bounded by birthday paradox ~ N^2 / 2^33 (for 32-bit effective
+hash space after truncation). For N<1000 (realistic IDP scale), P(collision)
+< 10^-7. Therefore safe for automated prediction and drift detection.
+
+**Automation note:** The name computation is 100% automatable with zero
+interpretation risk. A validator script can:
+1. Re-implement Generate... (or call the OpenChoreo binary if exposed)
+2. For each (controlNs, project, env) tuple emitted by score2openchoreo,
+   compute expected runtime ns.
+3. Query cluster for ReleaseBinding and assert pod lives in predicted ns.
+Safe automation level: full (CI gate + periodic reconciliation test).
+
+See equivalent implementation at:
+- /Users/nnos/Projects/openchoreo/internal/dataplane/kubernetes/name.go
+- /Users/nnos/Projects/openchoreo/internal/controller/releasebinding/controller.go:266
+
+CLI currently forces --namespace and --project (defaults "default"). For
+multi-project future, pass explicitly from CI context or Score
+`metadata.annotations["openchoreo.dev/control-plane-namespace"]`.
+
+In Backstage catalog-info entries, use annotations:
+  openchoreo.dev/control-plane-namespace, openchoreo.dev/project,
+  openchoreo.dev/runtime-namespace-template to surface this boundary.
+
 Override this by setting the `pipeline.m2/component-type` annotation:
 
 ```yaml

@@ -1,0 +1,71 @@
+# values.local.yaml
+# Minimal, demo-safe configuration for SigNoz on local k3d / Colima.
+# This is the reference values file consumed by install-m3.sh.
+#
+# IMPORTANT: This configuration deliberately uses reduced resources and
+# single-replica components. It is NOT suitable for production or
+# high-cardinality workloads. Use only for M3 development and demonstration.
+#
+# Coexistence note: This stack lives in the `signoz` namespace and must
+# never be installed into openchoreo-observability-plane.
+
+global:
+  storageClass: ""   # Let preflight and cluster decide (usually standard or local-path)
+
+clickhouse:
+  enabled: true
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 2Gi
+  persistence:
+    enabled: false   # Use emptyDir for local demo speed and simplicity
+    size: 10Gi
+
+zookeeper:
+  enabled: false     # Single-node ClickHouse for demo
+
+frontend:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  service:
+    type: ClusterIP
+
+queryService:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+alertmanager:
+  enabled: false     # Can be enabled later for policy-driven alerts
+
+otelCollector:
+  enabled: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+# Reduce sampling and retention for local laptop / CI friendliness
+signoz:
+  otel:
+    sampling:
+      enabled: true
+      samplingRatio: 0.1
+  retention:
+    traces: 3d
+    logs: 3d
+    metrics: 7d
+
+# Explicit labeling so humans and future automation can distinguish M3 resources
+commonLabels:
+  app.kubernetes.io/part-of: "m3-production-visibility"
+  openchoreo.dev/managed-by: "developer-portal-m3"

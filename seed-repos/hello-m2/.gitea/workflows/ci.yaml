@@ -60,6 +60,12 @@ jobs:
         if: github.event_name == 'push'
         run: docker push registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7}
 
+      - name: Compute OpenChoreo runtime namespace
+        if: github.event_name == 'push'
+        run: |
+          EXPECTED_NS=$(go run /tmp/dp/tools/namespace-predictor/main.go default default dev)
+          echo "EXPECTED_NS=${EXPECTED_NS}" >> $GITHUB_ENV
+
       - name: Render OpenChoreo resources
         if: github.event_name == 'push'
         run: |
@@ -67,6 +73,12 @@ jobs:
             --input score.yaml \
             --environment dev \
             --image registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7} \
+            --extra-env OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-opentelemetry-collector.otel-system.svc.cluster.local:4318 \
+            --extra-env OPENCHOREO_PROJECT=default \
+            --extra-env OPENCHOREO_COMPONENT=hello-m2 \
+            --extra-env OPENCHOREO_ENVIRONMENT=dev \
+            --extra-env OPENCHOREO_RUNTIME_NAMESPACE=${EXPECTED_NS} \
+            --extra-env GIT_SHA=${GITHUB_SHA::7} \
             > /tmp/component.yaml
 
       - name: Commit to platform-config

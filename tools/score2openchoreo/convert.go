@@ -13,6 +13,7 @@ type ConvertOptions struct {
 	Namespace   string
 	ImageRef    string
 	Project     string
+	ExtraEnv    map[string]string
 }
 
 const componentTypeAnnotation = "pipeline.m2/component-type"
@@ -59,7 +60,7 @@ func Convert(in ScoreDocument, opts ConvertOptions) ([]OpenChoreoResource, error
 	if err != nil {
 		return nil, err
 	}
-	container.Env = env
+	container.Env = mergeExtraEnv(env, opts.ExtraEnv)
 	secretReferences, err := convertSecretReferences(in, scoreContainer, opts)
 	if err != nil {
 		return nil, err
@@ -180,6 +181,29 @@ func convertEnv(in ScoreDocument, c ScoreContainer, environment string) ([]EnvVa
 		}
 	}
 	return env, nil
+}
+
+func mergeExtraEnv(env []EnvVarSpec, extra map[string]string) []EnvVarSpec {
+	if len(extra) == 0 {
+		return env
+	}
+	merged := make(map[string]EnvVarSpec, len(env)+len(extra))
+	for _, e := range env {
+		merged[e.Key] = e
+	}
+	for k, v := range extra {
+		merged[k] = EnvVarSpec{Key: k, Value: v}
+	}
+	names := make([]string, 0, len(merged))
+	for k := range merged {
+		names = append(names, k)
+	}
+	sort.Strings(names)
+	out := make([]EnvVarSpec, 0, len(names))
+	for _, k := range names {
+		out = append(out, merged[k])
+	}
+	return out
 }
 
 func convertSecretReferences(in ScoreDocument, c ScoreContainer, opts ConvertOptions) ([]OpenChoreoSecretReference, error) {

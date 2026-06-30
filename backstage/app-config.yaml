@@ -43,15 +43,15 @@ backend:
 
 integrations:
   gitea:
-    - host: localhost:3002
-      baseUrl: http://localhost:3002
+    - host: localhost:3333
+      baseUrl: http://localhost:3333
       username: gitea_admin
       password: ${GITEA_ADMIN_PASSWORD}
 
 proxy:
   endpoints:
     '/gitea-actions':
-      target: http://localhost:3002
+      target: http://localhost:3333
       changeOrigin: true
       pathRewrite:
         '^/api/proxy/gitea-actions': '/api/v1'

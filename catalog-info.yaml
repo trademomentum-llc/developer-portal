@@ -2,9 +2,10 @@ apiVersion: backstage.io/v1alpha1
 kind: System
 metadata:
   name: developer-portal
-  description: Self-hosted Internal Developer Platform (IDP) -- M1 substrate and M2 delivery loop
+  description: Self-hosted Internal Developer Platform (IDP) -- M1 substrate and M2 delivery loop. Option C: first-class cohesive extension of OpenChoreo (interim to sovereign Jasterish/NeuroDiOS).
   annotations:
     backstage.io/techdocs-ref: dir:.
+    openchoreo.dev/system: true
 spec:
   owner: gitea_admin
 ---
@@ -15,11 +16,17 @@ metadata:
   description: Umbrella Backstage catalog entry for the self-hosted Internal Developer Platform
   annotations:
     backstage.io/techdocs-ref: dir:.
+    openchoreo.dev/control-plane-namespace: default
+    openchoreo.dev/project: default
+    openchoreo.dev/environments: "dev,staging"
+    openchoreo.dev/api-base: http://localhost:9090
 spec:
   type: website
   lifecycle: experimental
   owner: gitea_admin
   system: developer-portal
+  dependsOn:
+    - component:openchoreo-platform
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
@@ -41,4 +48,21 @@ spec:
   type: website
   lifecycle: experimental
   owner: gitea_admin
+  system: developer-portal
+---
+# OpenChoreo platform as first-class entity in catalog (Option C cohesion)
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: openchoreo-platform
+  description: Upstream OpenChoreo orchestrator (control-plane, data-plane, workflow-plane, observability-plane). Load-bearing for Component/Workload/ReleaseBinding reconciliation and dp-* namespace projection.
+  annotations:
+    openchoreo.dev/is-platform: "true"
+    openchoreo.dev/crds: "Component,Workload,SecretReference,Environment,Project,ReleaseBinding,RenderedRelease"
+    openchoreo.dev/api: http://localhost:9090
+    openchoreo.dev/source: https://github.com/openchoreo/openchoreo
+spec:
+  type: service
+  lifecycle: production
+  owner: openchoreo
   system: developer-portal

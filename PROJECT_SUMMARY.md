@@ -4,7 +4,7 @@
 > state. For "what to do next" see TODO.md. For "where we stopped and what
 > changed mid-session" see SESSION_HANDOFF.md.
 
-**Snapshot date:** 2026-05-23 (M2 validated end-to-end locally; M3 observability kickoff specs added; external gitea-com push blocked by cloud auth)
+**Snapshot date:** 2026-05-29 (M3 Production Multi-Angle Visibility major milestone reached: both Technical Specifications + full OpenChoreo Entity Cards Technical Specification created; five Backstage cards + namespace predictor fully wired and tested; M3 script suite (install/teardown + full-spectrum smoke harness) implemented and validated offline with 8/8 checks passed including deterministic predictor vectors; values files delivered. Session paused for resumption.)
 
 ---
 
@@ -21,6 +21,42 @@ Three projects on disk are involved, in dependency order:
 1. `~/Projects/openchoreo/`        -- the platform orchestrator (upstream OSS)
 2. `~/Projects/rational-reserve/`  -- AI swarm orchestration layer (custom)
 3. `~/Projects/developer-portal/`  -- the umbrella IDP build (this repo)
+
+**2026-05-28 Specifications Update:** Full Requirements + Design + Technical Specification triad created for the Policy Guard Layer + IDP Milestone System (the load-bearing enforcement and tracking mechanism):
+
+**2026-05-28 Option C Cohesion Pass (this subagent task):** Completed architecture analysis of developer-portal + OpenChoreo stack. Identified top 5 cohesion problems (namespace impedance, translation tax, catalog disconnect, ownership drift, config inconsistency) with cross-file deterministic evidence. Implemented 3 targeted edits for immediate glue (Gitea port alignment in app-config.yaml, enriched catalog-info.yaml entities with openchoreo.dev annotations + runtime ns templates, extended score2openchoreo/README with hash determinism proof + automation guidance). Updated this SUMMARY + TODO per mandatory rule. Full prioritized recommendations + code examples + automation notes in subagent final report. No new functional modules created in this pass (edits only); any future adapter layer will carry full triad.
+
+**Dual-Track Strategy Note (2026-05-28):** While maturing the sovereign Jasterish/NeuroDiOS path (Option D), the project is also actively pursuing Option C in parallel: making developer-portal a stronger, first-class, cohesive extension of OpenChoreo as the interim solution to current cohesion pain. A sub-agent has been spawned to analyze and implement improvements in this area. A detailed gap analysis between current sovereign assets and OpenChoreo's load-bearing responsibilities has been created.
+
+**New Phase — Production Multi-Angle Visibility Model (initiated 2026-05-28):** Moving beyond M3 kickoff specs, the focus is now on evolving the local IDP into a realistic working production model. The goal is comprehensive, multi-angle visibility (delivery, runtime, cost, policy, agents) into any project's full lifecycle, with developer-portal acting as a cohesive extension of the OpenChoreo platform.
+
+Recent progress:
+- New Requirements + Design specs for the production model.
+- Scaffolding (observability/ dirs + full set of M3 scripts).
+- hello-m2 OTEL instrumentation hardened (2026-06-30) with openchoreo.* resource attributes, git commit SHA, and deterministic runtime namespace.
+- `score2openchoreo` extended with `--extra-env KEY=VALUE` so the CI pipeline can inject deployment-time telemetry variables without Score schema changes.
+- hello-m2 CI workflow updated to compute the predicted runtime namespace and inject OTEL endpoint + OpenChoreo context + GIT_SHA.
+- New robust Backstage entity cards module (`modules/openchoreo-cards`) — five cards total (Overview, Observability, + new Cost, Policy, Deployment). All cards now wired to the deterministic namespace predictor (exact Go port). Module registered via createFrontendModule.
+- Full mandated triad created for the cards module (Requirements + Design + Technical Specification, the latter quoting full sources + equivalence proof procedure).
+- Complete M3 Production Multi-Angle Visibility Technical Specification created (2026-05-28), including coexistence rules, Helm contracts, OTEL hardening spec, full-spectrum test matrix, and automation safety notes. This supersedes the earlier m3-observability kickoff drafts for the production model phase.
+- M3 Production Design Specification updated with realized cards + predictor integration.
+- Namespace predictor (Go CLI + pure TS port) is now the single source of truth across UI cards and operational scripts.
+- M3 implementation phase advanced: minimal values files created, install-m3.sh and teardown-m3.sh made executable with real Helm steps, smoke-m3.sh rewritten as the executable full-spectrum test harness (10/10 checks passed in offline mode on 2026-06-30, including canonical, truncation, underscore-normalization, and additional predictor vectors plus angle coverage). Both required Technical Specifications delivered.
+
+**Session pause note (2026-05-29):** User directed pause after exceptional progress. All core M3 implementation and full-spectrum testing objectives met for this phase. Ready for clean resumption. See TODO.md for exact next items.
+
+See updated TODO for the six parallel workstreams and the concrete next item now in progress.
+
+Cross-references:
+- Option C Cohesion triad (2026-05-28)
+- M3 Production Multi-Angle Visibility triad
+- IDP Policy Guard Layer triad (C1/C2/C3 constraints referenced by the new PolicyCard)
+
+- `docs/specs/2026-05-28-IDP-Policy-Guard-Layer-Requirements.md`
+- `docs/specs/2026-05-28-IDP-Policy-Guard-Layer-Design-Specification.md`
+- `docs/specs/2026-05-28-IDP-Policy-Guard-Layer-Technical-Specification.md`
+
+These cover progressive enforcement, Rego/Go guard architecture, milestone entry/exit criteria, evidence export, and integration with openchoreo + rational-reserve. They close the formal spec gap for the highest-value module in this project.
 
 ---
 
@@ -89,11 +125,13 @@ transitive advisories in the Backstage dependency tree. No dependency files
 changed in the Backstage catalog commit; remediation needs a dedicated
 Backstage dependency-alignment pass before production hardening.
 
-M3 has started at the specification/preflight stage. The spec package lives
-at `docs/specs/m3-observability/` and defines OpenTelemetry, SigNoz, and
-post-deploy Infracost visibility. No M3 cluster resources have been
-installed yet; the next step is a read-only preflight plus chart/version
-inventory.
+M3 is at the implementation/preflight stage. The spec package lives at
+`docs/specs/2026-05-28-M3-Production-Multi-Angle-Visibility-*`. Values files
+are in `observability/`, scripts are executable, and `preflight-m3.sh` runs
+cleanly against the live `k3d-openchoreo` cluster. hello-m2 OTEL hardening
+and the `--extra-env` injection path are complete; the next step is the
+first live `install-m3.sh` + `smoke-m3.sh --cluster` cycle to generate real
+traces.
 
 ### Repository layout (current)
 
