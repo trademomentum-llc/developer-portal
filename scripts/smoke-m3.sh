@@ -244,6 +244,45 @@ if [[ "${MODE}" == "cluster" || ( "${MODE}" == "auto" && "${CLUSTER_AVAILABLE}" 
         record_result fail
     fi
 
+    # Live trace ingestion end-to-end check (generate a request, query ClickHouse)
+    info "Generating a live hello-m2 request and waiting for trace ingestion..."
+    TRACE_POD=$(kubectl --context k3d-openchoreo -n "${EXPECTED_NS}" get pods -l openchoreo.dev/component=hello-m2 -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+    if [[ -n "${TRACE_POD}" ]]; then
+        kubectl --context k3d-openchoreo -n "${EXPECTED_NS}" port-forward "${TRACE_POD}" 28080:8080 >/tmp/smoke-m3-app-pf.log 2>&1 & APP_PF=$!
+        sleep 2
+        if curl -fsS http://localhost:28080/ >/tmp/smoke-m3-app-response.txt 2>&1; then
+            info "HTTP request succeeded: $(cat /tmp/smoke-m3-app-response.txt)"
+            kubectl --context k3d-openchoreo -n signoz port-forward svc/signoz-clickhouse 28123:8123 >/tmp/smoke-m3-ch-pf.log 2>&1 & CH_PF=$!
+            sleep 2
+            TRACE_FOUND=false
+            for attempt in {1..12}; do
+                TRACE_ROWS=$(curl -fsS "http://localhost:28123/?query=SELECT+count%28%2A%29+FROM+signoz_traces.signoz_index_v3+WHERE+serviceName%3D%27hello-m2%27+AND+resources_string%5B%27openchoreo.runtime_namespace%27%5D%3D%27${EXPECTED_NS}%27+FORMAT+JSONCompact" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data'][0][0])" 2>/dev/null || echo 0)
+                if [[ "${TRACE_ROWS}" -gt 0 ]]; then
+                    TRACE_FOUND=true
+                    break
+                fi
+                sleep 5
+            done
+            kill "${CH_PF}" 2>/dev/null || true
+            wait "${CH_PF}" 2>/dev/null || true
+            if [[ "${TRACE_FOUND}" == true ]]; then
+                pass "Live trace ingested for hello-m2 in namespace ${EXPECTED_NS} (${TRACE_ROWS} span(s))"
+                record_result pass
+            else
+                warn "No hello-m2 trace found in SigNoz/ClickHouse for namespace ${EXPECTED_NS}"
+                record_result fail
+            fi
+        else
+            warn "Could not reach hello-m2 via port-forward (see /tmp/smoke-m3-app-pf.log)"
+            record_result fail
+        fi
+        kill "${APP_PF}" 2>/dev/null || true
+        wait "${APP_PF}" 2>/dev/null || true
+    else
+        warn "No hello-m2 pod available for live trace generation"
+        record_result fail
+    fi
+
 else
     info "No k3d-openchoreo context or offline mode — skipping live cluster checks"
     info "To exercise cluster checks: ./scripts/smoke-m3.sh --cluster (after install)"

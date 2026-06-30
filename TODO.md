@@ -67,9 +67,11 @@ These are now the foundation for the interim cohesive extension layer while the 
 
 **Current Concrete Next Items (in priority order, for resumption):**
 1. Harden hello-m2 OTEL with full M3 resource attributes (openchoreo.*, predicted ns, git SHA) per the Technical Specification contract. **DONE 2026-06-30** -- implemented in `seed-repos/hello-m2/main.go`; `score2openchoreo` gained `--extra-env KEY=VALUE` for deployment-time injection; CI workflow computes the predicted namespace and injects all required variables.
-2. Execute the full install + smoke-m3.sh --cluster cycle on a live k3d-openchoreo environment (when available) to generate real traces and validate cards against live data.
-3. Begin iac/modules/observability/ after the first successful end-to-end run.
-4. Update the older m3-observability/ kickoff docs to reference the production M3 triad.
+2. Execute the full install + smoke-m3.sh --cluster cycle on a live k3d-openchoreo environment (when available) to generate real traces and validate cards against live data. **DONE 2026-06-30** -- SigNoz + standalone OTEL collector installed; hello-m2 run #27 succeeded; trace verified in ClickHouse with `openchoreo.runtime_namespace=dp-default-default-development-f8e58905` and `git.commit.sha=a6eaf5a`; `smoke-m3.sh` passes 12/12.
+3. Add a live trace-ingestion assertion to `smoke-m3.sh` (query ClickHouse `signoz_traces.signoz_index_v3` for `service.name='hello-m2'` after generating an HTTP request).
+4. Begin iac/modules/observability/ after the first successful end-to-end run.
+5. Update the older m3-observability/ kickoff docs to reference the production M3 triad.
+6. Wire Backstage app-config to register `hello-m2` from the local Gitea catalog-info.yaml and verify the five OpenChoreo cards render live data.
 
 This work directly implements the user's request to "implement M3 and test it with full spectrum tests" while maintaining the dual-track (Option C cohesion surface while Option D sovereign kernel matures).
 
