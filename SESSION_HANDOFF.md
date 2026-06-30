@@ -141,6 +141,11 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 - This allowed removal of `dangerouslyDisableDefaultAuthPolicy` and `dangerouslyAllowOutsideDevelopment` from `app-config.local.yaml.example`; the default auth policy is now active in local dev.
 - `yarn tsc`, `smoke-m3.sh` (22/22), and the Playwright guest-sign-in test all pass with the hardened config.
 
+### Backstage production config template
+
+- Added `backstage/app-config.production.yaml` with env-var-driven PostgreSQL connection, backend auth secret, disabled guest provider, and enabled permission framework.
+- Keeps secrets out of git and gives a clear path for deploying Backstage beyond local dev.
+
 ### Entity-page tab polish
 
 - Removed the four dedicated-tab cards from the Overview grid in `openchoreo-cards/index.tsx`; only the `OpenChoreo Overview` card remains on Overview.
