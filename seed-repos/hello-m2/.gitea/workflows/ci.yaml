@@ -39,6 +39,21 @@ jobs:
           tofu init
           tofu plan -out=plan.out
 
+      - name: Install Infracost
+        if: (github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'iac/')) || github.event_name == 'push'
+        run: |
+          ARCH=$(uname -m)
+          case "$ARCH" in
+            x86_64) INFRACOST_ARCH=amd64 ;;
+            aarch64|arm64) INFRACOST_ARCH=arm64 ;;
+            *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+          esac
+          curl -fsSL "https://github.com/infracost/infracost/releases/latest/download/infracost-linux-${INFRACOST_ARCH}.tar.gz" -o /tmp/infracost.tar.gz
+          tar -xzf /tmp/infracost.tar.gz -C /tmp
+          mv "/tmp/infracost-linux-${INFRACOST_ARCH}" /usr/local/bin/infracost
+          chmod +x /usr/local/bin/infracost
+          infracost --version
+
       - name: Infracost breakdown
         if: github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'iac/')
         run: |
