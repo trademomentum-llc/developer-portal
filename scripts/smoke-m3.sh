@@ -233,7 +233,16 @@ if [[ "${MODE}" == "cluster" || ( "${MODE}" == "auto" && "${CLUSTER_AVAILABLE}" 
 
     # Backstage live catalog checks
     BACKSTAGE_BACKEND_URL="http://127.0.0.1:7008"
-    if curl -fsS -o /dev/null "${BACKSTAGE_BACKEND_URL}/api/catalog/entities?limit=1"; then
+
+    # Obtain a guest token if the backend requires authentication. This keeps the
+    # smoke harness working both with and without dangerouslyDisableDefaultAuthPolicy.
+    BACKSTAGE_TOKEN=$(curl -fsS "${BACKSTAGE_BACKEND_URL}/api/auth/guest/refresh?env=development" 2>/dev/null | python3 -c "import sys,json; print(json.load(sys.stdin).get('backstageIdentity',{}).get('token',''))" 2>/dev/null || true)
+    AUTH_CURL=()
+    if [[ -n "${BACKSTAGE_TOKEN}" ]]; then
+        AUTH_CURL=(-H "Authorization: Bearer ${BACKSTAGE_TOKEN}")
+    fi
+
+    if curl -fsS -o /dev/null "${AUTH_CURL[@]}" "${BACKSTAGE_BACKEND_URL}/api/catalog/entities?limit=1"; then
         pass "Backstage backend API is reachable at ${BACKSTAGE_BACKEND_URL}"
         record_result pass
 
@@ -242,7 +251,7 @@ if [[ "${MODE}" == "cluster" || ( "${MODE}" == "auto" && "${CLUSTER_AVAILABLE}" 
             local namespace="$2"
             local name="$3"
             local entity_url="${BACKSTAGE_BACKEND_URL}/api/catalog/entities/by-name/${kind}/${namespace}/${name}"
-            if curl -fsS -o /tmp/smoke-m3-entity-${name}.json "${entity_url}" 2>/dev/null; then
+            if curl -fsS -o /tmp/smoke-m3-entity-${name}.json "${AUTH_CURL[@]}" "${entity_url}" 2>/dev/null; then
                 if grep -q "\"name\":\"${name}\"" "/tmp/smoke-m3-entity-${name}.json"; then
                     pass "Backstage catalog contains ${kind}/${namespace}/${name}"
                     record_result pass

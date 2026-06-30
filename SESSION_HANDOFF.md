@@ -135,6 +135,12 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 - Guest sign-in now works and the catalog loads from either `localhost:3001` or `127.0.0.1:3001`.
 - Added `group:default/openchoreo` to `backstage/examples/org.yaml` to eliminate the entity-relations warning.
 
+### Backstage auth hardening
+
+- `scripts/smoke-m3.sh` now obtains a guest token from `/api/auth/guest/refresh` and sends it as a Bearer token for catalog API calls.
+- This allowed removal of `dangerouslyDisableDefaultAuthPolicy` and `dangerouslyAllowOutsideDevelopment` from `app-config.local.yaml.example`; the default auth policy is now active in local dev.
+- `yarn tsc`, `smoke-m3.sh` (22/22), and the Playwright guest-sign-in test all pass with the hardened config.
+
 ### Entity-page tab polish
 
 - Removed the four dedicated-tab cards from the Overview grid in `openchoreo-cards/index.tsx`; only the `OpenChoreo Overview` card remains on Overview.

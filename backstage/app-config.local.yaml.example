@@ -4,8 +4,6 @@
 # remains secure. Backstage loads app-config.local.yaml automatically in
 # development mode.
 backend:
-  auth:
-    dangerouslyDisableDefaultAuthPolicy: true
   # Use a file-backed database directory in local dev so catalog state survives restarts.
   # The directory will be created automatically and each plugin gets its own .sqlite file.
   database:
@@ -15,8 +13,7 @@ backend:
 
 auth:
   providers:
-    guest:
-      dangerouslyAllowOutsideDevelopment: true
+    guest: {}
 
 permission:
   enabled: false
