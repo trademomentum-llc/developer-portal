@@ -38,7 +38,7 @@ The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replic
 ## 2. Git state at handoff
 
 - **Branch:** `main`
-- **Local HEAD:** `15a40cd` -- `security(backstage): force @grpc/grpc-js ^1.14.4 and ws ^8.21.0 via resolutions`
+- **Local HEAD:** `6985be3` -- `security(backstage): add resolutions for axios and undici`
 - **origin (local Gitea):** `http://localhost:3333/openchoreo/developer-portal.git` is up-to-date with `main`.
 - **hello-m2 (local Gitea):** `http://localhost:3333/openchoreo/hello-m2.git` is up-to-date with `main` at commit `a6eaf5a`.
 - **Working tree:** clean.
@@ -46,8 +46,10 @@ The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replic
 
 Recent commits on `main`:
 ```
+6985be3 security(backstage): add resolutions for axios and undici
 15a40cd security(backstage): force @grpc/grpc-js ^1.14.4 and ws ^8.21.0 via resolutions
 e252515 chore(backstage): default BACKSTAGE_APP_HOST to localhost
+1b4ba50 chore(backstage): add restart-backstage.sh convenience script
 ebec46c feat(backstage): add Platform angle tab to Component entity page
 fcaab53 refactor(backstage): avoid card duplication by keeping only overview card on Overview
 14dcfcf fix(backstage): add openchoreo group to catalog
@@ -119,8 +121,8 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 
 ### Dependency audit progress
 
-- Added Yarn resolutions in `backstage/package.json` for `@grpc/grpc-js ^1.14.4` and `ws ^8.21.0`, clearing their high/critical advisories.
-- Remaining critical `vm2` (via `typescript-json-schema`) is a build-time transitive; resolving it requires a Backstage version upgrade or replacing `typescript-json-schema`.
+- Added Yarn resolutions in `backstage/package.json` for `@grpc/grpc-js ^1.14.4`, `ws ^8.21.0`, `axios ^1.18.1`, and `undici ^7.28.0`, clearing their high/critical advisories.
+- Remaining critical `vm2` (via `typescript-json-schema`) and other transitive advisories (`tar`, `protobufjs`, `minimatch`, etc.) require a coordinated Backstage version upgrade.
 
 ### Live smoke cycle
 
