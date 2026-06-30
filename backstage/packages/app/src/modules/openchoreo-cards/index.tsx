@@ -24,60 +24,12 @@ const openchoreoOverviewCard = EntityCardBlueprint.make({
   },
 });
 
-const openchoreoObservabilityCard = EntityCardBlueprint.make({
-  name: 'observability',
-  params: {
-    filter: componentCardFilter,
-    loader: async () => {
-      const { ObservabilityLinksCard } = await import('./ObservabilityLinksCard');
-      return <ObservabilityLinksCard />;
-    },
-  },
-});
-
-const openchoreoCostCard = EntityCardBlueprint.make({
-  name: 'cost',
-  params: {
-    filter: componentCardFilter,
-    loader: async () => {
-      const { CostCard } = await import('./CostCard');
-      return <CostCard />;
-    },
-  },
-});
-
-const openchoreoPolicyCard = EntityCardBlueprint.make({
-  name: 'policy',
-  params: {
-    filter: componentCardFilter,
-    loader: async () => {
-      const { PolicyCard } = await import('./PolicyCard');
-      return <PolicyCard />;
-    },
-  },
-});
-
-const openchoreoDeploymentCard = EntityCardBlueprint.make({
-  name: 'deployment',
-  params: {
-    filter: componentCardFilter,
-    loader: async () => {
-      const { DeploymentCard } = await import('./DeploymentCard');
-      return <DeploymentCard />;
-    },
-  },
-});
-
 export const openchoreoCardsModule = createFrontendModule({
   pluginId: 'catalog',
   extensions: [
-    // These contribute to Component entity pages via the catalog plugin.
-    // For production entity page layouts a custom EntityLayout override is
-    // recommended so the five cards can be placed in deliberate grid sections.
+    // Only the overview card stays on the default Overview grid.
+    // The other four cards are rendered inside dedicated entity-page tabs
+    // contributed by openchoreo-entity-page, so content is not duplicated.
     openchoreoOverviewCard,
-    openchoreoObservabilityCard,
-    openchoreoCostCard,
-    openchoreoPolicyCard,
-    openchoreoDeploymentCard,
   ],
 });
