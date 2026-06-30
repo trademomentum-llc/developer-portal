@@ -2,7 +2,9 @@ apiVersion: backstage.io/v1alpha1
 kind: System
 metadata:
   name: developer-portal
-  description: Self-hosted Internal Developer Platform (IDP) -- M1 substrate and M2 delivery loop. Option C: first-class cohesive extension of OpenChoreo (interim to sovereign Jasterish/NeuroDiOS).
+  description: >-
+    Self-hosted Internal Developer Platform (IDP) -- M1 substrate and M2 delivery loop.
+    Option C: first-class cohesive extension of OpenChoreo (interim to sovereign Jasterish/NeuroDiOS).
   annotations:
     backstage.io/techdocs-ref: dir:.
     openchoreo.dev/system: true

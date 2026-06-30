@@ -1,6 +1,8 @@
 app:
   title: Developer Portal
-  baseUrl: http://localhost:3000
+  baseUrl: http://localhost:3001
+  listen:
+    port: 3001
 
   # Enable all packages by default, this will discover packages from packages/app/package.json
   packages: all
@@ -21,9 +23,9 @@ backend:
   # auth:
   #   keys:
   #     - secret: ${BACKEND_SECRET}
-  baseUrl: http://localhost:7007
+  baseUrl: http://localhost:7008
   listen:
-    port: 7007
+    port: 7008
     # Uncomment the following host directive to bind to specific interfaces
     # host: 127.0.0.1
   csp:
@@ -31,7 +33,7 @@ backend:
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
     # Default Helmet Content-Security-Policy values can be removed by setting the key to false
   cors:
-    origin: http://localhost:3000
+    origin: http://localhost:3001
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
   # This is for local development only, it is not recommended to use this in production
