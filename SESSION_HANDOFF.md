@@ -5,7 +5,7 @@
 > exactly what to do first.
 
 **Last updated:** 2026-06-30
-**Reason for handoff:** M3 Production Multi-Angle Visibility live install and full-spectrum smoke cycle completed successfully on k3d-openchoreo. Items 7 and 8 (post-deploy cost artifact + multi-angle entity page layout) are done. The recurring Backstage guest sign-in / catalog failure has been fixed. Working tree is clean after the final commit.
+**Reason for handoff:** M3 Production Multi-Angle Visibility is live and `smoke-m3.sh` passes 16/16. Backstage now auto-discovers Components from the local Gitea `openchoreo` org, the dependency audit is clear of high/critical advisories, and `start-backstage.sh` ensures both required Gitea port-forwards are active.
 
 ---
 
@@ -23,8 +23,9 @@ M3 is now live and validated end-to-end:
   - `OPENCHOREO_ENVIRONMENT=development`
   - `GIT_SHA=a6eaf5a`
 - Live trace verified in ClickHouse `signoz_traces.signoz_index_v3` with `serviceName='hello-m2'`, `resources_string['openchoreo.runtime_namespace']='dp-default-default-development-f8e58905'`, and `resources_string['git.commit.sha']='a6eaf5a'`.
-- `./scripts/smoke-m3.sh` now passes 13/13 checks, including a live trace-ingestion assertion.
+- `./scripts/smoke-m3.sh` now passes 16/16 checks, including a live trace-ingestion assertion, the imported Gitea catalog entities, and the post-deploy cost artifact.
 - Backstage `yarn tsc` passes and the five OpenChoreo entity cards render on the live `hello-m2` catalog page after converting them to `EntityCardBlueprint.make` extension definitions (the initial `convertLegacyEntityCardExtension` attempt failed because the plain card components lacked legacy extension metadata).
+- Backstage catalog provider auto-imports `hello-m2` and `developer-portal` from the local Gitea `openchoreo` org via `@backstage/plugin-catalog-backend-module-gitea`; Gitea integrations are configured for both `localhost:3333` (API) and `localhost:3002` (raw file URLs).
 - Backstage dev ports moved from `3000/7007` to `3001/7008` in `app-config.yaml` and `playwright.config.ts` to avoid the Gitea service on port 3000.
 - `catalog-info.yaml` root System description folded to a `>-` block scalar to avoid the `Option C:` YAML parse error, and `openchoreo.dev/system` annotation quoted as a string to satisfy the Backstage envelope policy.
 - `iac/modules/observability/` created for repeatable SigNoz + OTEL Collector installs; `install-m3.sh` now applies it via OpenTofu; `tofu plan -target=module.observability` shows a clean 3-to-add plan.
@@ -109,6 +110,13 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 - Playwright verification confirms all tabs render on `http://localhost:3001/catalog/default/component/hello-m2`.
 - The four dedicated-tab cards are no longer duplicated on the Overview grid.
 
+### Gitea catalog provider / discovery
+
+- Configured `@backstage/plugin-catalog-backend-module-gitea` provider in `backstage/app-config.yaml` to scan the `openchoreo` org on `localhost:3333`.
+- Added a second Gitea integration for `localhost:3002` because Gitea returns raw catalog-info URLs on its internal ROOT_URL port.
+- Updated `scripts/start-backstage.sh` to ensure both `3333:3000` and `3002:3000` port-forwards to `svc/gitea-http` are active before the dev server starts.
+- `hello-m2` and `developer-portal` are now auto-imported; relations resolve correctly.
+
 ### Backstage guest sign-in / catalog fix
 
 - `backstage/app-config.yaml` now allows both `http://localhost:3001` and `http://127.0.0.1:3001` in `backend.cors.origin`.
@@ -121,10 +129,10 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 - Removed the four dedicated-tab cards from the Overview grid in `openchoreo-cards/index.tsx`; only the `OpenChoreo Overview` card remains on Overview.
 - Verified via Playwright that the Deployment, Policy, Observability, Cost, and Platform cards render only inside their dedicated tabs.
 
-### Dependency audit progress
+### Dependency audit completion
 
-- Added Yarn resolutions in `backstage/package.json` for `@grpc/grpc-js ^1.14.4`, `ws ^8.21.0`, `axios ^1.18.1`, and `undici ^7.28.0`, clearing their high/critical advisories.
-- Remaining critical `vm2` (via `typescript-json-schema`) and other transitive advisories (`tar`, `protobufjs`, `minimatch`, etc.) require a coordinated Backstage version upgrade.
+- Added Yarn resolutions in `backstage/package.json` for `@grpc/grpc-js ^1.14.4`, `ws ^8.21.0`, `axios ^1.18.1`, `undici ^7.28.0`, and `react-router ^6.30.4`, clearing all high/critical advisories.
+- `yarn npm audit --all` now reports only the moderate `@material-ui/core` v4 deprecation warning, which Backstage itself still depends on; resolving it requires a coordinated Backstage version upgrade.
 
 ### Auth hardening
 
@@ -156,14 +164,14 @@ Done 2026-06-30. `iac/modules/observability/` exists and is wired into `install-
 
 ### Backstage dependency audit remediation
 
-`yarn npm audit --all --recursive` still reports existing critical/high transitive advisories. No new dependencies were introduced.
+Done 2026-06-30. All high/critical advisories are resolved; only the moderate `@material-ui/core` v4 deprecation warning remains.
 
 ---
 
 ## 5. Live state at handoff
 
 - **k3d-openchoreo cluster:** healthy.
-- **Gitea local port state:** port-forward `localhost:3333 -> gitea-http:3000` should be running. If not, recreate with `kubectl --context k3d-openchoreo -n gitea port-forward svc/gitea-http 3333:3000 &`.
+- **Gitea local port state:** port-forwards `localhost:3333 -> gitea-http:3000` and `localhost:3002 -> gitea-http:3000` should be running. `scripts/start-backstage.sh` ensures them automatically; if needed, recreate with `kubectl --context k3d-openchoreo -n gitea port-forward svc/gitea-http 3333:3000 &` and the same for `3002:3000`.
 - **SigNoz:** namespace `signoz` exists; frontend service `signoz` exists; OTLP receiver on `signoz-otel-collector.signoz.svc.cluster.local:4317/4318`.
 - **OTEL collector:** namespace `otel-system`; forwards to SigNoz.
 - **hello-m2 workload:** running in `dp-default-default-development-f8e58905` at image tag `a6eaf5a`.
@@ -189,7 +197,7 @@ In this exact order:
 4. `git status` and `git log --oneline origin/main..HEAD` to verify state.
 5. Confirm cluster health: `kubectl --context k3d-openchoreo get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded`.
 6. Run `./scripts/smoke-m3.sh` to confirm the live smoke cycle still passes.
-7. TODO.md items 7 and 8 are complete. Ask the user for the next priority.
+7. TODO.md items 7-9 are complete. Ask the user for the next priority.
 
 ---
 

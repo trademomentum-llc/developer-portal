@@ -76,6 +76,7 @@ These are now the foundation for the interim cohesive extension layer while the 
 **New Production-Model TODOs (not yet created until now):**
 7. Persist post-deploy Infracost cost artifact on every `hello-m2` push and wire the CostCard to the real artifact (FR-VIS-3). **DONE 2026-06-30** -- CI run #30 succeeded; artifact committed to `platform-config/cost-artifacts/hello-m2/development/latest.json`; CostCard links to the real artifact; `smoke-m3.sh` validates it (16/16 pass).
 8. Create a dedicated Backstage multi-angle entity page layout that groups the existing OpenChoreo cards into deliberate tabs/sections (Overview, Deployment, Observability, Cost, Policy, Platform) rather than rendering all cards on the default overview grid (FR-VIS-1). **DONE 2026-06-30** -- new `openchoreo-entity-page` module adds Deployment, Policy, Observability, Cost, and Platform tabs; verified via Playwright on the `hello-m2` Component page. The dedicated-tab cards are no longer duplicated on the Overview grid (only the OpenChoreo Context overview card remains there). Also fixed the recurring guest sign-in / catalog failure by allowing both `localhost:3001` and `127.0.0.1:3001` in backend CORS and by hardening `start-backstage.sh` with `nohup`/`disown` and Node 24 path pinning. Added the missing `group:default/openchoreo` catalog entity to eliminate the entity-relations warning.
+9. Enable Backstage catalog discovery from the local Gitea `openchoreo` org and ensure the required port-forwards are managed automatically. **DONE 2026-06-30** -- configured `@backstage/plugin-catalog-backend-module-gitea` provider in `app-config.yaml`; added Gitea integrations for both `localhost:3333` (API/listing) and `localhost:3002` (raw file URLs returned by Gitea); `scripts/start-backstage.sh` now ensures both port-forwards are active before the dev server starts; `hello-m2` and `developer-portal` components are imported automatically and `smoke-m3.sh` passes 16/16.
 
 This work directly implements the user's request to "implement M3 and test it with full spectrum tests" while maintaining the dual-track (Option C cohesion surface while Option D sovereign kernel matures).
 
@@ -211,7 +212,7 @@ origin (local Gitea) now points at `http://localhost:3333/openchoreo/developer-p
 
 | Item | Status | Notes |
 |---|---|---|
-| Backstage dependency audit remediation | IN PROGRESS 2026-06-30 | Resolved high/critical `@grpc/grpc-js`, `ws`, `axios`, and `undici` advisories via Yarn resolutions. Moved dev-only flags (`dangerouslyDisableDefaultAuthPolicy`, `dangerouslyAllowOutsideDevelopment`, `permission.enabled=false`) from `app-config.yaml` to `app-config.local.yaml` so production config stays secure. Remaining critical `vm2` (via `typescript-json-schema`) and other transitive advisories (`tar`, `protobufjs`, `minimatch`, etc.) require a coordinated Backstage version upgrade; continue in dedicated dependency-alignment pass. |
+| Backstage dependency audit remediation | DONE 2026-06-30 | Resolved all high/critical advisories via Yarn resolutions (`@grpc/grpc-js ^1.14.4`, `ws ^8.21.0`, `axios ^1.18.1`, `undici ^7.28.0`, `react-router ^6.30.4`). Moved dev-only flags (`dangerouslyDisableDefaultAuthPolicy`, `dangerouslyAllowOutsideDevelopment`, `permission.enabled=false`) from `app-config.yaml` to `app-config.local.yaml` so production config stays secure. The only remaining finding is the moderate deprecation warning for `@material-ui/core` v4, which Backstage itself still depends on; resolving it requires a coordinated Backstage version upgrade and is out of scope for this pass. |
 
 ---
 
@@ -226,7 +227,7 @@ M3 core observability is **implemented and validated live on k3d-openchoreo**. T
 | M3 chart/version inventory | DONE 2026-06-30 | Pinned versions recorded in `iac/modules/observability/variables.tf` and `observability/{signoz,otel}/values.local.yaml` |
 | M3 install/teardown scripts | DONE 2026-06-30 | `scripts/install-m3.sh` and `scripts/teardown-m3.sh` flow through OpenTofu module `iac/modules/observability/` |
 | M3 smoke suite | DONE 2026-06-30 | `scripts/smoke-m3.sh` validates SigNoz health, OTLP collector, Backstage cards, `hello-m2` telemetry, live trace ingestion in ClickHouse, and post-deploy cost artifact (16/16 pass) |
-| M3 Backstage dependency audit | IN PROGRESS 2026-06-30 | `@grpc/grpc-js`, `ws`, `axios`, and `undici` resolved via resolutions; `vm2`, `tar`, `protobufjs`, and other transitive advisories remain blocked on coordinated Backstage upgrade |
+| M3 Backstage dependency audit | DONE 2026-06-30 | All high/critical advisories resolved via Yarn resolutions; only the `@material-ui/core` v4 deprecation warning remains (requires Backstage upstream upgrade) |
 
 **Remaining production-model work:** items 7 and 8 are DONE 2026-06-30. Next production-model priorities are TBD with the user.
 
@@ -239,12 +240,12 @@ M3 core observability is **implemented and validated live on k3d-openchoreo**. T
 **Top 5 Cohesion Problems Identified (deterministic cross-ref):**
 1. Namespace/Placement Impedance: hardcoded "default" in score2openchoreo/cli + convert; runtime dp- ns generated via sha256 in openchoreo/internal/dataplane/kubernetes/name.go + releasebinding/controller.go. Components must colocate with Project in control ns.
 2. Translation Tax: score2openchoreo is ad-hoc Go binary cloned wholesale in Gitea CI (ci.yaml:21); no plugin/extension point, incomplete fidelity (no Traits/Workflows).
-3. Catalog/Entity Disconnect: purely static file locations in app-config.yaml; no provider for OpenChoreo CRs; ownership strings do not map to .spec.owner.projectName.
+3. Catalog/Entity Disconnect: ~~purely static file locations in app-config.yaml; no provider for OpenChoreo CRs~~ -- resolved for Gitea-hosted entities via `@backstage/plugin-catalog-backend-module-gitea` auto-discovery of the `openchoreo` org; ownership strings now map to `group:default/openchoreo` for `hello-m2`.
 4. Ownership/Tenancy Boundary Drift: Gitea orgs + Backstage owners + OpenChoreo Projects + label-injected dp- ns have no synchronized model or provenance.
 5. Config/Integration Inconsistencies: Gitea port drift (3002 in some scripts/app-config vs 3333 in M2 docs/hand-off); missing Backstage OpenChoreo plugin surface; Flux only for handoff.
 
 **Implemented Small Cohesion Changes (this pass, edits only to existing artifacts per quality rules):**
-- Aligned Gitea integration/proxy in backstage/app-config.yaml to 3333 (matches current port-forward + handoff).
+- Aligned Gitea integration/proxy in `backstage/app-config.yaml` to `localhost:3333` for API access and added a second integration for `localhost:3002` because Gitea returns raw catalog-info URLs on its internal ROOT_URL port; `start-backstage.sh` now ensures both port-forwards are active.
 - Enhanced catalog-info.yaml (root + hello-m2) with openchoreo.dev/* annotations, links to API, runtime-ns template note, and openchoreo-platform entity. Catalog now surfaces the Option C model.
 - Extended tools/score2openchoreo/README.md with full "Namespace and ownership placement" section + mathematical determinism proof for the dp- hash + automation note (pure function, collision bound, safe 100% automation for validators).
 
