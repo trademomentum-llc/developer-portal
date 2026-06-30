@@ -4,7 +4,7 @@ set -euo pipefail
 
 BACKSTAGE_DIR="/Users/nnos/Projects/developer-portal/backstage"
 RUNTIME_DIR="${HOME}/.rational-reserve"
-APP_HOST="${BACKSTAGE_APP_HOST:-127.0.0.1}"
+APP_HOST="${BACKSTAGE_APP_HOST:-localhost}"
 APP_PORT="${BACKSTAGE_APP_PORT:-3001}"
 BACKEND_PORT="${BACKSTAGE_BACKEND_PORT:-7008}"
 APP_BASE_URL="${BACKSTAGE_APP_BASE_URL:-http://${APP_HOST}:${APP_PORT}}"
