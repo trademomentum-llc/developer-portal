@@ -55,6 +55,7 @@ spec:
   lifecycle: experimental
   owner: user:default/nnos
   system: developer-portal
+  domain: internal-developer-platform
   dependsOn:
     - component:openchoreo-platform
 ---
@@ -75,6 +76,7 @@ spec:
   lifecycle: experimental
   owner: user:default/nnos
   system: developer-portal
+  domain: internal-developer-platform
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
@@ -94,6 +96,7 @@ spec:
   lifecycle: production
   owner: user:default/nnos
   system: developer-portal
+  domain: internal-developer-platform
 ---
 # OpenChoreo platform as first-class entity in catalog (Option C cohesion)
 apiVersion: backstage.io/v1alpha1
@@ -119,3 +122,4 @@ spec:
   lifecycle: production
   owner: openchoreo
   system: developer-portal
+  domain: internal-developer-platform
