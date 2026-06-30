@@ -75,7 +75,7 @@ These are now the foundation for the interim cohesive extension layer while the 
 
 **New Production-Model TODOs (not yet created until now):**
 7. Persist post-deploy Infracost cost artifact on every `hello-m2` push and wire the CostCard to the real artifact (FR-VIS-3). **DONE 2026-06-30** -- CI run #30 succeeded; artifact committed to `platform-config/cost-artifacts/hello-m2/development/latest.json`; CostCard links to the real artifact; `smoke-m3.sh` validates it (16/16 pass).
-8. Create a dedicated Backstage multi-angle entity page layout that groups the existing OpenChoreo cards into deliberate tabs/sections (Overview, Deployment, Observability, Cost, Policy, Platform) rather than rendering all cards on the default overview grid (FR-VIS-1).
+8. Create a dedicated Backstage multi-angle entity page layout that groups the existing OpenChoreo cards into deliberate tabs/sections (Overview, Deployment, Observability, Cost, Policy, Platform) rather than rendering all cards on the default overview grid (FR-VIS-1). **DONE 2026-06-30** -- new `openchoreo-entity-page` module adds Deployment, Policy, Observability, and Cost tabs; verified via Playwright on the `hello-m2` Component page. Also fixed the recurring guest sign-in / catalog failure by allowing both `localhost:3001` and `127.0.0.1:3001` in backend CORS and by hardening `start-backstage.sh` with `nohup`/`disown` and Node 24 path pinning.
 
 This work directly implements the user's request to "implement M3 and test it with full spectrum tests" while maintaining the dual-track (Option C cohesion surface while Option D sovereign kernel matures).
 
@@ -228,7 +228,7 @@ M3 core observability is **implemented and validated live on k3d-openchoreo**. T
 | M3 smoke suite | DONE 2026-06-30 | `scripts/smoke-m3.sh` validates SigNoz health, OTLP collector, Backstage cards, `hello-m2` telemetry, live trace ingestion in ClickHouse, and post-deploy cost artifact (16/16 pass) |
 | M3 Backstage dependency audit | OPEN | Existing critical/high Backstage audit advisories remain; deferred to a dedicated dependency-alignment pass before production hardening |
 
-**Remaining production-model work:** see items 7 and 8 in Current Concrete Next Items above (post-deploy cost artifact + multi-angle entity page layout).
+**Remaining production-model work:** items 7 and 8 are DONE 2026-06-30. Next production-model priorities are TBD with the user.
 
 ---
 

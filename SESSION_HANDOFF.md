@@ -5,7 +5,7 @@
 > exactly what to do first.
 
 **Last updated:** 2026-06-30
-**Reason for handoff:** M3 Production Multi-Angle Visibility live install and full-spectrum smoke cycle completed successfully on k3d-openchoreo. Working tree is clean after the final commit.
+**Reason for handoff:** M3 Production Multi-Angle Visibility live install and full-spectrum smoke cycle completed successfully on k3d-openchoreo. Items 7 and 8 (post-deploy cost artifact + multi-angle entity page layout) are done. The recurring Backstage guest sign-in / catalog failure has been fixed. Working tree is clean after the final commit.
 
 ---
 
@@ -38,7 +38,7 @@ The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replic
 ## 2. Git state at handoff
 
 - **Branch:** `main`
-- **Local HEAD:** `79bf4f2` -- `feat(m3): add live trace-ingestion assertion to smoke-m3.sh; update TODO`
+- **Local HEAD:** `0b6211e` -- `fix(backstage): repair guest sign-in and add entity-page tabs`
 - **origin (local Gitea):** `http://localhost:3333/openchoreo/developer-portal.git` is up-to-date with `main`.
 - **hello-m2 (local Gitea):** `http://localhost:3333/openchoreo/hello-m2.git` is up-to-date with `main` at commit `a6eaf5a`.
 - **Working tree:** clean.
@@ -46,6 +46,7 @@ The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replic
 
 Recent commits on `main`:
 ```
+0b6211e fix(backstage): repair guest sign-in and add entity-page tabs
 d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verify cards render
 79bf4f2 feat(m3): add live trace-ingestion assertion to smoke-m3.sh; update TODO
 2655ed1 fix(m3): align namespace predictor with OpenChoreo, fix Backstage card types, default env to development
@@ -84,9 +85,29 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 - Worked around SigNoz enterprise collector OpAMP issue by patching the Deployment to remove the manager config argument.
 - Verified the standalone collector forwards to `signoz-otel-collector.signoz.svc.cluster.local:4317`.
 
+### Post-deploy cost artifact
+
+- `scripts/ci/commit-cost-artifact.sh` commits the rendered artifact to `platform-config`.
+- `seed-repos/hello-m2/.gitea/workflows/ci.yaml` generates the artifact on every push.
+- `CostCard.tsx` links to the real artifact in `platform-config`.
+- `smoke-m3.sh` validates artifact presence via the Gitea API.
+- Live run #30 succeeded; artifact exists at `cost-artifacts/hello-m2/development/latest.json`.
+
+### Multi-angle entity page layout
+
+- New module `backstage/packages/app/src/modules/openchoreo-entity-page/index.tsx` adds Deployment, Observability, Cost, and Policy tabs for Component entities.
+- `App.tsx` registers the module.
+- Playwright verification confirms all tabs render on `http://localhost:3001/catalog/default/component/hello-m2`.
+
+### Backstage guest sign-in / catalog fix
+
+- `backstage/app-config.yaml` now allows both `http://localhost:3001` and `http://127.0.0.1:3001` in `backend.cors.origin`.
+- `scripts/start-backstage.sh` only overrides `backend.cors.origin` when `BACKSTAGE_APP_HOST` is explicitly set, uses `nohup`/`disown` so the backend survives SIGHUP, and pins Node 24 via PATH.
+- Guest sign-in now works and the catalog loads from either `localhost:3001` or `127.0.0.1:3001`.
+
 ### Live smoke cycle
 
-- `./scripts/smoke-m3.sh` passes 13/13.
+- `./scripts/smoke-m3.sh` passes 16/16.
 - `./scripts/preflight-m3.sh` runs successfully.
 - Manual ClickHouse query confirms trace ingestion with correct resource attributes.
 
@@ -100,11 +121,11 @@ External `gitea-com` push is still blocked by cloud authentication. Local Gitea 
 
 ### Backstage catalog live render verification
 
-The cards typecheck and the catalog locations are configured. A headless browser test signed in as Guest and confirmed all five card titles (`OpenChoreo Context`, `Observability`, `Cost`, `Policy`, `Deployment`) render on `http://localhost:3000/catalog/default/component/hello-m2`.
+Done. Guest sign-in works and all five OpenChoreo cards plus the new Deployment, Policy, Observability, and Cost entity-page tabs render on `http://localhost:3001/catalog/default/component/hello-m2`.
 
 ### iac/modules/observability/
 
-SigNoz and the OTEL collector are currently installed via Helm commands, not via OpenTofu. The next repeatable-infrastructure step is to create `iac/modules/observability/` and wire it into `iac/main.tf`.
+Done 2026-06-30. `iac/modules/observability/` exists and is wired into `install-m3.sh` / `teardown-m3.sh` via OpenTofu.
 
 ### Backstage dependency audit remediation
 
@@ -141,9 +162,7 @@ In this exact order:
 4. `git status` and `git log --oneline origin/main..HEAD` to verify state.
 5. Confirm cluster health: `kubectl --context k3d-openchoreo get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded`.
 6. Run `./scripts/smoke-m3.sh` to confirm the live smoke cycle still passes.
-7. Pick the next production-model slice from `TODO.md` items 7 and 8:
-   - Persist post-deploy Infracost cost artifact on every `hello-m2` push and wire CostCard to the real artifact.
-   - Create a dedicated Backstage multi-angle entity page layout with tabs/sections.
+7. TODO.md items 7 and 8 are complete. Ask the user for the next priority.
 
 ---
 
@@ -151,4 +170,4 @@ In this exact order:
 
 - **openchoreo** (`/Users/nnos/Projects/openchoreo/`): unchanged, cluster healthy, used as reference for namespace algorithm and CRD shapes.
 - **rational-reserve** (`/Users/nnos/Projects/rational-reserve/`): unchanged this session.
-- **developer-portal** (`/Users/nnos/Projects/developer-portal/`): M3 Production Multi-Angle Visibility installed and smoke-validated on k3d-openchoreo; Backstage cards typecheck and are wired to the live predictor; next steps are IaC module and live UI verification.
+- **developer-portal** (`/Users/nnos/Projects/developer-portal/`): M3 Production Multi-Angle Visibility installed and smoke-validated on k3d-openchoreo; Backstage guest sign-in repaired, multi-angle entity-page tabs verified, and post-deploy cost artifact wired; next step is user-prioritized.
