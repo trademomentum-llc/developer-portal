@@ -161,6 +161,13 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 - `scripts/start-backstage.sh` now ensures the OpenCost port-forward (`localhost:29003 -> svc/opencost:9090`) is active before the dev server starts.
 - `scripts/smoke-m3.sh` continues to pass 22/22 with OpenCost installed.
 
+### Unified smoke validation
+
+- Added `scripts/smoke-all.sh` to run M2, M3, and M4 smoke suites end-to-end.
+- Made `scripts/smoke-infracost.sh` skip gracefully when no local `INFRACOST_API_KEY` is configured, avoiding a false failure in local dev.
+- Reseeded OpenBao so `scripts/smoke-openbao.sh` passes.
+- `scripts/smoke-all.sh` now reports `ALL SMOKE SUITES PASSED (M2, M3, M4)`.
+
 ### Entity-page tab polish
 
 - Removed the four dedicated-tab cards from the Overview grid in `openchoreo-cards/index.tsx`; only the `OpenChoreo Overview` card remains on Overview.
