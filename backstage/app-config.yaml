@@ -106,5 +106,5 @@ kubernetes:
 
 # see https://backstage.io/docs/permissions/getting-started for more on the permission framework
 permission:
-  # setting this to `false` will disable permissions
-  enabled: false
+  # Permissions are enabled in production; local development disables them via
+  # app-config.local.yaml so the guest provider flow stays simple.
