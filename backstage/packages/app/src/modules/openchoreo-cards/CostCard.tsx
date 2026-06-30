@@ -20,11 +20,13 @@ export const CostCard = () => {
   const project = annotations['openchoreo.dev/project'] || 'unknown';
   const env = annotations['openchoreo.dev/environment'] || 'development';
   const costCenter = annotations['openchoreo.dev/cost-center'] || project;
+  const component = annotations['openchoreo.dev/component'] || entity.metadata.name;
 
   const predictedNs = predictRuntimeNamespace(controlNs, project, env);
 
-  // Future: these would be real collector endpoints or static artifact URLs
-  const infracostBase = 'http://localhost:8088'; // placeholder for M3 collector
+  // Post-deploy cost artifact committed by CI to platform-config.
+  const giteaBase = 'http://localhost:3333';
+  const costArtifactUrl = `${giteaBase}/openchoreo/platform-config/raw/branch/main/cost-artifacts/${component}/${env}/latest.json`;
 
   return (
     <InfoCard title="Cost (Infracost + Budget)" variant="gridItem">
@@ -40,11 +42,11 @@ export const CostCard = () => {
         </Typography>
 
         <Box mt={2} display="flex" flexDirection="column" gridGap={4}>
-          <Link to={`${infracostBase}/reports?ns=${predictedNs}`}>
-            Pre-deploy Infracost diff (PR gate)
+          <Link to={costArtifactUrl}>
+            Post-deploy Infracost artifact (platform-config)
           </Link>
-          <Link to={`${infracostBase}/attribution?namespace=${predictedNs}`}>
-            Post-deploy cost attribution
+          <Link to={`${giteaBase}/openchoreo/hello-m2/actions`}>
+            CI cost breakdown runs
           </Link>
           <Link to="/policies/C3-infracost-delta.rego">
             C3 Cost-Delta Policy (Rego)
@@ -52,8 +54,10 @@ export const CostCard = () => {
         </Box>
 
         <Typography variant="caption" style={{ marginTop: 8, opacity: 0.7 }}>
-          Cost signals will be enriched once the M3 Infracost collector + OpenChoreo cost
-          annotations are active. Namespace is computed deterministically (see Option C).
+          The artifact above is generated on every push by the hello-m2 CI workflow and
+          committed to platform-config. Values are estimates, not live spend; live
+          runtime allocation is OpenCost in M4. Namespace is computed deterministically
+          (see Option C).
         </Typography>
       </Box>
     </InfoCard>

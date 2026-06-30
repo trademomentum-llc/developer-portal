@@ -177,6 +177,26 @@ else
     record_result fail
 fi
 
+# Post-deploy cost artifact wiring (CI script + workflow)
+COST_SCRIPT="${ROOT_DIR}/scripts/ci/commit-cost-artifact.sh"
+if [[ -x "${COST_SCRIPT}" ]]; then
+    pass "Post-deploy cost artifact commit script exists and is executable"
+    record_result pass
+else
+    fail "Post-deploy cost artifact commit script missing or not executable"
+    record_result fail
+fi
+
+CI_WORKFLOW="${ROOT_DIR}/seed-repos/hello-m2/.gitea/workflows/ci.yaml"
+if grep -q 'commit-cost-artifact.sh' "${CI_WORKFLOW}" 2>/dev/null && \
+   grep -q 'cost-artifact.json' "${CI_WORKFLOW}" 2>/dev/null; then
+    pass "hello-m2 CI workflow generates and commits a post-deploy cost artifact"
+    record_result pass
+else
+    fail "hello-m2 CI workflow does not commit a post-deploy cost artifact"
+    record_result fail
+fi
+
 # =============================================================================
 # 3. ANGLE COVERAGE MATRIX (Static + Future Dynamic)
 # =============================================================================
@@ -280,6 +300,22 @@ if [[ "${MODE}" == "cluster" || ( "${MODE}" == "auto" && "${CLUSTER_AVAILABLE}" 
         wait "${APP_PF}" 2>/dev/null || true
     else
         warn "No hello-m2 pod available for live trace generation"
+        record_result fail
+    fi
+
+    # Post-deploy cost artifact presence in platform-config (best effort)
+    info "Checking for post-deploy cost artifact in platform-config..."
+    COST_ARTIFACT_URL="http://gitea-http.gitea.svc.cluster.local:3000/api/v1/repos/openchoreo/platform-config/contents/cost-artifacts/hello-m2/development/latest.json"
+    COST_CURL_AUTH=""
+    if [[ -n "${GITEA_TOKEN:-}" ]]; then
+        COST_CURL_AUTH="-u gitea_admin:${GITEA_TOKEN}"
+    fi
+    # shellcheck disable=SC2086
+    if curl -fsS ${COST_CURL_AUTH} "${COST_ARTIFACT_URL}" >/tmp/smoke-m3-cost-meta.json 2>/dev/null; then
+        pass "Post-deploy cost artifact exists in platform-config"
+        record_result pass
+    else
+        warn "Post-deploy cost artifact not found in platform-config (will appear after next hello-m2 push)"
         record_result fail
     fi
 

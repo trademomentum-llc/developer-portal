@@ -8,7 +8,7 @@
 > `docs/specs/2026-05-28-M3-Production-Multi-Angle-Visibility-*`. This kickoff
 > draft remains for historical context; use the 2026-05-28 documents for current
 > implementation contracts.
-> **Status:** Kickoff draft
+>
 > **Companion docs:** [requirements.md](./requirements.md), [design-specification.md](./design-specification.md)
 
 ---

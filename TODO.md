@@ -67,11 +67,15 @@ These are now the foundation for the interim cohesive extension layer while the 
 
 **Current Concrete Next Items (in priority order, for resumption):**
 1. Harden hello-m2 OTEL with full M3 resource attributes (openchoreo.*, predicted ns, git SHA) per the Technical Specification contract. **DONE 2026-06-30** -- implemented in `seed-repos/hello-m2/main.go`; `score2openchoreo` gained `--extra-env KEY=VALUE` for deployment-time injection; CI workflow computes the predicted namespace and injects all required variables.
-2. Execute the full install + smoke-m3.sh --cluster cycle on a live k3d-openchoreo environment (when available) to generate real traces and validate cards against live data. **DONE 2026-06-30** -- SigNoz + standalone OTEL collector installed; hello-m2 run #27 succeeded; trace verified in ClickHouse with `openchoreo.runtime_namespace=dp-default-default-development-f8e58905` and `git.commit.sha=a6eaf5a`; `smoke-m3.sh` passes 12/12.
-3. Add a live trace-ingestion assertion to `smoke-m3.sh` (query ClickHouse `signoz_traces.signoz_index_v3` for `service.name='hello-m2'` after generating an HTTP request).
-4. Begin iac/modules/observability/ after the first successful end-to-end run.
-5. Update the older m3-observability/ kickoff docs to reference the production M3 triad.
-6. Wire Backstage app-config to register `hello-m2` from the local Gitea catalog-info.yaml and verify the five OpenChoreo cards render live data.
+2. Execute the full install + smoke-m3.sh --cluster cycle on a live k3d-openchoreo environment (when available) to generate real traces and validate cards against live data. **DONE 2026-06-30** -- SigNoz + standalone OTEL collector installed; hello-m2 run #27 succeeded; trace verified in ClickHouse with `openchoreo.runtime_namespace=dp-default-default-development-f8e58905` and `git.commit.sha=a6eaf5a`; `smoke-m3.sh` passes 13/13.
+3. Add a live trace-ingestion assertion to `smoke-m3.sh` (query ClickHouse `signoz_traces.signoz_index_v3` for `service.name='hello-m2'` after generating an HTTP request). **DONE 2026-06-30** -- `smoke-m3.sh` now queries ClickHouse via the `signoz-clickhouse` pod and asserts at least one trace exists for the latest `git.commit.sha`.
+4. Begin iac/modules/observability/ after the first successful end-to-end run. **DONE 2026-06-30** -- `iac/modules/observability/` created with Helm releases for SigNoz and the standalone OTEL collector plus a patch to disable the bundled SigNoz collector OpAMP manager; `install-m3.sh` and `teardown-m3.sh` now flow through OpenTofu; `tofu plan -target=module.observability` is clean.
+5. Update the older m3-observability/ kickoff docs to reference the production M3 triad. **DONE 2026-06-30** -- all three kickoff docs now carry a superseded notice pointing to `docs/specs/2026-05-28-M3-Production-Multi-Angle-Visibility-*`.
+6. Wire Backstage app-config to register `hello-m2` from the local Gitea catalog-info.yaml and verify the five OpenChoreo cards render live data. **DONE 2026-06-30** -- `hello-m2` catalog imported from local Gitea; all five OpenChoreo entity cards render on the Component page using `EntityCardBlueprint.make`.
+
+**New Production-Model TODOs (not yet created until now):**
+7. Persist post-deploy Infracost cost artifact on every `hello-m2` push and wire the CostCard to the real artifact (FR-VIS-3). Current CostCard links are placeholders; Infracost only runs on PRs when `iac/` changes. Add a post-deploy step that writes a deterministic artifact (component/env/git-sha/monthly/delta) and update CostCard to link to it.
+8. Create a dedicated Backstage multi-angle entity page layout that groups the existing OpenChoreo cards into deliberate tabs/sections (Overview, Deployment, Observability, Cost, Policy, Platform) rather than rendering all cards on the default overview grid (FR-VIS-1).
 
 This work directly implements the user's request to "implement M3 and test it with full spectrum tests" while maintaining the dual-track (Option C cohesion surface while Option D sovereign kernel matures).
 
@@ -213,17 +217,18 @@ origin (local Gitea) now points at `http://localhost:3333/openchoreo/developer-p
 
 ## M3 Observability -- kickoff
 
-M3 is now active at the specification/preflight stage. No M3 cluster resources
-have been installed.
+M3 core observability is **implemented and validated live on k3d-openchoreo**. The kickoff triad in `docs/specs/m3-observability/` is superseded by the Production Multi-Angle Visibility triad in `docs/specs/2026-05-28-M3-Production-Multi-Angle-Visibility-*`; the kickoff docs remain for historical context only.
 
 | Task | Status | Notes |
 |---|---|---|
-| M3 spec package | DONE pending commit | Added `docs/specs/m3-observability/{requirements,design-specification,technical-specification}.md` |
-| M3 preflight script | NEXT | Add read-only `scripts/preflight-m3.sh` to inventory cluster headroom, storage classes, existing OpenChoreo observability-plane resources, and current non-running pods |
-| M3 chart/version inventory | TODO | Record pinned SigNoz, SigNoz K8s Infra, and OpenTelemetry Collector chart versions before any install script mutates cluster state |
-| M3 install/teardown scripts | TODO | Add `scripts/install-m3.sh` and `scripts/teardown-m3.sh` only after preflight and version pins are complete |
-| M3 smoke suite | TODO | Add `scripts/smoke-m3.sh` plus SigNoz, OTLP, Backstage telemetry, `hello-m2`, and Infracost artifact checks |
-| M3 Backstage dependency audit | BLOCKED | Existing critical/high Backstage audit advisories should be handled before treating Backstage observability as production-ready |
+| M3 spec package | DONE 2026-05-23 | Added `docs/specs/m3-observability/{requirements,design-specification,technical-specification}.md`; superseded by 2026-05-28 production triad |
+| M3 preflight script | DONE 2026-06-30 | `scripts/preflight-m3.sh` inventories cluster headroom, storage classes, existing OpenChoreo observability-plane resources, and verifies the namespace predictor |
+| M3 chart/version inventory | DONE 2026-06-30 | Pinned versions recorded in `iac/modules/observability/variables.tf` and `observability/{signoz,otel}/values.local.yaml` |
+| M3 install/teardown scripts | DONE 2026-06-30 | `scripts/install-m3.sh` and `scripts/teardown-m3.sh` flow through OpenTofu module `iac/modules/observability/` |
+| M3 smoke suite | DONE 2026-06-30 | `scripts/smoke-m3.sh` validates SigNoz health, OTLP collector, Backstage cards, `hello-m2` telemetry, and live trace ingestion in ClickHouse (13/13 pass) |
+| M3 Backstage dependency audit | OPEN | Existing critical/high Backstage audit advisories remain; deferred to a dedicated dependency-alignment pass before production hardening |
+
+**Remaining production-model work:** see items 7 and 8 in Current Concrete Next Items above (post-deploy cost artifact + multi-angle entity page layout).
 
 ---
 

@@ -81,6 +81,27 @@ jobs:
             --extra-env GIT_SHA=${GITHUB_SHA::7} \
             > /tmp/component.yaml
 
+      - name: Generate post-deploy cost artifact
+        if: github.event_name == 'push'
+        run: |
+          infracost breakdown --path /tmp/dp/iac --format json --out-file /tmp/infracost.json
+          MONTHLY=$(jq -r '.totalMonthlyCost // 0' /tmp/infracost.json)
+          BASE=$(jq -r '.pastTotalMonthlyCost // 0' /tmp/infracost.json)
+          DELTA=$(awk -v a="$MONTHLY" -v b="$BASE" 'BEGIN{print a-b}')
+          jq -n \
+            --arg component "hello-m2" \
+            --arg environment "development" \
+            --arg git_sha "${GITHUB_SHA::7}" \
+            --arg monthly_cost "$MONTHLY" \
+            --arg monthly_delta "$DELTA" \
+            --arg generated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{component:$component, environment:$environment, source:"infracost", estimate_type:"post-deploy-reference", currency:"USD", monthly_cost:($monthly_cost|tonumber), monthly_delta:($monthly_delta|tonumber), git_sha:$git_sha, generated_at:$generated_at}' \
+            > /tmp/cost-artifact.json
+      - name: Commit cost artifact to platform-config
+        if: github.event_name == 'push'
+        run: /tmp/dp/scripts/ci/commit-cost-artifact.sh development hello-m2 /tmp/cost-artifact.json
+        env:
+          GITEA_TOKEN: ${{ secrets.PLATFORM_CONFIG_TOKEN }}
       - name: Commit to platform-config
         if: github.event_name == 'push'
         run: /tmp/dp/scripts/ci/commit-to-platform-config.sh dev hello-m2 /tmp/component.yaml

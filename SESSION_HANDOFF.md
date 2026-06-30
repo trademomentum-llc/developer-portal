@@ -141,7 +141,9 @@ In this exact order:
 4. `git status` and `git log --oneline origin/main..HEAD` to verify state.
 5. Confirm cluster health: `kubectl --context k3d-openchoreo get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded`.
 6. Run `./scripts/smoke-m3.sh` to confirm the live smoke cycle still passes.
-7. Decide next slice: either Backstage live card verification or `iac/modules/observability/` OpenTofu module.
+7. Pick the next production-model slice from `TODO.md` items 7 and 8:
+   - Persist post-deploy Infracost cost artifact on every `hello-m2` push and wire CostCard to the real artifact.
+   - Create a dedicated Backstage multi-angle entity page layout with tabs/sections.
 
 ---
 
