@@ -38,7 +38,7 @@ The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replic
 ## 2. Git state at handoff
 
 - **Branch:** `main`
-- **Local HEAD:** `ebec46c` -- `feat(backstage): add Platform angle tab to Component entity page`
+- **Local HEAD:** `15a40cd` -- `security(backstage): force @grpc/grpc-js ^1.14.4 and ws ^8.21.0 via resolutions`
 - **origin (local Gitea):** `http://localhost:3333/openchoreo/developer-portal.git` is up-to-date with `main`.
 - **hello-m2 (local Gitea):** `http://localhost:3333/openchoreo/hello-m2.git` is up-to-date with `main` at commit `a6eaf5a`.
 - **Working tree:** clean.
@@ -46,6 +46,8 @@ The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replic
 
 Recent commits on `main`:
 ```
+15a40cd security(backstage): force @grpc/grpc-js ^1.14.4 and ws ^8.21.0 via resolutions
+e252515 chore(backstage): default BACKSTAGE_APP_HOST to localhost
 ebec46c feat(backstage): add Platform angle tab to Component entity page
 fcaab53 refactor(backstage): avoid card duplication by keeping only overview card on Overview
 14dcfcf fix(backstage): add openchoreo group to catalog
@@ -114,6 +116,11 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 
 - Removed the four dedicated-tab cards from the Overview grid in `openchoreo-cards/index.tsx`; only the `OpenChoreo Overview` card remains on Overview.
 - Verified via Playwright that the Deployment, Policy, Observability, Cost, and Platform cards render only inside their dedicated tabs.
+
+### Dependency audit progress
+
+- Added Yarn resolutions in `backstage/package.json` for `@grpc/grpc-js ^1.14.4` and `ws ^8.21.0`, clearing their high/critical advisories.
+- Remaining critical `vm2` (via `typescript-json-schema`) is a build-time transitive; resolving it requires a Backstage version upgrade or replacing `typescript-json-schema`.
 
 ### Live smoke cycle
 

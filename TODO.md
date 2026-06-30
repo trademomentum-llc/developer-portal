@@ -211,7 +211,7 @@ origin (local Gitea) now points at `http://localhost:3333/openchoreo/developer-p
 
 | Item | Status | Notes |
 |---|---|---|
-| Backstage dependency audit remediation | OPEN 2026-05-23 | `yarn npm audit --all --recursive` reaches the registry with network escalation and reports existing critical/high transitive advisories, including `vm2`, `protobufjs`, `axios`, `tar`, `undici`, `fast-uri`, `fast-xml-builder`, and `basic-ftp`. No dependency files changed in the Backstage catalog commit. Treat this as a dedicated dependency-upgrade and Backstage-version alignment task before production hardening. |
+| Backstage dependency audit remediation | IN PROGRESS 2026-06-30 | Resolved high/critical `@grpc/grpc-js` and `ws` advisories via Yarn resolutions. Remaining critical `vm2` (via `typescript-json-schema`) is a build-time transitive and cannot be resolved without upgrading Backstage or replacing `typescript-json-schema`; continue in dedicated dependency-alignment pass. |
 
 ---
 
@@ -226,7 +226,7 @@ M3 core observability is **implemented and validated live on k3d-openchoreo**. T
 | M3 chart/version inventory | DONE 2026-06-30 | Pinned versions recorded in `iac/modules/observability/variables.tf` and `observability/{signoz,otel}/values.local.yaml` |
 | M3 install/teardown scripts | DONE 2026-06-30 | `scripts/install-m3.sh` and `scripts/teardown-m3.sh` flow through OpenTofu module `iac/modules/observability/` |
 | M3 smoke suite | DONE 2026-06-30 | `scripts/smoke-m3.sh` validates SigNoz health, OTLP collector, Backstage cards, `hello-m2` telemetry, live trace ingestion in ClickHouse, and post-deploy cost artifact (16/16 pass) |
-| M3 Backstage dependency audit | OPEN | Existing critical/high Backstage audit advisories remain; deferred to a dedicated dependency-alignment pass before production hardening |
+| M3 Backstage dependency audit | IN PROGRESS 2026-06-30 | `@grpc/grpc-js` and `ws` resolved via resolutions; `vm2` remains blocked on upstream `typescript-json-schema` / Backstage upgrade |
 
 **Remaining production-model work:** items 7 and 8 are DONE 2026-06-30. Next production-model priorities are TBD with the user.
 
