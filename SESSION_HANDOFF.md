@@ -151,6 +151,15 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 - Added `scripts/setup-gitea-oauth.sh` to create the local Gitea OAuth app for Backstage sign-in and store `client_id`/`client_secret` under `~/.rational-reserve/backstage-oauth-client-{id,secret}` with `chmod 600`.
 - The script is idempotent: it reports the existing app if one is already present.
 
+### M4 cost visibility plane (OpenCost + Prometheus)
+
+- Added the M4 cost visibility spec triad under `docs/specs/2026-06-30-M4-Cost-Visibility-*`.
+- Added `iac/modules/cost/` with OpenTofu-managed Helm releases for Prometheus 29.13.0 and OpenCost 2.5.25 in namespace `opencost`.
+- Added `scripts/install-m4.sh`, `scripts/teardown-m4.sh`, and `scripts/smoke-m4.sh`.
+- Deployed the stack on k3d-openchoreo; `scripts/smoke-m4.sh` passes and `/model/allocation` returns live namespace-level cost data.
+- Updated the Backstage CostCard to link to the OpenCost UI filtered by the predicted runtime namespace.
+- `scripts/smoke-m3.sh` continues to pass 22/22 with OpenCost installed.
+
 ### Entity-page tab polish
 
 - Removed the four dedicated-tab cards from the Overview grid in `openchoreo-cards/index.tsx`; only the `OpenChoreo Overview` card remains on Overview.

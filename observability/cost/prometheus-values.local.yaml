@@ -1,0 +1,14 @@
+server:
+  persistentVolume:
+    enabled: false
+  retention: "2d"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+alertmanager:
+  enabled: false
+
+pushgateway:
+  enabled: false

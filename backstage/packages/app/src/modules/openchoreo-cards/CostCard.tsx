@@ -27,9 +27,10 @@ export const CostCard = () => {
   // Post-deploy cost artifact committed by CI to platform-config.
   const giteaBase = 'http://localhost:3333';
   const costArtifactUrl = `${giteaBase}/openchoreo/platform-config/raw/branch/main/cost-artifacts/${component}/${env}/latest.json`;
+  const openCostUrl = `http://localhost:29003/?namespace=${predictedNs}`;
 
   return (
-    <InfoCard title="Cost (Infracost + Budget)" variant="gridItem">
+    <InfoCard title="Cost (Infracost + OpenCost)" variant="gridItem">
       <Box>
         <Typography variant="body2">
           <strong>Cost Center:</strong> {costCenter}
@@ -45,6 +46,9 @@ export const CostCard = () => {
           <Link to={costArtifactUrl}>
             Post-deploy Infracost artifact (platform-config)
           </Link>
+          <Link to={openCostUrl}>
+            Live OpenCost allocation for {predictedNs}
+          </Link>
           <Link to={`${giteaBase}/openchoreo/hello-m2/actions`}>
             CI cost breakdown runs
           </Link>
@@ -54,10 +58,10 @@ export const CostCard = () => {
         </Box>
 
         <Typography variant="caption" style={{ marginTop: 8, opacity: 0.7 }}>
-          The artifact above is generated on every push by the hello-m2 CI workflow and
-          committed to platform-config. Values are estimates, not live spend; live
-          runtime allocation is OpenCost in M4. Namespace is computed deterministically
-          (see Option C).
+          The Infracost artifact is generated on every push by the hello-m2 CI workflow
+          and committed to platform-config. OpenCost provides live runtime allocation
+          for the predicted namespace. Namespace is computed deterministically (see
+          Option C).
         </Typography>
       </Box>
     </InfoCard>

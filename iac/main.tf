@@ -34,3 +34,7 @@ module "local_registry" {
 module "observability" {
   source = "./modules/observability"
 }
+
+module "cost" {
+  source = "./modules/cost"
+}

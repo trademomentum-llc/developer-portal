@@ -1,0 +1,13 @@
+opencost:
+  prometheus:
+    internal:
+      enabled: true
+      namespaceName: opencost
+      serviceName: prometheus-server
+      port: 80
+  ui:
+    enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
