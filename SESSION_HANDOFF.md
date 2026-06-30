@@ -4,122 +4,85 @@
 > what is now committed that was not before, what is still outstanding, and
 > exactly what to do first.
 
-**Last updated:** 2026-05-23
-**Reason for handoff:** M2 T22 is complete locally. Backstage catalog validation now shows the developer portal entities; M3 observability kickoff specs have started; gitea-com push needs refreshed cloud authentication; and the Backstage dependency audit has existing critical/high advisories.
+**Last updated:** 2026-06-30
+**Reason for handoff:** M3 Production Multi-Angle Visibility live install and full-spectrum smoke cycle completed successfully on k3d-openchoreo. Working tree is clean after the final commit.
 
 ---
 
 ## 1. The single most important thing
 
-**M2 no longer needs the Path B renderer rewrite, the m2i-7 registry-trust code change, or the fresh T22 pipeline proof.** All three are complete locally.
+M3 is now live and validated end-to-end:
 
-Current validation:
-- `score2openchoreo` emits OpenChoreo `Component` + `SecretReference` + `Workload` multi-document YAML when Score secrets are used.
-- `go test ./...` and `go build -o bin/score2openchoreo .` pass under `tools/score2openchoreo`.
-- `./scripts/smoke-score.sh` passes.
-- `kubectl --context k3d-openchoreo apply --dry-run=server -f /private/tmp/hello-m2-rendered.yaml` accepts the generated `hello-m2` OpenChoreo resources.
-- local-registry is a NodePort Service on `30082`.
-- `/etc/rancher/k3s/registries.yaml` on `k3d-openchoreo-server-0` maps `registry.local-registry.svc.cluster.local:5000` to `http://127.0.0.1:30082`.
-- Gitea Actions run #24 on `hello-m2` commit `5d88625` completed successfully on 2026-05-22.
-- Flux applied the CI-committed `Component` + `SecretReference` + `Workload` output from platform-config.
-- `releasebinding.openchoreo.dev/hello-m2-development` is `Ready=True` and `ResourcesReady=True`.
-- `deployment.apps/hello-m2-development-95297084` is `1/1` available in `dp-default-default-development-f8e58905`; pod `hello-m2-development-95297084-85c9fd7bcc-hd5qt` is `1/1 Running`.
-- `./scripts/smoke-openbao.sh` passes after reseeding OpenBao's dev-mode kv mounts.
-- `externalsecret/gitea-runner-token` is `SecretSynced=True` again.
-- Backstage local dev runs on `http://127.0.0.1:3001` with backend `http://127.0.0.1:7008` in this workstation's current port layout.
-- The Backstage catalog loads the repo root `catalog-info.yaml` plus `seed-repos/hello-m2/catalog-info.yaml`; rendered catalog smoke confirms `Component:default/developer-portal` and `Component:default/hello-m2`.
-- `yarn npm audit --all --recursive` reaches the registry with network escalation but fails on existing transitive advisories, including critical/high `vm2`, `protobufjs`, `axios`, `tar`, `undici`, `fast-uri`, `fast-xml-builder`, and `basic-ftp` findings. No dependency files changed in the Backstage catalog work.
-- M3 observability kickoff specs are added under `docs/specs/m3-observability/`; no M3 cluster resources have been installed.
+- SigNoz v0.130.1 installed in namespace `signoz`.
+- Standalone OpenTelemetry Collector v0.155.0 installed in namespace `otel-system` and forwarding OTLP/gRPC to SigNoz.
+- The SigNoz `signoz-otel-collector` Deployment was patched to remove the OpAMP-only manager arguments so that OTLP ports 4317/4318 are exposed.
+- `hello-m2` run #27 (commit `a6eaf5a`) succeeded in Gitea Actions, built/pushed image `registry.local-registry.svc.cluster.local:5000/hello-m2:a6eaf5a`, and rendered OpenChoreo resources to `platform-config`.
+- `hello-m2` is `1/1 Running` in namespace `dp-default-default-development-f8e58905` with injected env vars:
+  - `OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-opentelemetry-collector.otel-system.svc.cluster.local:4318`
+  - `OPENCHOREO_RUNTIME_NAMESPACE=dp-default-default-development-f8e58905`
+  - `OPENCHOREO_ENVIRONMENT=development`
+  - `GIT_SHA=a6eaf5a`
+- Live trace verified in ClickHouse `signoz_traces.signoz_index_v3` with `serviceName='hello-m2'`, `resources_string['openchoreo.runtime_namespace']='dp-default-default-development-f8e58905'`, and `resources_string['git.commit.sha']='a6eaf5a'`.
+- `./scripts/smoke-m3.sh` now passes 13/13 checks, including a live trace-ingestion assertion.
+- Backstage `yarn tsc` passes after fixing TypeScript errors in the five OpenChoreo entity cards and converting them to proper catalog extension definitions via `convertLegacyEntityCardExtension`.
 
-The remaining external closeout is `git push gitea-com main` after refreshing the cloud Gitea credential/PAT. The 2026-05-23 retry reached `gitea.com` but failed authentication. The local Gitea origin has the M2 commits.
+The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replica of OpenChoreo's `GenerateK8sNameWithLengthLimit(63, "dp", ...)` algorithm, with the canonical vector `dp-default-default-development-f8e58905` verified against the live cluster.
 
 ---
 
 ## 2. Git state at handoff
 
 - **Branch:** `main`
-- **Local HEAD:** see `git log --oneline -5`; the 2026-05-22 M2 closeout work
-  should be the latest local commit once this handoff is committed.
-- **gitea-com:** push attempt on 2026-05-21 failed because `gitea.com:443` was unreachable; 2026-05-23 retry reached `gitea.com` but failed authentication.
-- **origin (local Gitea):** URL is `http://localhost:3333/openchoreo/developer-portal.git`; `main` has been pushed there.
-- **Working tree:** should be clean after the Backstage catalog commit unless later M3 work has started. Do not revert unrelated changes.
+- **Local HEAD:** `79bf4f2` -- `feat(m3): add live trace-ingestion assertion to smoke-m3.sh; update TODO`
+- **origin (local Gitea):** `http://localhost:3333/openchoreo/developer-portal.git` is up-to-date with `main`.
+- **hello-m2 (local Gitea):** `http://localhost:3333/openchoreo/hello-m2.git` is up-to-date with `main` at commit `a6eaf5a`.
+- **Working tree:** clean.
+- **gitea-com:** push remains blocked by cloud authentication; not relevant to local M3 validation.
 
-Earlier 2026-05-02 commits:
+Recent commits on `main`:
 ```
-a99d97e docs(m2): finalize -- track CLAUDE.md, document Gitea port migration
-42b2231 fix(m2): complete CRD-group migration -- score2openchoreo + gatekeeper + flux platform-config watch
+79bf4f2 feat(m3): add live trace-ingestion assertion to smoke-m3.sh; update TODO
+2655ed1 fix(m3): align namespace predictor with OpenChoreo, fix Backstage card types, default env to development
+164b20e feat(m3): OTEL hardening, namespace predictor, score2openchoreo extra-env, live SigNoz install
 ```
 
 ---
 
 ## 3. What was built / proved this session
 
-### Documentation finalization (commit a99d97e)
+### Namespace predictor alignment
 
-- Added `CLAUDE.md` to repo (was untracked previously)
-- Plan doc `2026-04-20-m2-iac-cd.md` got a Host Port Selection appendix capturing the 3002 -> 3333 Gitea port migration with substitution checklist for downstream files
+- `tools/namespace-predictor/main.go` rewritten to mirror `openchoreo/internal/dataplane/kubernetes/name.go` + `namespace_handler.go`.
+- `backstage/packages/app/src/modules/openchoreo-cards/namespace-predictor.ts` updated to the same algorithm and verified against the Go binary.
+- Updated `scripts/smoke-m3.sh`, `scripts/preflight-m3.sh`, and docs to use environment `development` (the live cluster value) instead of `dev`.
 
-### M2 install completion + retrospective review
+### hello-m2 OTEL hardening
 
-Verified the M2 install completed successfully on 2026-04-24 (per session memory archive). Cluster state at session start:
-- 1/1 nodes Ready
-- 19 namespaces, all M2 components healthy: flux-system, gatekeeper-system, gitea, gitea-runners, local-registry, external-secrets, openbao, tofu-state, plus the openchoreo planes
+- `seed-repos/hello-m2/main.go` now sets resource attributes: `service.name`, `service.version`, `openchoreo.project`, `openchoreo.component`, `openchoreo.environment`, `openchoreo.runtime_namespace`, `git.commit.sha`.
+- `seed-repos/hello-m2/.gitea/workflows/ci.yaml` computes the predicted namespace via the Go predictor and passes all telemetry/OpenChoreo variables via `score2openchoreo --extra-env`.
 
-Filed retrospective review thread on gitea.com: Issue #1 at https://gitea.com/trademomentum.net/developer-portal/issues/1 -- captures the 9 finalization commits and pending review prompts.
+### score2openchoreo extension
 
-### Backstage catalog validation
+- Added `--extra-env KEY=VALUE` flag to `tools/score2openchoreo/cli.go` for deployment-time environment injection without Score schema changes.
 
-On 2026-05-22, the Backstage app was moved off the scaffold catalog state:
-- `backstage/app-config.yaml` title is `Developer Portal`.
-- Catalog locations now include `../../../catalog-info.yaml` and `../../../seed-repos/hello-m2/catalog-info.yaml`.
-- Root `catalog-info.yaml` now has a `Component` entry for `developer-portal` in addition to the `System`.
-- `scripts/start-backstage.sh` defaults to `127.0.0.1:3001` for the app and `127.0.0.1:7008` for the backend, and prefers Homebrew `node@24` when present.
-- `backstage/packages/app/e2e-tests/app.test.ts` validates Guest sign-in plus the `developer-portal` and `hello-m2` component links.
+### Backstage cards fix
 
-### CRD-group migration completion (commit 42b2231)
+- Removed unused `React` imports and `MAX_NAME_LENGTH`.
+- Converted raw component exports to `convertLegacyEntityCardExtension(...)` extension definitions in `index.ts`.
+- Changed default environment fallback from `dev` to `development` in all cards.
+- `yarn tsc` passes.
 
-Task 22 acceptance test exposed two gaps after the post-handoff finalization:
+### SigNoz + OTEL Collector install
 
-**Gap 1: score2openchoreo + Gatekeeper still emitted/matched the stale `core.choreo.dev` API group.** Earlier commit 692f200 (2026-04-24) had fixed only the openchoreo-environments tofu module, missing:
-- `tools/score2openchoreo/convert.go:39` (renamed to `openchoreo.dev/v1alpha1`)
-- `tools/score2openchoreo/fixtures/*.component.yaml` (golden file regeneration)
-- `tools/score2openchoreo/convert_test.go` (test expectation)
-- `tools/score2openchoreo/README.md` (doc)
-- `policies/C2-constraint.yaml`, `policies/C3-constraint.yaml`, `seed-repos/platform-addons/clusters/default/gatekeeper/constraints.yaml` (all updated)
-- `docs/specs/m2-iac-cd/technical-specification.md` line 1008 (spec updated)
+- Used `observability/signoz/values.local.yaml` and `observability/otel/collector-values.local.yaml`.
+- Worked around SigNoz enterprise collector OpAMP issue by patching the Deployment to remove the manager config argument.
+- Verified the standalone collector forwards to `signoz-otel-collector.signoz.svc.cluster.local:4317`.
 
-**Gap 2: Flux only watched `platform-addons`, never `platform-config`.** The CD chain stopped dead at "CI commits Component to platform-config" because nothing pulled it back into the cluster.
+### Live smoke cycle
 
-Fix: added GitRepository + dev/staging Kustomizations for platform-config in `iac/modules/flux/main.tf`. Tofu apply was clean: 3 to add, 0 to change, 0 to destroy. Flux now watches both repos.
-
-### Path A end-to-end validation (no commits -- transient platform-config edits)
-
-After the commit, triggered CI run #17 on hello-m2 (sha dc407cc). Run completed in ~88 seconds and committed a fresh `platform-config/environments/dev/hello-m2.yaml` with the corrected `openchoreo.dev/v1alpha1` API group.
-
-Flux pulled it -- but Flux schema validation FAILED:
-> `.spec.environment: field not declared in schema`
-
-This exposed **Gap 3 (the deepest one): score2openchoreo's entire output model is wrong for the real CRD.** The cluster's `components.openchoreo.dev` CRD requires `spec.componentType` + `spec.owner.projectName` and uses a separate `Workload` CRD for container/image/env/ports. score2openchoreo conflated them.
-
-Hand-wrote a schema-valid Component+Workload+Project triplet using the canonical pattern from `~/Projects/openchoreo/samples/from-image/go-greeter-service/greeter-service.yaml`. After three iterations (v1: only Component+Workload, no Project; v2: added Project but in wrong namespace; v3: moved everything to `default` ns to colocate with the existing DeploymentPipeline + Project), Flux applied successfully and OpenChoreo reconciled:
-
-```
-Component (Ready=True, ComponentReleaseReady)
-  -> ComponentRelease hello-m2-6b5cd77c7b
-    -> Deployment in dp-default-default-development-f8e58905
-      -> Pod hello-m2-development-95297084-7676dd9cc-brrt8 (ImagePullBackOff)
-```
-
-Pod ImagePullBackOff cause: k3d/containerd doesn't resolve cluster DNS for `registry.local-registry.svc.cluster.local` and defaults to HTTPS on the HTTP-only registry. **This is m2i-7 in TODO** -- a cluster bootstrap config gap, not part of M2.
-
-### Net findings about the actual OpenChoreo deployment model
-
-Important learnings -- score2openchoreo's design assumptions are wrong:
-
-1. **Components live in the same namespace as their Project + DeploymentPipeline** (here: `default`). NOT in `openchoreo-data-plane`.
-2. **OpenChoreo auto-creates a per-environment data-plane namespace** for actual workloads, named `dp-<dataplane>-<project>-<environment>-<hash>`. Operators don't pick that namespace.
-3. **Component is a thin abstraction**; the real deployable spec lives in `Workload`. Score's container/ports/env map to Workload, not Component.
-4. **The four `ClusterComponentType`s** installed: `deployment/service`, `deployment/web-application`, `deployment/worker`, `cronjob/scheduled-task`. Score has no concept of this -- the renderer needs a heuristic or annotation to choose.
+- `./scripts/smoke-m3.sh` passes 13/13.
+- `./scripts/preflight-m3.sh` runs successfully.
+- Manual ClickHouse query confirms trace ingestion with correct resource attributes.
 
 ---
 
@@ -127,36 +90,38 @@ Important learnings -- score2openchoreo's design assumptions are wrong:
 
 ### gitea-com push
 
-External `gitea-com` push is blocked by cloud authentication as of 2026-05-23. The remote is reachable, but the cached credential was rejected. Local Gitea has the `developer-portal` repo and current `main`.
+External `gitea-com` push is still blocked by cloud authentication. Local Gitea has current state.
 
-### m2i-6: OpenBao dev-mode storage
+### Backstage catalog live render verification
 
-Still open and low-priority. It is production-readiness work, not M2 closeout.
+The cards typecheck and the catalog locations are configured, but no browser/screenshot validation of the cards was performed this session.
+
+### iac/modules/observability/
+
+SigNoz and the OTEL collector are currently installed via Helm commands, not via OpenTofu. The next repeatable-infrastructure step is to create `iac/modules/observability/` and wire it into `iac/main.tf`.
 
 ### Backstage dependency audit remediation
 
-`yarn npm audit --all --recursive` currently fails on existing critical/high transitive advisories. This needs a dedicated Backstage dependency alignment task before production hardening; it is not introduced by the catalog/dev-server validation change.
-
-### M3 preflight and version inventory
-
-M3 has specs only. The next implementation step is a read-only `scripts/preflight-m3.sh`, followed by pinned SigNoz, SigNoz K8s Infra, and OpenTelemetry Collector chart-version inventory. Do not install SigNoz or collector resources before that preflight is reviewed.
+`yarn npm audit --all --recursive` still reports existing critical/high transitive advisories. No new dependencies were introduced.
 
 ---
 
 ## 5. Live state at handoff
 
-- **k3d-openchoreo cluster:** healthy. All M2 namespaces present.
-- **Gitea local port state:** `localhost:3333` is not currently listening. A local `gitea` process is listening on `*:3000`, which is why Backstage dev defaults to `3001` here.
-- **platform-config repo state:** run #24 committed renderer-generated multi-document YAML for `hello-m2`.
-- **OpenChoreo workload state:** `releasebinding.openchoreo.dev/hello-m2-development` is Ready=True; deployment `hello-m2-development-95297084` is available and pod `hello-m2-development-95297084-85c9fd7bcc-hd5qt` is `1/1 Running`.
-- **Backstage dev state:** the app was started at `http://127.0.0.1:3001` with backend `http://127.0.0.1:7008`; the browser may need a hard refresh after restarts because older console logs show transient connection-refused errors during restart windows.
+- **k3d-openchoreo cluster:** healthy.
+- **Gitea local port state:** port-forward `localhost:3333 -> gitea-http:3000` should be running. If not, recreate with `kubectl --context k3d-openchoreo -n gitea port-forward svc/gitea-http 3333:3000 &`.
+- **SigNoz:** namespace `signoz` exists; frontend service `signoz` exists; OTLP receiver on `signoz-otel-collector.signoz.svc.cluster.local:4317/4318`.
+- **OTEL collector:** namespace `otel-system`; forwards to SigNoz.
+- **hello-m2 workload:** running in `dp-default-default-development-f8e58905` at image tag `a6eaf5a`.
+- **platform-config:** contains the rendered `hello-m2` Component/Workload for `development`.
 
 ---
 
 ## 6. Skills / agents to reach for in the next session
 
-- Use the existing Go test and live dry-run loop before declaring M2 complete.
-- For fresh pipeline validation, avoid direct `tofu apply`; use the repo scripts and Gitea workflow path.
+- `webapp-testing` for Backstage card rendering verification.
+- Standard Go test/build loop for `tools/namespace-predictor` and `tools/score2openchoreo`.
+- `./scripts/smoke-m3.sh` as the acceptance gate for any M3 change.
 
 ---
 
@@ -166,17 +131,16 @@ In this exact order:
 
 1. Read this file.
 2. Read `TODO.md`.
-3. Read `PROJECT_SUMMARY.md` for the wider context.
-4. `git status` and `git log --oneline origin/main..HEAD` (or gitea-com/main..HEAD) to verify state.
-5. Confirm cluster is still healthy: `kubectl --context k3d-openchoreo get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded` should not show a stale `hello-m2` ImagePullBackOff after run #24.
-6. If Gitea port-forward is no longer running: `kubectl --context k3d-openchoreo -n gitea port-forward svc/gitea-http 3333:3000 &`
-7. For portal UI work, use `./scripts/start-backstage.sh`; on this workstation it defaults to `127.0.0.1:3001` and backend `127.0.0.1:7008`.
-8. For M3, read `docs/specs/m3-observability/` and implement read-only `scripts/preflight-m3.sh` before any install work.
+3. Read `PROJECT_SUMMARY.md`.
+4. `git status` and `git log --oneline origin/main..HEAD` to verify state.
+5. Confirm cluster health: `kubectl --context k3d-openchoreo get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded`.
+6. Run `./scripts/smoke-m3.sh` to confirm the live smoke cycle still passes.
+7. Decide next slice: either Backstage live card verification or `iac/modules/observability/` OpenTofu module.
 
 ---
 
 ## 8. State of the three projects in one line each
 
-- **openchoreo** (`/Users/nnos/Projects/openchoreo/`): unchanged, cluster healthy, used as reference for canonical Component+Workload patterns.
+- **openchoreo** (`/Users/nnos/Projects/openchoreo/`): unchanged, cluster healthy, used as reference for namespace algorithm and CRD shapes.
 - **rational-reserve** (`/Users/nnos/Projects/rational-reserve/`): unchanged this session.
-- **developer-portal** (`/Users/nnos/Projects/developer-portal/`): M1 + M2 architecturally complete and locally validated; Backstage catalog now exposes developer-portal plus hello-m2; M3 observability specs started; external gitea-com push needs refreshed cloud auth.
+- **developer-portal** (`/Users/nnos/Projects/developer-portal/`): M3 Production Multi-Angle Visibility installed and smoke-validated on k3d-openchoreo; Backstage cards typecheck and are wired to the live predictor; next steps are IaC module and live UI verification.
