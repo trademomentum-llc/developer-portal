@@ -29,12 +29,19 @@ export PORT="$APP_PORT"
 export APP_CONFIG_app_baseUrl="$APP_BASE_URL"
 export APP_CONFIG_backend_baseUrl="$BACKEND_BASE_URL"
 export APP_CONFIG_backend_listen_port="$BACKEND_PORT"
-export APP_CONFIG_backend_cors_origin="$APP_BASE_URL"
+# Only pin CORS to a custom app host; otherwise the app-config.yaml list
+# (localhost + 127.0.0.1) is used so both URLs work.
+if [ -n "${BACKSTAGE_APP_HOST:-}" ]; then
+    export APP_CONFIG_backend_cors_origin="$APP_BASE_URL"
+fi
 
-yarn start &
+LOG_FILE="${BACKSTAGE_LOG_FILE:-$RUNTIME_DIR/backstage-dev.log}"
+nohup yarn start > "$LOG_FILE" 2>&1 &
 BACKSTAGE_PID=$!
+disown "$BACKSTAGE_PID"
 echo "$BACKSTAGE_PID" > "$RUNTIME_DIR/m1-backstage-dev.pid"
 echo "Backstage starting with PID $BACKSTAGE_PID"
+echo "Logs: $LOG_FILE"
 echo "Waiting for $APP_BASE_URL ..."
 
 for i in $(seq 1 90); do
