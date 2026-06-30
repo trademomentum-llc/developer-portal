@@ -1,27 +1,55 @@
 apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: internal-developer-platform
+  description: |
+    A self-hosted Internal Developer Platform (IDP) that turns infrastructure
+    into a product. It gives engineers a single place to discover services,
+    deploy workloads, and follow paved-path workflows.
+  links:
+    - url: https://localhost:3001
+      title: Backstage Portal
+      icon: dashboard
+spec:
+  owner: user:default/nnos
+---
+apiVersion: backstage.io/v1alpha1
 kind: System
 metadata:
   name: developer-portal
-  description: >-
-    Self-hosted Internal Developer Platform (IDP) -- M1 substrate and M2 delivery loop.
-    Option C: first-class cohesive extension of OpenChoreo (interim to sovereign Jasterish/NeuroDiOS).
+  description: |
+    The Backstage-based portal and its supporting tools. This is the part of
+    the platform that engineers interact with directly: the service catalog,
+    scaffolder, and the policy guards that keep local workflows safe.
   annotations:
     backstage.io/techdocs-ref: dir:.
     openchoreo.dev/system: "true"
+  tags:
+    - portal
+    - idp
+    - backstage
 spec:
   owner: user:default/nnos
+  domain: internal-developer-platform
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: developer-portal
-  description: Umbrella Backstage catalog entry for the self-hosted Internal Developer Platform
+  title: Developer Portal
+  description: |
+    The main Backstage instance: the web UI, service catalog, scaffolder, and
+    the Gitea-backed GitOps workflows that let teams push code and see it run.
   annotations:
     backstage.io/techdocs-ref: dir:.
     openchoreo.dev/control-plane-namespace: default
     openchoreo.dev/project: default
     openchoreo.dev/environments: "dev,staging"
     openchoreo.dev/api-base: http://localhost:9090
+  tags:
+    - portal
+    - backstage
+    - ui
 spec:
   type: website
   lifecycle: experimental
@@ -33,22 +61,37 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: rr-policy-guards
-  description: PreToolUse policy hooks -- emoji guard, bash guard, brew guard
+  name: backstage-app
+  title: Backstage App
+  description: |
+    The Backstage frontend and backend packages that power the portal UI,
+    including the custom Gitea sign-in module and OpenChoreo integrations.
+  tags:
+    - backstage
+    - frontend
+    - nodejs
 spec:
-  type: library
-  lifecycle: production
+  type: website
+  lifecycle: experimental
   owner: user:default/nnos
   system: developer-portal
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: backstage-app
-  description: Backstage frontend and backend -- the portal UI
+  name: rr-policy-guards
+  title: Rational Reserve Policy Guards
+  description: |
+    Small local tools that guard the development workflow: preventing unsafe
+    shell expansions, blocking direct tofu apply, and keeping non-ASCII
+    characters out of source files.
+  tags:
+    - policy
+    - go
+    - guardrails
 spec:
-  type: website
-  lifecycle: experimental
+  type: library
+  lifecycle: production
   owner: user:default/nnos
   system: developer-portal
 ---
@@ -57,12 +100,20 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: openchoreo-platform
-  description: Upstream OpenChoreo orchestrator (control-plane, data-plane, workflow-plane, observability-plane). Load-bearing for Component/Workload/ReleaseBinding reconciliation and dp-* namespace projection.
+  title: OpenChoreo Platform
+  description: |
+    The upstream platform orchestrator that runs the workloads defined in the
+    portal. It reconciles Components, Workloads, Environments, and
+    ReleaseBindings into the k3d cluster.
   annotations:
     openchoreo.dev/is-platform: "true"
     openchoreo.dev/crds: "Component,Workload,SecretReference,Environment,Project,ReleaseBinding,RenderedRelease"
     openchoreo.dev/api: http://localhost:9090
     openchoreo.dev/source: https://github.com/openchoreo/openchoreo
+  tags:
+    - platform
+    - orchestrator
+    - kubernetes
 spec:
   type: service
   lifecycle: production
