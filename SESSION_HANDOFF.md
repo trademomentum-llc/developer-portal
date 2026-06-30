@@ -38,7 +38,7 @@ The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replic
 ## 2. Git state at handoff
 
 - **Branch:** `main`
-- **Local HEAD:** `0b6211e` -- `fix(backstage): repair guest sign-in and add entity-page tabs`
+- **Local HEAD:** `fcaab53` -- `refactor(backstage): avoid card duplication by keeping only overview card on Overview`
 - **origin (local Gitea):** `http://localhost:3333/openchoreo/developer-portal.git` is up-to-date with `main`.
 - **hello-m2 (local Gitea):** `http://localhost:3333/openchoreo/hello-m2.git` is up-to-date with `main` at commit `a6eaf5a`.
 - **Working tree:** clean.
@@ -46,6 +46,8 @@ The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replic
 
 Recent commits on `main`:
 ```
+fcaab53 refactor(backstage): avoid card duplication by keeping only overview card on Overview
+14dcfcf fix(backstage): add openchoreo group to catalog
 0b6211e fix(backstage): repair guest sign-in and add entity-page tabs
 d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verify cards render
 79bf4f2 feat(m3): add live trace-ingestion assertion to smoke-m3.sh; update TODO
@@ -104,6 +106,12 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 - `backstage/app-config.yaml` now allows both `http://localhost:3001` and `http://127.0.0.1:3001` in `backend.cors.origin`.
 - `scripts/start-backstage.sh` only overrides `backend.cors.origin` when `BACKSTAGE_APP_HOST` is explicitly set, uses `nohup`/`disown` so the backend survives SIGHUP, and pins Node 24 via PATH.
 - Guest sign-in now works and the catalog loads from either `localhost:3001` or `127.0.0.1:3001`.
+- Added `group:default/openchoreo` to `backstage/examples/org.yaml` to eliminate the entity-relations warning.
+
+### Entity-page tab polish
+
+- Removed the four dedicated-tab cards from the Overview grid in `openchoreo-cards/index.tsx`; only the `OpenChoreo Overview` card remains on Overview.
+- Verified via Playwright that the Deployment, Policy, Observability, and Cost cards render only inside their dedicated tabs.
 
 ### Live smoke cycle
 
