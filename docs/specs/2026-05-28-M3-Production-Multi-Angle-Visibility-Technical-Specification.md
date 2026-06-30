@@ -38,7 +38,7 @@ Recommended layout (validated via preflight):
 |---------------------------|--------------------|-------|
 | SigNoz UI + backend       | `signoz`           | Dedicated. UI on 8080 inside cluster. |
 | OTEL Collector (M3)       | `otel-system`      | Separate from any OpenChoreo collector. |
-| hello-m2 + workloads      | Predicted by tool  | e.g. `dp-default-default-dev-3a594436` |
+| hello-m2 + workloads      | Predicted by tool  | e.g. `dp-default-default-development-f8e58905` |
 | Existing OpenChoreo       | `openchoreo-*`     | Never touch |
 
 Port strategy (local k3d + Colima):
@@ -158,9 +158,9 @@ Or a dedicated:
 
 Minimum vector set for predictor (to be encoded in the harness):
 
-- (default, default, dev) → dp-default-default-dev-3a594436
-- (default, hello-m2, dev)
-- (openchoreo-control, prod-api, prod)
+- (default, default, development) → dp-default-default-development-f8e58905
+- (default, hello-m2, development)
+- (openchoreo-control, prod-api, production)
 - Long name + underscore normalization case
 - 63-char truncation edge case
 
@@ -191,10 +191,10 @@ Until that module exists, the scripts in `scripts/` are the source of truth.
 Run in any environment with Go:
 
 ```bash
-go run tools/namespace-predictor/main.go default default dev
+go run tools/namespace-predictor/main.go default default development
 ```
 
-Expected: `dp-default-default-dev-3a594436`
+Expected: `dp-default-default-development-f8e58905`
 
 Run the TS implementation (via node after extracting or future test command) and confirm identical output on the same inputs.
 
@@ -209,7 +209,7 @@ The implementation in `namespace-predictor.ts` (sha256 + predict function) is a 
 
 ### 9.3 Card Correctness (when Backstage running)
 
-Visit the hello-m2 Component page. All five cards must display the same `dp-default-default-dev-3a594436` (or the equivalent for the entity's annotations) as the authoritative runtime namespace.
+Visit the hello-m2 Component page. All five cards must display the same `dp-default-default-development-f8e58905` (or the equivalent for the entity's annotations) as the authoritative runtime namespace.
 
 ---
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { InfoCard, Link } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { Box, Typography } from '@material-ui/core';
@@ -11,7 +10,7 @@ export const ObservabilityLinksCard = () => {
 
   const annotations = entity.metadata.annotations ?? {};
   const serviceName = entity.metadata.name;
-  const env = annotations['openchoreo.dev/environment'] || 'dev';
+  const env = annotations['openchoreo.dev/environment'] || 'development';
 
   // Single source of truth: the pure deterministic predictor (identical to Go reference).
   // The template annotation is retained only as a hint; the computed value is authoritative.

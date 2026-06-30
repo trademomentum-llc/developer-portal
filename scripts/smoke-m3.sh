@@ -89,12 +89,12 @@ section "1. Namespace Predictor Contract (Mathematical Foundation)"
 if [[ -x "$(command -v go)" && -f "${PREDICTOR_DIR}/main.go" ]]; then
     info "Go binary available — exercising reference implementation"
 
-    # Canonical vector (must never change)
-    CANONICAL_OUTPUT=$(go run "${PREDICTOR_DIR}/main.go" default default dev 2>/dev/null || echo "FAILED")
-    EXPECTED="dp-default-default-dev-3a594436"
+    # Canonical vector (must never change) — matches the live hello-m2 ReleaseBinding
+    CANONICAL_OUTPUT=$(go run "${PREDICTOR_DIR}/main.go" default default development 2>/dev/null || echo "FAILED")
+    EXPECTED="dp-default-default-development-f8e58905"
 
     if [[ "${CANONICAL_OUTPUT}" == "${EXPECTED}" ]]; then
-        pass "Canonical vector (default, default, dev) → ${CANONICAL_OUTPUT}"
+        pass "Canonical vector (default, default, development) → ${CANONICAL_OUTPUT}"
         record_result pass
     else
         fail "Canonical vector mismatch. Got: ${CANONICAL_OUTPUT}, expected: ${EXPECTED}"
@@ -113,8 +113,8 @@ if [[ -x "$(command -v go)" && -f "${PREDICTOR_DIR}/main.go" ]]; then
 
     # Additional vectors (expand over time)
     declare -a VECTORS=(
-        "default:hello-m2:dev"
-        "openchoreo-control:prod-api:prod"
+        "default:hello-m2:development"
+        "openchoreo-control:prod-api:production"
         "underscore_ns:my_project:prod_env"
         "long-control-ns:very-long-project-name-that-keeps-going:development"
     )
@@ -211,14 +211,18 @@ fi
 if [[ "${MODE}" == "cluster" || ( "${MODE}" == "auto" && "${CLUSTER_AVAILABLE}" == true ) ]]; then
     info "k3d-openchoreo context detected — running live checks"
 
-    # Predictor-driven namespace presence (future: assert pods)
+    # Predictor-driven namespace presence for hello-m2
     if [[ -x "$(command -v go)" ]]; then
-        EXPECTED_NS=$(go run "${PREDICTOR_DIR}/main.go" default default dev 2>/dev/null || echo "")
+        EXPECTED_NS=$(go run "${PREDICTOR_DIR}/main.go" default default development 2>/dev/null || echo "")
         if [[ -n "$EXPECTED_NS" ]]; then
-            info "Expected runtime namespace for hello-m2 (dev): ${EXPECTED_NS}"
-            # In a real run we would: kubectl get pods -n "$EXPECTED_NS" ...
-            pass "Predictor produced usable namespace for cluster queries (dry for now)"
-            record_result pass
+            info "Expected runtime namespace for hello-m2 (development): ${EXPECTED_NS}"
+            if kubectl --context k3d-openchoreo get pods -n "${EXPECTED_NS}" 2>/dev/null | grep -q 'Running'; then
+                pass "Running hello-m2 pod found in predicted namespace ${EXPECTED_NS}"
+                record_result pass
+            else
+                warn "No Running pod in predicted namespace ${EXPECTED_NS} (may still be rolling out)"
+                record_result fail
+            fi
         fi
     fi
 

@@ -4,7 +4,7 @@
 > state. For "what to do next" see TODO.md. For "where we stopped and what
 > changed mid-session" see SESSION_HANDOFF.md.
 
-**Snapshot date:** 2026-05-29 (M3 Production Multi-Angle Visibility major milestone reached: both Technical Specifications + full OpenChoreo Entity Cards Technical Specification created; five Backstage cards + namespace predictor fully wired and tested; M3 script suite (install/teardown + full-spectrum smoke harness) implemented and validated offline with 8/8 checks passed including deterministic predictor vectors; values files delivered. Session paused for resumption.)
+**Snapshot date:** 2026-06-30 (M3 Production Multi-Angle Visibility live milestone: SigNoz + standalone OTEL collector installed on k3d-openchoreo; namespace predictor corrected to match OpenChoreo's `GenerateK8sNameWithLengthLimit` algorithm; hello-m2 OTEL instrumentation hardened and deployed via the Gitea Actions/Flux/CD loop; first end-to-end trace ingested into SigNoz/ClickHouse; M3 script suite validated offline with 10/10 checks and against the live cluster.)
 
 ---
 
@@ -36,6 +36,9 @@ Recent progress:
 - hello-m2 OTEL instrumentation hardened (2026-06-30) with openchoreo.* resource attributes, git commit SHA, and deterministic runtime namespace.
 - `score2openchoreo` extended with `--extra-env KEY=VALUE` so the CI pipeline can inject deployment-time telemetry variables without Score schema changes.
 - hello-m2 CI workflow updated to compute the predicted runtime namespace and inject OTEL endpoint + OpenChoreo context + GIT_SHA.
+- Namespace predictor corrected to a byte-for-byte replica of OpenChoreo's `GenerateK8sNameWithLengthLimit`; canonical vector updated to the live cluster value `dp-default-default-development-f8e58905`.
+- SigNoz and standalone OpenTelemetry Collector installed on the live `k3d-openchoreo` cluster; the SigNoz collector's OTLP receiver was enabled by removing the OpAMP-only manager arguments.
+- First end-to-end trace flow verified: test span accepted by the standalone collector, forwarded to the SigNoz collector, and stored in ClickHouse.
 - New robust Backstage entity cards module (`modules/openchoreo-cards`) — five cards total (Overview, Observability, + new Cost, Policy, Deployment). All cards now wired to the deterministic namespace predictor (exact Go port). Module registered via createFrontendModule.
 - Full mandated triad created for the cards module (Requirements + Design + Technical Specification, the latter quoting full sources + equivalence proof procedure).
 - Complete M3 Production Multi-Angle Visibility Technical Specification created (2026-05-28), including coexistence rules, Helm contracts, OTEL hardening spec, full-spectrum test matrix, and automation safety notes. This supersedes the earlier m3-observability kickoff drafts for the production model phase.

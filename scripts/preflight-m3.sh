@@ -60,14 +60,14 @@ kubectl --context k3d-openchoreo get ns | grep -E 'openchoreo-(control|data|obse
 echo
 
 echo "9. Namespace Predictor Verification (deterministic, Option C)"
-echo "   Using hello-m2 catalog annotations (control=default, project=default, env=dev)"
-echo "   Canonical vector must produce: dp-default-default-dev-3a594436"
+echo "   Using hello-m2 catalog annotations (control=default, project=default, env=development)"
+echo "   Canonical vector must produce: dp-default-default-development-f8e58905"
 if command -v go >/dev/null 2>&1; then
     PREDICTOR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/tools/namespace-predictor"
     if [[ -f "$PREDICTOR_DIR/main.go" ]]; then
-        COMPUTED_NS=$(go run "$PREDICTOR_DIR/main.go" default default dev 2>/dev/null || echo "PREDICTOR_FAILED")
-        echo "   Go binary output for (default, default, dev): $COMPUTED_NS"
-        if [[ "$COMPUTED_NS" == "dp-default-default-dev-3a594436" ]]; then
+        COMPUTED_NS=$(go run "$PREDICTOR_DIR/main.go" default default development 2>/dev/null || echo "PREDICTOR_FAILED")
+        echo "   Go binary output for (default, default, development): $COMPUTED_NS"
+        if [[ "$COMPUTED_NS" == "dp-default-default-development-f8e58905" ]]; then
             echo "    Predictor matches canonical test vector (deterministic contract verified)"
         else
             echo "    Predictor output mismatch — investigate immediately (data integrity risk)"

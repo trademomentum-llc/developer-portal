@@ -1,4 +1,3 @@
-import React from 'react';
 import { InfoCard, Link } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { Box, Typography } from '@material-ui/core';
@@ -19,7 +18,7 @@ export const CostCard = () => {
   const annotations = entity.metadata.annotations ?? {};
   const controlNs = annotations['openchoreo.dev/control-plane-namespace'] || 'default';
   const project = annotations['openchoreo.dev/project'] || 'unknown';
-  const env = annotations['openchoreo.dev/environment'] || 'dev';
+  const env = annotations['openchoreo.dev/environment'] || 'development';
   const costCenter = annotations['openchoreo.dev/cost-center'] || project;
 
   const predictedNs = predictRuntimeNamespace(controlNs, project, env);

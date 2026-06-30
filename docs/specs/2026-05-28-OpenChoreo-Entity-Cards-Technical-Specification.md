@@ -73,25 +73,25 @@ The TS version is a direct semantic transliteration of the Go reference. The SHA
 ### 3.3 Canonical Test Vector (Verified)
 
 ```
-predictRuntimeNamespace("default", "default", "dev")
-→ "dp-default-default-dev-3a594436"
+predictRuntimeNamespace("default", "default", "development")
+→ "dp-default-default-development-f8e58905"
 ```
 
 **Verification command (Go reference):**
 
 ```bash
 cd developer-portal/tools/namespace-predictor
-go run main.go default default dev
+go run main.go default default development
 ```
 
 **Cross-verification (Node crypto, for sanity):**
 
 ```js
 const crypto = require('crypto');
-const input = 'default-default-dev';
+const input = 'dp-default-default-development';
 const hash = crypto.createHash('sha256').update(input).digest('hex');
 const short = hash.slice(0,8);
-console.log(`dp-default-default-dev-${short}`);  // must equal the above
+console.log(`dp-default-default-development-${short}`);  // must equal the above
 ```
 
 Any future language port (shell, Python, Jasterish, Rust) must reproduce this vector exactly.

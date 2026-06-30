@@ -74,8 +74,8 @@ return name
 This is a pure mathematical function with no external state. Collision resistance follows from SHA-256 preimage resistance. Truncation to 8 hex characters (32 bits) yields 2^32 possible suffixes per (c,p,e) triple — sufficient for local and moderate-scale multi-tenant use while keeping names human-readable.
 
 **Primary test vector (canonical):**
-- Input: control="default", project="default", env="dev"
-- Output: "dp-default-default-dev-3a594436"
+- Input: control="default", project="default", env="development"
+- Output: "dp-default-default-development-f8e58905"
 
 All TS and Go implementations must reproduce this vector exactly. Additional vectors (long names, underscores, mixed case) are required in the Technical Specification.
 

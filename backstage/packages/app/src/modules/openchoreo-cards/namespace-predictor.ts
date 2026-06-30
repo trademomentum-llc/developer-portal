@@ -5,27 +5,24 @@
  * runtime namespace predictor.
  *
  * Reference implementation: tools/namespace-predictor/main.go
- * (PredictRuntimeNamespace, lines 14-28)
+ * (PredictRuntimeNamespace)
  *
- * Mathematical definition (identical in both languages):
+ * OpenChoreo computes the namespace in
+ * internal/controller/project/integrations/kubernetes/namespace_handler.go as:
  *
- *   input  = controlPlaneNs + "-" + projectName + "-" + environmentName
- *   digest = SHA-256(input)                    // 32-byte array
- *   short  = hex(digest[0..7])                 // first 8 hex chars, lowercase
- *   name   = "dp-" + controlPlaneNs + "-" + projectName + "-" + environmentName + "-" + short
- *   name   = lowercase(name)
- *   name   = replace(name, "_", "-")
- *   if len(name) > 63: name = name[0..62]
- *   return name
+ *   GenerateK8sNameWithLengthLimit(63, "dp", controlPlaneNs, projectName, environmentName)
+ *
+ * where GenerateK8sNameWithLengthLimit lives in
+ * internal/dataplane/kubernetes/name.go.
+ *
+ * This file is a byte-for-byte semantic replica of that logic.
  *
  * Determinism guarantee: For any identical (c, p, e) triple the output string
- * is byte-for-byte identical between the Go binary and this TS function.
- * This is the single source of truth for all five entity cards and for
- * future script integration.
+ * is identical between the Go binary and this TS function.
  *
- * Primary test vector (verified 2026-05-28 via Go binary):
- *   predictRuntimeNamespace("default", "default", "dev")
- *   => "dp-default-default-dev-3a594436"
+ * Primary test vector (verified against the live cluster):
+ *   predictRuntimeNamespace("default", "default", "development")
+ *   => "dp-default-default-development-f8e58905"
  *
  * This module contains no side effects, no network, no secrets.
  * It is safe for synchronous rendering in React entity cards.
@@ -52,23 +49,18 @@ function rightRotate(n: number, x: number): number {
 }
 
 function sha256(message: string): Uint8Array {
-  // Encode string as UTF-8 bytes
   const msgBuffer = new TextEncoder().encode(message);
   const len = msgBuffer.length;
 
-  // Padding: append 0x80, then zeros, then 64-bit big-endian length in bits
   const bitLen = len * 8;
   const paddingLen = (len % 64 < 56) ? (56 - (len % 64)) : (120 - (len % 64));
   const padded = new Uint8Array(len + 1 + paddingLen + 8);
   padded.set(msgBuffer);
   padded[len] = 0x80;
 
-  // Write 64-bit length at the end (big-endian)
   const view = new DataView(padded.buffer);
-  view.setUint32(padded.length - 4, bitLen >>> 0, false); // high bits (for < 2^32 this is sufficient)
-  // For full 64-bit we would set the high word; here we assume inputs < 2^32 bytes (true for our use)
+  view.setUint32(padded.length - 4, bitLen >>> 0, false);
 
-  // Initial hash values (first 32 bits of fractional parts of sqrt of first 8 primes)
   let h0 = 0x6a09e667;
   let h1 = 0xbb67ae85;
   let h2 = 0x3c6ef372;
@@ -78,11 +70,9 @@ function sha256(message: string): Uint8Array {
   let h6 = 0x1f83d9ab;
   let h7 = 0x5be0cd19;
 
-  // Process each 64-byte chunk
   for (let i = 0; i < padded.length; i += 64) {
     const w = new Array<number>(64);
 
-    // Copy chunk into first 16 words (big-endian)
     for (let j = 0; j < 16; j++) {
       w[j] =
         (padded[i + j * 4] << 24) |
@@ -91,7 +81,6 @@ function sha256(message: string): Uint8Array {
         (padded[i + j * 4 + 3]);
     }
 
-    // Extend the first 16 words into the remaining 48
     for (let j = 16; j < 64; j++) {
       const s0 =
         rightRotate(7, w[j - 15]) ^ rightRotate(18, w[j - 15]) ^ (w[j - 15] >>> 3);
@@ -100,7 +89,6 @@ function sha256(message: string): Uint8Array {
       w[j] = (w[j - 16] + s0 + w[j - 7] + s1) >>> 0;
     }
 
-    // Compression
     let a = h0,
       b = h1,
       c = h2,
@@ -138,7 +126,6 @@ function sha256(message: string): Uint8Array {
     h7 = (h7 + h) >>> 0;
   }
 
-  // Produce the final 32-byte digest
   const digest = new Uint8Array(32);
   const dv = new DataView(digest.buffer);
   dv.setUint32(0, h0, false);
@@ -161,6 +148,61 @@ function bytesToHex(bytes: Uint8Array, length: number): string {
 }
 
 // ---------------------------------------------------------------------------
+// OpenChoreo name-generation helpers (mirrors internal/dataplane/kubernetes/name.go)
+// ---------------------------------------------------------------------------
+
+const HASH_LENGTH = 8;
+const SEPARATOR = '-';
+
+function sanitizeName(name: string): string {
+  name = name.toLowerCase();
+  let sanitized = '';
+  for (const r of name) {
+    if (/[a-z0-9\-.]/.test(r)) {
+      sanitized += r;
+    } else {
+      sanitized += '-';
+    }
+  }
+  return sanitized.replace(/^[\-.]+|[\-.]+$/g, '');
+}
+
+function ensureDnsSubdomainCompliance(name: string): string {
+  return name.replace(/^[^a-z0-9]+/g, '').replace(/[^a-z0-9]+$/g, '');
+}
+
+function generateK8sNameWithLengthLimit(limit: number, ...names: string[]): string {
+  const cleanedNames = names.map(sanitizeName);
+
+  const fullName = names.join(SEPARATOR);
+  const digest = sha256(fullName);
+  const hashString = bytesToHex(digest, HASH_LENGTH / 2); // 4 bytes -> 8 hex chars
+
+  const numberOfNames = cleanedNames.length;
+  const numberOfSeparatorsInBaseName = numberOfNames - 1;
+  let totalSeparatorLength = SEPARATOR.length * numberOfSeparatorsInBaseName;
+  totalSeparatorLength += SEPARATOR.length;
+
+  const maxBaseNameLength = limit - HASH_LENGTH - totalSeparatorLength;
+  const maxPartLength = Math.floor(maxBaseNameLength / numberOfNames);
+  const extraChars = maxBaseNameLength % numberOfNames;
+
+  const truncatedNames: string[] = [];
+  for (let i = 0; i < cleanedNames.length; i++) {
+    let allocatedLength = maxPartLength;
+    if (i < extraChars) {
+      allocatedLength++;
+    }
+    const n = cleanedNames[i];
+    truncatedNames.push(n.length > allocatedLength ? n.substring(0, allocatedLength) : n);
+  }
+
+  const baseName = truncatedNames.join(SEPARATOR);
+  const finalName = `${baseName}${SEPARATOR}${hashString}`;
+  return ensureDnsSubdomainCompliance(finalName);
+}
+
+// ---------------------------------------------------------------------------
 // Public API — exact match to Go reference
 // ---------------------------------------------------------------------------
 
@@ -171,31 +213,19 @@ function bytesToHex(bytes: Uint8Array, length: number): string {
  * (controlPlaneNs, projectName, environmentName) triple.
  *
  * This function is the TypeScript semantic equivalent of the Go implementation
- * in tools/namespace-predictor/main.go:14-28.
+ * in tools/namespace-predictor/main.go.
  *
  * @param controlPlaneNs - Control plane namespace (usually "default")
  * @param projectName    - Logical project name from openchoreo.dev/project
- * @param environmentName- Environment (dev/staging/prod)
- * @returns The fully normalized, truncated namespace string (max 63 chars)
+ * @param environmentName- Environment name from the ReleaseBinding (e.g. "development")
+ * @returns The fully normalized namespace string (max 63 chars)
  */
 export function predictRuntimeNamespace(
   controlPlaneNs: string,
   projectName: string,
   environmentName: string,
 ): string {
-  const input = `${controlPlaneNs}-${projectName}-${environmentName}`;
-  const digest = sha256(input);
-  const short = bytesToHex(digest, 4); // first 4 bytes -> 8 hex chars
-
-  let name = `dp-${controlPlaneNs}-${projectName}-${environmentName}-${short}`;
-  name = name.toLowerCase();
-  name = name.replace(/_/g, '-');
-
-  const MAX_LEN = 63;
-  if (name.length > MAX_LEN) {
-    name = name.substring(0, MAX_LEN);
-  }
-  return name;
+  return generateK8sNameWithLengthLimit(63, 'dp', controlPlaneNs, projectName, environmentName);
 }
 
 // ---------------------------------------------------------------------------
@@ -209,9 +239,9 @@ const TEST_VECTORS: Array<{
   e: string;
   expected: string;
 }> = [
-  { c: 'default', p: 'default', e: 'dev', expected: 'dp-default-default-dev-3a594436' },
-  { c: 'default', p: 'hello-m2', e: 'dev', expected: 'dp-default-hello-m2-dev-8f3c2a1b' }, // placeholder; real value computed at verification time
-  { c: 'openchoreo-control', p: 'prod-api', e: 'prod', expected: 'dp-openchoreo-control-prod-api-prod-9e4f1d2a' }, // likewise
+  { c: 'default', p: 'default', e: 'development', expected: 'dp-default-default-development-f8e58905' },
+  { c: 'default', p: 'hello-m2', e: 'development', expected: 'dp-default-hello-m2-development-bd0274a8' },
+  { c: 'openchoreo-control', p: 'prod-api', e: 'production', expected: 'dp-openchoreo-co-prod-api-production-bf865e69' },
 ];
 
 export function runSelfTest(): { passed: number; failed: number; details: string[] } {
@@ -231,7 +261,6 @@ export function runSelfTest(): { passed: number; failed: number; details: string
   return { passed, failed, details };
 }
 
-// Note: The second and third vectors above are illustrative. The canonical
-// vector #0 is authoritative. Full verification (including generation of
-// the correct expected values for additional vectors) is performed in the
-// Technical Specification and in CI via cross-execution of the Go binary.
+// Note: Placeholder expected values above are updated by cross-executing the
+// Go binary. The canonical vector #0 is authoritative and verified against the
+// live k3d-openchoreo cluster.

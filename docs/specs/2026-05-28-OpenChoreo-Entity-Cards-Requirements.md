@@ -83,7 +83,7 @@ These cards are the primary developer-facing realization of the M3 Production Mu
 
 ## 5. Success Criteria
 
-1. A developer viewing the `hello-m2` Component entity sees five coherent cards, all displaying the identical predicted runtime namespace `dp-default-default-dev-3a594436` (or equivalent for the entity's annotations).
+1. A developer viewing the `hello-m2` Component entity sees five coherent cards, all displaying the identical predicted runtime namespace `dp-default-default-development-f8e58905` (or equivalent for the entity's annotations).
 2. Cost, Policy, and Deployment angles are visible with actionable links to Infracost, Gatekeeper policies, OpenChoreo ReleaseBindings, and Flux resources.
 3. The TS predictor produces byte-identical results to the Go binary across a minimum of five test vectors (including boundary cases for length and special characters).
 4. Existing two cards have been refactored to use the shared util (no more `*` wildcards in predicted namespace display).

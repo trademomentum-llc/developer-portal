@@ -61,18 +61,18 @@ The pure function in `namespace-predictor.ts` is a line-for-line semantic port o
 **Canonical test vector (verified on both Go binary and Node crypto reference):**
 
 ```
-predictRuntimeNamespace("default", "default", "dev")
-→ "dp-default-default-dev-3a594436"
+predictRuntimeNamespace("default", "default", "development")
+→ "dp-default-default-development-f8e58905"
 ```
 
-Mathematical definition (repeated for emphasis):
+Mathematical definition (repeated for emphasis; matches `GenerateK8sNameWithLengthLimit`):
 
 ```
-input  := c + "-" + p + "-" + e
-short  := hex( SHA-256(input) )[0:8]
-name   := "dp-" + c + "-" + p + "-" + e + "-" + short
-name   := lower(replace(name, "_", "-"))
-name   := truncate(name, 63)
+names   := ["dp", c, p, e]
+input   := join(names, "-")
+hash    := hex( SHA-256(input) )[0:8]
+base    := truncate-per-part(join(lowercase(sanitize(names)), "-"), 63 - 8 - len(separators))
+name    := ensure-dns-compliance(base + "-" + hash)
 ```
 
 This guarantees that the namespace string a developer sees in any card is identical to the namespace OpenChoreo will create in the data plane and to the value any script (preflight, smoke, CI) will compute when given the same (c, p, e) triple.

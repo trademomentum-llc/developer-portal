@@ -1,4 +1,3 @@
-import React from 'react';
 import { InfoCard, Link } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { Box, Typography } from '@material-ui/core';
@@ -13,7 +12,7 @@ export const OpenChoreoOverviewCard = () => {
   const controlNs = annotations['openchoreo.dev/control-plane-namespace'] || 'default';
   const project = annotations['openchoreo.dev/project'] || 'unknown';
   const component = annotations['openchoreo.dev/component'] || entity.metadata.name;
-  const env = annotations['openchoreo.dev/environment'] || 'dev';
+  const env = annotations['openchoreo.dev/environment'] || 'development';
   const apiBase = annotations['openchoreo.dev/api-base'] || 'http://localhost:9090';
 
   // Single source of truth: the pure deterministic predictor (identical to Go reference).

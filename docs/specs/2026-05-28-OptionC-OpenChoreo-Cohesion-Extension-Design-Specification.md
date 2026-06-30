@@ -70,7 +70,7 @@ New annotation vocabulary (prefix openchoreo.dev/):
 - control-plane-namespace
 - project
 - environment
-- runtime-namespace-template (e.g. "dp-default-default-dev-*")
+- runtime-namespace-template (e.g. "dp-default-default-development-*")
 - api-base
 - component (for leaf workloads)
 - is-platform (for the orchestrator entity)
