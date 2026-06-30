@@ -158,7 +158,7 @@ else
 fi
 
 # Predictor is referenced in the cards module (source check)
-CARDS_INDEX="${ROOT_DIR}/backstage/packages/app/src/modules/openchoreo-cards/index.ts"
+CARDS_INDEX="${ROOT_DIR}/backstage/packages/app/src/modules/openchoreo-cards/index.tsx"
 if grep -q 'namespace-predictor' "${CARDS_INDEX}" 2>/dev/null; then
     pass "Cards module imports and uses the shared namespace predictor"
     record_result pass
