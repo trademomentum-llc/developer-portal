@@ -1,0 +1,22 @@
+# Local development overrides for Backstage.
+# Copy this file to app-config.local.yaml and adjust values.
+# These flags are intentionally NOT in app-config.yaml so production config
+# remains secure. Backstage loads app-config.local.yaml automatically in
+# development mode.
+backend:
+  auth:
+    dangerouslyDisableDefaultAuthPolicy: true
+  # Use a file-backed database directory in local dev so catalog state survives restarts.
+  # The directory will be created automatically and each plugin gets its own .sqlite file.
+  database:
+    client: better-sqlite3
+    connection:
+      directory: ${HOME}/.rational-reserve/backstage-db
+
+auth:
+  providers:
+    guest:
+      dangerouslyAllowOutsideDevelopment: true
+
+permission:
+  enabled: false

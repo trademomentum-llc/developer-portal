@@ -122,6 +122,11 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 - `scripts/smoke-m3.sh` now verifies the Backstage backend API is reachable and that `component/default/hello-m2` and `component/default/developer-portal` are present in the catalog.
 - Checks that `hello-m2` carries the `openchoreo.dev/*` annotations used by the entity cards and that its relations resolve to `group:default/openchoreo`.
 
+### Backstage persistent dev database
+
+- `backstage/app-config.local.yaml` now uses a file-backed `better-sqlite3` database directory at `~/.rational-reserve/backstage-db` instead of the in-memory database configured in `app-config.yaml`.
+- Catalog, search, auth, and plugin state now survive dev-server restarts.
+
 ### Backstage guest sign-in / catalog fix
 
 - `backstage/app-config.yaml` now allows both `http://localhost:3001` and `http://127.0.0.1:3001` in `backend.cors.origin`.
