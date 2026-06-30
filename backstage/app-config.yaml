@@ -67,6 +67,11 @@ proxy:
         '^/api/proxy/gitea-actions': '/api/v1'
       headers:
         Authorization: 'token ${GITEA_ADMIN_TOKEN}'
+    '/opencost':
+      target: http://localhost:29003
+      changeOrigin: true
+      pathRewrite:
+        '^/api/proxy/opencost': ''
 
 # Reference documentation http://backstage.io/docs/features/techdocs/configuration
 # Note: After experimenting with basic setup, use CI/CD to generate docs

@@ -1,19 +1,20 @@
 import { InfoCard, Link } from '@backstage/core-components';
+import { useApi, fetchApiRef } from '@backstage/core-plugin-api';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { Box, Typography } from '@material-ui/core';
+import { useEffect, useState } from 'react';
 import { predictRuntimeNamespace } from './namespace-predictor';
 
 /**
  * CostCard
  *
- * Surfaces the Cost angle of the M3 multi-angle visibility model.
+ * Surfaces the Cost angle of the M3/M4 multi-angle visibility model.
  * Annotation-driven and fully deterministic via the shared namespace predictor.
- *
- * In a full M3 deployment this card would also display live post-deploy
- * cost attribution from an Infracost collector + OpenChoreo cost signals.
+ * Fetches live runtime allocation from the local OpenCost proxy when available.
  */
 export const CostCard = () => {
   const { entity } = useEntity();
+  const { fetch } = useApi(fetchApiRef);
 
   const annotations = entity.metadata.annotations ?? {};
   const controlNs = annotations['openchoreo.dev/control-plane-namespace'] || 'default';
@@ -29,6 +30,38 @@ export const CostCard = () => {
   const costArtifactUrl = `${giteaBase}/openchoreo/platform-config/raw/branch/main/cost-artifacts/${component}/${env}/latest.json`;
   const openCostUrl = `http://localhost:29003/?namespace=${predictedNs}`;
 
+  const [liveCost, setLiveCost] = useState<string | null>(null);
+  const [costError, setCostError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/proxy/opencost/model/allocation?window=today&aggregate=namespace`)
+      .then(async res => {
+        if (!res.ok) {
+          throw new Error(`OpenCost proxy returned ${res.status}`);
+        }
+        const body = await res.json();
+        const data = body.data ?? [];
+        const nsData = data.find((item: Record<string, any>) => item[predictedNs]);
+        if (!cancelled) {
+          if (nsData && nsData[predictedNs]) {
+            const total = nsData[predictedNs].totalCost ?? nsData[predictedNs].totalCost ?? null;
+            setLiveCost(total !== null ? `$${Number(total).toFixed(4)}` : 'no cost data');
+          } else {
+            setLiveCost('no data for namespace');
+          }
+        }
+      })
+      .catch(err => {
+        if (!cancelled) {
+          setCostError(err.message);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [fetch, predictedNs]);
+
   return (
     <InfoCard title="Cost (Infracost + OpenCost)" variant="gridItem">
       <Box>
@@ -42,12 +75,23 @@ export const CostCard = () => {
           <strong>Predicted Runtime NS (cost scope):</strong> <code>{predictedNs}</code>
         </Typography>
 
+        <Typography variant="body2" style={{ marginTop: 8 }}>
+          <strong>Live OpenCost (today):</strong>{' '}
+          {costError ? (
+            <span style={{ color: 'orange' }}>{costError}</span>
+          ) : liveCost !== null ? (
+            liveCost
+          ) : (
+            'loading...'
+          )}
+        </Typography>
+
         <Box mt={2} display="flex" flexDirection="column" gridGap={4}>
           <Link to={costArtifactUrl}>
             Post-deploy Infracost artifact (platform-config)
           </Link>
           <Link to={openCostUrl}>
-            Live OpenCost allocation for {predictedNs}
+            OpenCost UI for {predictedNs}
           </Link>
           <Link to={`${giteaBase}/openchoreo/hello-m2/actions`}>
             CI cost breakdown runs
