@@ -211,7 +211,7 @@ origin (local Gitea) now points at `http://localhost:3333/openchoreo/developer-p
 
 | Item | Status | Notes |
 |---|---|---|
-| Backstage dependency audit remediation | IN PROGRESS 2026-06-30 | Resolved high/critical `@grpc/grpc-js`, `ws`, `axios`, and `undici` advisories via Yarn resolutions. Moved dev-only dangerous auth flags (`dangerouslyDisableDefaultAuthPolicy`, `dangerouslyAllowOutsideDevelopment`) from `app-config.yaml` to `app-config.local.yaml` so production config stays secure. Remaining critical `vm2` (via `typescript-json-schema`) and other transitive advisories (`tar`, `protobufjs`, `minimatch`, etc.) require a coordinated Backstage version upgrade; continue in dedicated dependency-alignment pass. |
+| Backstage dependency audit remediation | IN PROGRESS 2026-06-30 | Resolved high/critical `@grpc/grpc-js`, `ws`, `axios`, and `undici` advisories via Yarn resolutions. Moved dev-only flags (`dangerouslyDisableDefaultAuthPolicy`, `dangerouslyAllowOutsideDevelopment`, `permission.enabled=false`) from `app-config.yaml` to `app-config.local.yaml` so production config stays secure. Remaining critical `vm2` (via `typescript-json-schema`) and other transitive advisories (`tar`, `protobufjs`, `minimatch`, etc.) require a coordinated Backstage version upgrade; continue in dedicated dependency-alignment pass. |
 
 ---
 
