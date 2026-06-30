@@ -146,6 +146,11 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 - Added `backstage/app-config.production.yaml` with env-var-driven PostgreSQL connection, backend auth secret, disabled guest provider, and enabled permission framework.
 - Keeps secrets out of git and gives a clear path for deploying Backstage beyond local dev.
 
+### Gitea OAuth setup helper
+
+- Added `scripts/setup-gitea-oauth.sh` to create the local Gitea OAuth app for Backstage sign-in and store `client_id`/`client_secret` under `~/.rational-reserve/backstage-oauth-client-{id,secret}` with `chmod 600`.
+- The script is idempotent: it reports the existing app if one is already present.
+
 ### Entity-page tab polish
 
 - Removed the four dedicated-tab cards from the Overview grid in `openchoreo-cards/index.tsx`; only the `OpenChoreo Overview` card remains on Overview.
