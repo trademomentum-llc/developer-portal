@@ -223,8 +223,8 @@ traces.
 | OpenTofu modules | initialized + applied | Task 21 done; Flux watching both platform-addons AND platform-config (commit 42b2231 added the platform-config watch) |
 | score2openchoreo live CRD dry-run | OpenChoreo resources | PASS 2026-05-17 via `kubectl apply --dry-run=server`; SecretReference emission added after CI exposed the missing-resource gap |
 | End-to-end pipeline | DONE 2026-05-22 | CI run #24 (sha `5d88625`) succeeded; image pushed to local registry; platform-config commit applied by Flux; ReleaseBinding Ready=True; data-plane pod 1/1 Running |
-| Backstage catalog smoke | PASS 2026-05-22 | `PLAYWRIGHT_URL=http://127.0.0.1:3001 CI=1 yarn test:e2e --reporter=line --project=app` verifies Guest sign-in and the `developer-portal` + `hello-m2` component links |
-| Backstage dependency audit | FAIL 2026-05-23 | Existing critical/high transitive advisories remain in the dependency tree; catalog commit does not modify dependencies |
+| Backstage catalog smoke | PASS 2026-06-30 | Gitea catalog provider auto-discovers `openchoreo` org repos; `hello-m2` and `developer-portal` entities load; Playwright verifies guest sign-in and component links |
+| Backstage dependency audit | PASS 2026-06-30 | High/critical advisories resolved via Yarn resolutions (`@grpc/grpc-js`, `ws`, `axios`, `undici`, `react-router`); only the moderate `@material-ui/core` v4 deprecation warning remains |
 
 ### M2 delta from locked-in tool list (canonical)
 
