@@ -15,6 +15,33 @@ if [ -d "$NODE24_BIN" ]; then
     export PATH="$NODE24_BIN:$PATH"
 fi
 
+ensure_gitea_port() {
+    local local_port="$1"
+    local pid_file="$RUNTIME_DIR/gitea-portforward-${local_port}.pid"
+    if curl -s -o /dev/null -w '%{http_code}' "http://localhost:${local_port}/api/v1/version" | grep -q '^200$'; then
+        return 0
+    fi
+    if [ -f "$pid_file" ]; then
+        kill "$(cat "$pid_file")" 2>/dev/null || true
+        rm -f "$pid_file"
+    fi
+    pkill -f "kubectl.*port-forward.*gitea-http.*:${local_port}" 2>/dev/null || true
+    nohup kubectl --context k3d-openchoreo -n gitea port-forward "svc/gitea-http" "${local_port}:3000" \
+        > "/tmp/gitea-portforward-${local_port}.log" 2>&1 &
+    echo $! > "$pid_file"
+    for i in $(seq 1 30); do
+        if curl -s -o /dev/null -w '%{http_code}' "http://localhost:${local_port}/api/v1/version" | grep -q '^200$'; then
+            return 0
+        fi
+        sleep 1
+    done
+    echo "Gitea port-forward on ${local_port} did not become ready" >&2
+    return 1
+}
+
+ensure_gitea_port 3333
+ensure_gitea_port 3002
+
 cd "$BACKSTAGE_DIR"
 GITEA_ADMIN_PASSWORD=$(cat "$RUNTIME_DIR/m1-gitea-admin-password")
 export GITEA_ADMIN_PASSWORD

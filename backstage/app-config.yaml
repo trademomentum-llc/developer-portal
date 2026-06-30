@@ -51,6 +51,12 @@ integrations:
       baseUrl: http://localhost:3333
       username: gitea_admin
       password: ${GITEA_ADMIN_PASSWORD}
+    # Gitea internally reports URLs on its native port (3002); allow reading
+    # raw catalog-info.yaml files from there while API calls go through 3333.
+    - host: localhost:3002
+      baseUrl: http://localhost:3002
+      username: gitea_admin
+      password: ${GITEA_ADMIN_PASSWORD}
 
 proxy:
   endpoints:
@@ -86,12 +92,19 @@ catalog:
     pullRequestBranchName: backstage-integration
   rules:
     - allow: [Component, System, API, Resource, Location]
-  providers: {}
+  providers:
+    gitea:
+      local:
+        host: localhost:3333
+        organization: openchoreo
+        branch: main
+        catalogPath: catalog-info.yaml
+        schedule:
+          frequency: { minutes: 30 }
+          timeout: { minutes: 3 }
   locations:
     - type: file
       target: ../../../catalog-info.yaml
-    - type: file
-      target: ../../../seed-repos/hello-m2/catalog-info.yaml
     - type: file
       target: ../../examples/template/template.yaml
       rules:
