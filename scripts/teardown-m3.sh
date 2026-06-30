@@ -9,12 +9,17 @@ set -euo pipefail
 
 echo "=== M3 Teardown — $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONTEXT="k3d-openchoreo"
 
-helm uninstall signoz -n signoz 2>/dev/null || true
-helm uninstall otel-collector -n otel-system 2>/dev/null || true
+if ! kubectl config current-context 2>/dev/null | grep -q "${CONTEXT}"; then
+    echo "WARNING: Current kubectl context is not ${CONTEXT}."
+fi
 
-kubectl --context "${CONTEXT}" delete namespace signoz otel-system --ignore-not-found --timeout=60s || true
+echo "Destroying M3 observability module via OpenTofu"
+cd "${ROOT_DIR}/iac"
+export RR_TOFU_GUARD_BYPASS=1
+tofu destroy -auto-approve -target=module.observability
 
 echo "M3 resources removed (namespaces signoz + otel-system)."
 echo "Run preflight-m3.sh to confirm cluster state before any future install."
