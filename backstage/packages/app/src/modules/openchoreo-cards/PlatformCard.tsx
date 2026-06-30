@@ -10,8 +10,8 @@ export const PlatformCard = () => {
   const { entity } = useEntity();
   const name = entity.metadata.name;
   const annotations = entity.metadata.annotations ?? {};
-  const repoUrl = annotations['gitea.com/project-slug']
-    ? `http://localhost:3333/${annotations['gitea.com/project-slug']}`
+  const repoUrl = annotations['gitea.io/project']
+    ? `http://localhost:3333/${annotations['gitea.io/project']}`
     : 'http://localhost:3333/openchoreo/hello-m2';
 
   return (
