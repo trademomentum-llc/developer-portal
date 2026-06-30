@@ -231,6 +231,67 @@ fi
 if [[ "${MODE}" == "cluster" || ( "${MODE}" == "auto" && "${CLUSTER_AVAILABLE}" == true ) ]]; then
     info "k3d-openchoreo context detected — running live checks"
 
+    # Backstage live catalog checks
+    BACKSTAGE_BACKEND_URL="http://127.0.0.1:7008"
+    if curl -fsS -o /dev/null "${BACKSTAGE_BACKEND_URL}/api/catalog/entities?limit=1"; then
+        pass "Backstage backend API is reachable at ${BACKSTAGE_BACKEND_URL}"
+        record_result pass
+
+        check_entity() {
+            local kind="$1"
+            local namespace="$2"
+            local name="$3"
+            local entity_url="${BACKSTAGE_BACKEND_URL}/api/catalog/entities/by-name/${kind}/${namespace}/${name}"
+            if curl -fsS -o /tmp/smoke-m3-entity-${name}.json "${entity_url}" 2>/dev/null; then
+                if grep -q "\"name\":\"${name}\"" "/tmp/smoke-m3-entity-${name}.json"; then
+                    pass "Backstage catalog contains ${kind}/${namespace}/${name}"
+                    record_result pass
+                else
+                    fail "Backstage catalog returned unexpected payload for ${kind}/${namespace}/${name}"
+                    record_result fail
+                fi
+            else
+                fail "Backstage catalog missing ${kind}/${namespace}/${name}"
+                record_result fail
+            fi
+        }
+
+        check_entity component default hello-m2
+        check_entity component default developer-portal
+
+        # Verify hello-m2 has the Option C openchoreo annotations that the cards consume
+        if grep -q 'openchoreo.dev/project' /tmp/smoke-m3-entity-hello-m2.json && \
+           grep -q 'openchoreo.dev/component' /tmp/smoke-m3-entity-hello-m2.json && \
+           grep -q 'openchoreo.dev/environment' /tmp/smoke-m3-entity-hello-m2.json; then
+            pass "hello-m2 catalog entity carries openchoreo.dev annotations used by entity cards"
+            record_result pass
+        else
+            fail "hello-m2 catalog entity missing openchoreo.dev annotations"
+            record_result fail
+        fi
+
+        # Verify developer-portal has the platform API base annotation
+        if grep -q 'openchoreo.dev/api-base' /tmp/smoke-m3-entity-developer-portal.json; then
+            pass "developer-portal catalog entity carries openchoreo.dev/api-base annotation"
+            record_result pass
+        else
+            fail "developer-portal catalog entity missing openchoreo.dev/api-base annotation"
+            record_result fail
+        fi
+
+        # Verify hello-m2 ownership relation resolves to the openchoreo group
+        if grep -q 'group:default/openchoreo' /tmp/smoke-m3-entity-hello-m2.json; then
+            pass "hello-m2 relations resolve to group:default/openchoreo"
+            record_result pass
+        else
+            fail "hello-m2 relations do not resolve to group:default/openchoreo"
+            record_result fail
+        fi
+    else
+        warn "Backstage backend not reachable at ${BACKSTAGE_BACKEND_URL} (is the dev server running?)"
+        record_result fail
+    fi
+
     # Predictor-driven namespace presence for hello-m2
     if [[ -x "$(command -v go)" ]]; then
         EXPECTED_NS=$(go run "${PREDICTOR_DIR}/main.go" default default development 2>/dev/null || echo "")

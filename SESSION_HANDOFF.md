@@ -23,7 +23,7 @@ M3 is now live and validated end-to-end:
   - `OPENCHOREO_ENVIRONMENT=development`
   - `GIT_SHA=a6eaf5a`
 - Live trace verified in ClickHouse `signoz_traces.signoz_index_v3` with `serviceName='hello-m2'`, `resources_string['openchoreo.runtime_namespace']='dp-default-default-development-f8e58905'`, and `resources_string['git.commit.sha']='a6eaf5a'`.
-- `./scripts/smoke-m3.sh` now passes 16/16 checks, including a live trace-ingestion assertion, the imported Gitea catalog entities, and the post-deploy cost artifact.
+- `./scripts/smoke-m3.sh` now passes 22/22 checks, including live Backstage catalog entity import, a live trace-ingestion assertion, and the post-deploy cost artifact.
 - Backstage `yarn tsc` passes and the five OpenChoreo entity cards render on the live `hello-m2` catalog page after converting them to `EntityCardBlueprint.make` extension definitions (the initial `convertLegacyEntityCardExtension` attempt failed because the plain card components lacked legacy extension metadata).
 - Backstage catalog provider auto-imports `hello-m2` and `developer-portal` from the local Gitea `openchoreo` org via `@backstage/plugin-catalog-backend-module-gitea`; Gitea integrations are configured for both `localhost:3333` (API) and `localhost:3002` (raw file URLs).
 - Backstage dev ports moved from `3000/7007` to `3001/7008` in `app-config.yaml` and `playwright.config.ts` to avoid the Gitea service on port 3000.
@@ -117,6 +117,11 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 - Updated `scripts/start-backstage.sh` to ensure both `3333:3000` and `3002:3000` port-forwards to `svc/gitea-http` are active before the dev server starts.
 - `hello-m2` and `developer-portal` are now auto-imported; relations resolve correctly.
 
+### Smoke harness catalog assertions
+
+- `scripts/smoke-m3.sh` now verifies the Backstage backend API is reachable and that `component/default/hello-m2` and `component/default/developer-portal` are present in the catalog.
+- Checks that `hello-m2` carries the `openchoreo.dev/*` annotations used by the entity cards and that its relations resolve to `group:default/openchoreo`.
+
 ### Backstage guest sign-in / catalog fix
 
 - `backstage/app-config.yaml` now allows both `http://localhost:3001` and `http://127.0.0.1:3001` in `backend.cors.origin`.
@@ -142,7 +147,7 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 
 ### Live smoke cycle
 
-- `./scripts/smoke-m3.sh` passes 16/16.
+- `./scripts/smoke-m3.sh` passes 22/22 (added live Backstage catalog entity checks for `hello-m2` and `developer-portal`).
 - `./scripts/preflight-m3.sh` runs successfully.
 - Manual ClickHouse query confirms trace ingestion with correct resource attributes.
 
