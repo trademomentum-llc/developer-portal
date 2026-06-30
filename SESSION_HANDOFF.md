@@ -38,7 +38,7 @@ The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replic
 ## 2. Git state at handoff
 
 - **Branch:** `main`
-- **Local HEAD:** `fcaab53` -- `refactor(backstage): avoid card duplication by keeping only overview card on Overview`
+- **Local HEAD:** `ebec46c` -- `feat(backstage): add Platform angle tab to Component entity page`
 - **origin (local Gitea):** `http://localhost:3333/openchoreo/developer-portal.git` is up-to-date with `main`.
 - **hello-m2 (local Gitea):** `http://localhost:3333/openchoreo/hello-m2.git` is up-to-date with `main` at commit `a6eaf5a`.
 - **Working tree:** clean.
@@ -46,6 +46,7 @@ The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replic
 
 Recent commits on `main`:
 ```
+ebec46c feat(backstage): add Platform angle tab to Component entity page
 fcaab53 refactor(backstage): avoid card duplication by keeping only overview card on Overview
 14dcfcf fix(backstage): add openchoreo group to catalog
 0b6211e fix(backstage): repair guest sign-in and add entity-page tabs
@@ -97,9 +98,10 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 
 ### Multi-angle entity page layout
 
-- New module `backstage/packages/app/src/modules/openchoreo-entity-page/index.tsx` adds Deployment, Observability, Cost, and Policy tabs for Component entities.
+- New module `backstage/packages/app/src/modules/openchoreo-entity-page/index.tsx` adds Deployment, Observability, Cost, Policy, and Platform tabs for Component entities.
 - `App.tsx` registers the module.
 - Playwright verification confirms all tabs render on `http://localhost:3001/catalog/default/component/hello-m2`.
+- The four dedicated-tab cards are no longer duplicated on the Overview grid.
 
 ### Backstage guest sign-in / catalog fix
 
@@ -111,7 +113,7 @@ d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verif
 ### Entity-page tab polish
 
 - Removed the four dedicated-tab cards from the Overview grid in `openchoreo-cards/index.tsx`; only the `OpenChoreo Overview` card remains on Overview.
-- Verified via Playwright that the Deployment, Policy, Observability, and Cost cards render only inside their dedicated tabs.
+- Verified via Playwright that the Deployment, Policy, Observability, Cost, and Platform cards render only inside their dedicated tabs.
 
 ### Live smoke cycle
 
