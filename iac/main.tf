@@ -30,3 +30,7 @@ module "external_secrets_wiring" {
 module "local_registry" {
   source = "./modules/local-registry"
 }
+
+module "observability" {
+  source = "./modules/observability"
+}

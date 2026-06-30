@@ -4,5 +4,6 @@ terraform {
     kubernetes = { source = "hashicorp/kubernetes", version = "~> 2.33" }
     helm       = { source = "hashicorp/helm", version = "~> 2.17" }
     kubectl    = { source = "alekc/kubectl", version = "~> 2.1" }
+    null       = { source = "hashicorp/null", version = "~> 3.2" }
   }
 }

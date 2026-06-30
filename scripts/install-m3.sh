@@ -20,30 +20,21 @@ if ! kubectl config current-context 2>/dev/null | grep -q "${CONTEXT}"; then
     exit 1
 fi
 
+if ! command -v tofu >/dev/null 2>&1; then
+    echo "ERROR: OpenTofu (tofu) is required. Install it or use the helm path manually."
+    exit 1
+fi
+
 echo "1. Adding Helm repositories (idempotent)"
 helm repo add signoz https://charts.signoz.io 2>/dev/null || true
 helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts 2>/dev/null || true
 helm repo update
 
-echo "2. Creating M3 namespaces (idempotent)"
-kubectl --context "${CONTEXT}" create namespace signoz --dry-run=client -o yaml | kubectl apply -f -
-kubectl --context "${CONTEXT}" create namespace otel-system --dry-run=client -o yaml | kubectl apply -f -
-
-echo "3. Installing / upgrading SigNoz (using local values)"
-helm upgrade --install signoz signoz/signoz \
-    --namespace signoz \
-    --create-namespace \
-    -f "${ROOT_DIR}/observability/signoz/values.local.yaml" \
-    --wait --timeout 10m
-
-echo "4. Installing / upgrading standalone OTEL collector"
-helm upgrade --install otel-collector open-telemetry/opentelemetry-collector \
-    --namespace otel-system \
-    -f "${ROOT_DIR}/observability/otel/collector-values.local.yaml" \
-    --wait --timeout 5m
-
-echo "5. (Placeholder) Applying any additional M3 dashboards or ConfigMaps"
-# kubectl apply -f observability/dashboards/...
+echo "2. Applying M3 observability module via OpenTofu"
+cd "${ROOT_DIR}/iac"
+export RR_TOFU_GUARD_BYPASS=1
+tofu init -reconfigure
+tofu apply -auto-approve -target=module.observability
 
 echo
 echo "=== M3 Install complete ==="
