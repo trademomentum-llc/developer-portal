@@ -24,7 +24,7 @@ M3 is now live and validated end-to-end:
   - `GIT_SHA=a6eaf5a`
 - Live trace verified in ClickHouse `signoz_traces.signoz_index_v3` with `serviceName='hello-m2'`, `resources_string['openchoreo.runtime_namespace']='dp-default-default-development-f8e58905'`, and `resources_string['git.commit.sha']='a6eaf5a'`.
 - `./scripts/smoke-m3.sh` now passes 13/13 checks, including a live trace-ingestion assertion.
-- Backstage `yarn tsc` passes after fixing TypeScript errors in the five OpenChoreo entity cards and converting them to proper catalog extension definitions via `convertLegacyEntityCardExtension`.
+- Backstage `yarn tsc` passes and the five OpenChoreo entity cards render on the live `hello-m2` catalog page after converting them to `EntityCardBlueprint.make` extension definitions (the initial `convertLegacyEntityCardExtension` attempt failed because the plain card components lacked legacy extension metadata).
 
 The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replica of OpenChoreo's `GenerateK8sNameWithLengthLimit(63, "dp", ...)` algorithm, with the canonical vector `dp-default-default-development-f8e58905` verified against the live cluster.
 
@@ -41,6 +41,7 @@ The namespace predictor (Go + TypeScript) is now a byte-for-byte semantic replic
 
 Recent commits on `main`:
 ```
+d25139c fix(backstage): use EntityCardBlueprint.make for openchoreo cards; verify cards render
 79bf4f2 feat(m3): add live trace-ingestion assertion to smoke-m3.sh; update TODO
 2655ed1 fix(m3): align namespace predictor with OpenChoreo, fix Backstage card types, default env to development
 164b20e feat(m3): OTEL hardening, namespace predictor, score2openchoreo extra-env, live SigNoz install
@@ -94,7 +95,7 @@ External `gitea-com` push is still blocked by cloud authentication. Local Gitea 
 
 ### Backstage catalog live render verification
 
-The cards typecheck and the catalog locations are configured, but no browser/screenshot validation of the cards was performed this session.
+The cards typecheck and the catalog locations are configured. A headless browser test signed in as Guest and confirmed all five card titles (`OpenChoreo Context`, `Observability`, `Cost`, `Policy`, `Deployment`) render on `http://localhost:3000/catalog/default/component/hello-m2`.
 
 ### iac/modules/observability/
 
