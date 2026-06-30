@@ -305,7 +305,7 @@ if [[ "${MODE}" == "cluster" || ( "${MODE}" == "auto" && "${CLUSTER_AVAILABLE}" 
 
     # Post-deploy cost artifact presence in platform-config (best effort)
     info "Checking for post-deploy cost artifact in platform-config..."
-    COST_ARTIFACT_URL="http://gitea-http.gitea.svc.cluster.local:3000/api/v1/repos/openchoreo/platform-config/contents/cost-artifacts/hello-m2/development/latest.json"
+    COST_ARTIFACT_URL="http://localhost:3333/api/v1/repos/openchoreo/platform-config/contents/cost-artifacts/hello-m2/development/latest.json"
     COST_CURL_AUTH=""
     if [[ -n "${GITEA_TOKEN:-}" ]]; then
         COST_CURL_AUTH="-u gitea_admin:${GITEA_TOKEN}"
