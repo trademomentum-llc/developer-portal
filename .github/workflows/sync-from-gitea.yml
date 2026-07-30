@@ -2,17 +2,22 @@
 # Gitea: https://gitea.com/trademomentum.net/developer-portal
 # GitHub is the Vercel-facing mirror; this workflow is the pull side.
 #
-# Prefer also enabling a Gitea push mirror (Settings → Repository →
-# Mirror Settings → Push Mirror) so updates land immediately on push.
-# This schedule is the fallback when no push mirror is configured.
+# gitea.com has the server Mirror feature disabled (push/pull mirrors
+# return HTTP 400 "Mirror feature is disabled"), so native Gitea push
+# mirrors cannot be used there. This Action is the automatic path:
+#   - schedule: every 5 minutes
+#   - workflow_dispatch: manual
+#   - repository_dispatch type gitea-push: optional near-instant trigger
+#     from a Gitea webhook (see scripts/setup-gitea-github-dispatch-webhook.sh)
 
 name: Sync from Gitea
 
 on:
   schedule:
-    # Every 15 minutes
-    - cron: "*/15 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
+  repository_dispatch:
+    types: [gitea-push]
 
 concurrency:
   group: sync-from-gitea
