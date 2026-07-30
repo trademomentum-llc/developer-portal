@@ -18,14 +18,14 @@ backstage/.cache/
 # OS
 .DS_Store
 
-# Local Codex / agent runtime artifacts
+# Local Codex runtime artifacts
 .codex/
-AGENTS.md
-plugins/rr-policy-guards/README.md
-plugins/rr-policy-guards/hooks/hooks.json
-plugins/rr-policy-guards/plugin.json
-plugins/rr-policy-guards/tools/verify-guard/
 
 # Secrets (never commit)
 *.env
 *.env.*
+
+# Vercel local link (project id is safe; keep out of git by default)
+.vercel/
+.vercel
+.env*

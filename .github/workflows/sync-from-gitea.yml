@@ -1,0 +1,55 @@
+# Keep GitHub in sync with the Gitea source of truth.
+# Gitea: https://gitea.com/trademomentum.net/developer-portal
+# GitHub is the Vercel-facing mirror; this workflow is the pull side.
+#
+# Prefer also enabling a Gitea push mirror (Settings → Repository →
+# Mirror Settings → Push Mirror) so updates land immediately on push.
+# This schedule is the fallback when no push mirror is configured.
+
+name: Sync from Gitea
+
+on:
+  schedule:
+    # Every 15 minutes
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-from-gitea
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mirror branches and tags from Gitea
+        env:
+          SRC: https://gitea.com/trademomentum.net/developer-portal.git
+          # Same-repo write token provided by Actions
+          DST: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/trademomentum-llc/developer-portal.git
+        run: |
+          set -euo pipefail
+
+          git version
+          git clone --mirror "${SRC}" gitea.git
+          cd gitea.git
+
+          # Point origin at GitHub and push all fetched refs.
+          # --mirror updates matching refs; branches deleted on Gitea are
+          # pruned on GitHub so the mirror stays exact.
+          git remote set-url origin "${DST}"
+
+          before="$(git ls-remote origin HEAD | awk '{print $1}')"
+          git push --mirror origin
+          after="$(git ls-remote origin HEAD | awk '{print $1}')"
+
+          echo "GitHub HEAD before: ${before:-none}"
+          echo "GitHub HEAD after:  ${after:-none}"
+          if [ "${before:-}" = "${after:-}" ]; then
+            echo "Already up to date with Gitea."
+          else
+            echo "GitHub updated from Gitea."
+          fi

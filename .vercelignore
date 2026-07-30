@@ -1,0 +1,22 @@
+# Heavy local platform trees — not part of the static Vercel shell
+backstage/
+iac/
+plugins/
+policies/
+scripts/
+seed-repos/
+tools/
+observability/
+arena-sessions/
+assessments/
+docs/
+node_modules/
+.git/
+**/.terraform/
+**/*.tfstate*
+**/.cache/
+**/dist/
+**/dist-types/
+**/.yarn/
+**/.env
+**/.env.*

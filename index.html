@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Developer Portal</title>
+    <meta
+      name="description"
+      content="Self-hosted Internal Developer Platform for Trade Momentum LLC."
+    />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0b1020;
+        --panel: #121a2f;
+        --text: #e8eefc;
+        --muted: #9aaccf;
+        --accent: #6ea8fe;
+        --border: #24304d;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial, sans-serif;
+        background:
+          radial-gradient(1200px 600px at 10% -10%, #1b2a4d 0%, transparent 55%),
+          radial-gradient(900px 500px at 100% 0%, #16233f 0%, transparent 50%),
+          var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 4rem 1.5rem 3rem;
+      }
+      .card {
+        background: color-mix(in srgb, var(--panel) 92%, black);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      }
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: clamp(1.75rem, 4vw, 2.25rem);
+        letter-spacing: -0.02em;
+      }
+      p {
+        margin: 0 0 1rem;
+        color: var(--muted);
+      }
+      .badge {
+        display: inline-block;
+        margin-bottom: 1rem;
+        padding: 0.25rem 0.65rem;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        color: var(--accent);
+        font-size: 0.8rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      ul {
+        margin: 0 0 1.25rem;
+        padding-left: 1.2rem;
+        color: var(--muted);
+      }
+      li {
+        margin: 0.35rem 0;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.9em;
+        color: var(--text);
+      }
+      a {
+        color: var(--accent);
+      }
+      footer {
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="card">
+        <div class="badge">Trade Momentum LLC</div>
+        <h1>Developer Portal</h1>
+        <p>
+          Self-hosted Internal Developer Platform (IDP) built on k3d, Gitea,
+          Backstage, OpenTofu, Flux, Gatekeeper, and OpenChoreo.
+        </p>
+        <p>
+          This Vercel project is the public project shell for the monorepo.
+          Runtime services stay on the local OpenChoreo cluster, not on Vercel.
+        </p>
+        <ul>
+          <li><strong>M1</strong> substrate complete</li>
+          <li><strong>M2</strong> IaC + CD loop validated locally</li>
+          <li><strong>M3</strong> observability in progress</li>
+        </ul>
+        <p>
+          Local entrypoints:
+          <code>Backstage :3001</code>,
+          <code>Gitea :3333</code>,
+          <code>OpenChoreo API :9090</code>
+        </p>
+        <footer>
+          Production domain:
+          <a href="https://devplatform.link">devplatform.link</a>
+          · project
+          <code>developer-portal</code>
+          under
+          <code>trademomentumllcs-projects</code>
+        </footer>
+      </div>
+    </main>
+  </body>
+</html>
