@@ -4,7 +4,11 @@ Test end-to-end Backstage sign-in via Gitea.
 Expects Backstage dev server on localhost:3001 and Gitea on localhost:3333.
 """
 import os
+import stat
 import sys
+import tempfile
+from pathlib import Path
+
 from playwright.sync_api import sync_playwright
 
 BACKSTAGE_URL = os.environ.get("BACKSTAGE_URL", "http://localhost:3001")
@@ -15,10 +19,28 @@ if not os.path.exists(GITEA_PASSWORD_FILE):
     print("Gitea admin password file not found", file=sys.stderr)
     sys.exit(1)
 
-GITEA_PASSWORD = open(GITEA_PASSWORD_FILE).read().strip()
+with open(GITEA_PASSWORD_FILE, encoding="utf-8") as handle:
+    GITEA_PASSWORD = handle.read().strip()
 
 
-def main():
+def artifact_dir() -> Path:
+    configured = os.environ.get("ARTIFACT_DIR")
+    if configured:
+        path = Path(configured)
+        path.mkdir(parents=True, exist_ok=True)
+    else:
+        path = Path(tempfile.mkdtemp(prefix="gitea-signin-"))
+    try:
+        path.chmod(stat.S_IRWXU)
+    except OSError:
+        pass
+    return path
+
+
+def main() -> None:
+    out_dir = artifact_dir()
+    print(f"Artifact directory: {out_dir}")
+
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         context = browser.new_context()
@@ -28,11 +50,9 @@ def main():
         page.goto(BACKSTAGE_URL)
         page.wait_for_load_state("networkidle")
 
-        # Wait for the custom sign-in page to render.
         page.wait_for_selector("text=Gitea", timeout=10000)
         print("Clicking Gitea sign-in")
 
-        # Intercept the auth popup.
         with page.expect_popup() as popup_info:
             page.click("text=Gitea >> .. >> button")
         popup = popup_info.value
@@ -40,7 +60,6 @@ def main():
 
         print(f"Popup URL: {popup.url}")
 
-        # Gitea login page.
         if "login" in popup.url:
             popup.fill("input[name='user_name']", GITEA_USER)
             popup.fill("input[name='password']", GITEA_PASSWORD)
@@ -48,18 +67,14 @@ def main():
             popup.wait_for_load_state("networkidle")
             print(f"After login URL: {popup.url}")
 
-        # OAuth authorize page.
         if "/oauth/authorize" in popup.url or "/login/oauth/authorize" in popup.url:
-            # Authorize button text may be "Authorize Application" or similar.
             popup.click("button:has-text('Authorize')")
             popup.wait_for_load_state("networkidle")
             print(f"After authorize URL: {popup.url}")
 
-        # Wait for the popup to close or redirect back to Backstage.
         popup.wait_for_event("close", timeout=20000)
         print("Popup closed")
 
-        # Back on Backstage, wait for the app to load and capture identity.
         page.wait_for_load_state("networkidle")
         page.wait_for_timeout(2000)
 
@@ -77,7 +92,6 @@ def main():
         )
         print(f"Gitea auth session in localStorage: {identity}")
 
-        # Try to read the user profile from the profile API.
         profile = page.evaluate(
             """
             async () => {
@@ -92,8 +106,9 @@ def main():
         )
         print(f"Profile via /api/auth/gitea/session: {profile}")
 
-        # Screenshot for debugging.
-        page.screenshot(path="/tmp/backstage-after-gitea-signin.png", full_page=True)
+        screenshot = out_dir / "backstage-after-gitea-signin.png"
+        page.screenshot(path=str(screenshot), full_page=True)
+        print(f"Screenshot written to {screenshot}")
 
         browser.close()
 

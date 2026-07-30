@@ -18,9 +18,9 @@ complete and M2 (IaC + CD loop) is validated end-to-end locally.
 
 Three projects on disk are involved, in dependency order:
 
-1. `~/Projects/openchoreo/`        -- the platform orchestrator (upstream OSS)
-2. `~/Projects/rational-reserve/`  -- AI swarm orchestration layer (custom)
-3. `~/Projects/developer-portal/`  -- the umbrella IDP build (this repo)
+1. `~/Projects/Sovereign/openchoreo/`        -- the platform orchestrator (upstream OSS)
+2. `~/Projects/Sovereign/rational-reserve/`  -- AI swarm orchestration layer (custom)
+3. `~/Projects/Sovereign/developer-portal/`  -- the umbrella IDP build (this repo)
 
 **2026-05-28 Specifications Update:** Full Requirements + Design + Technical Specification triad created for the Policy Guard Layer + IDP Milestone System (the load-bearing enforcement and tracking mechanism):
 
@@ -65,7 +65,7 @@ These cover progressive enforcement, Rego/Go guard architecture, milestone entry
 
 ## 1. openchoreo
 
-**Source:** https://github.com/openchoreo/openchoreo (cloned at `~/Projects/openchoreo/`)
+**Source:** https://github.com/openchoreo/openchoreo (cloned at `~/Projects/Sovereign/openchoreo/`)
 
 **Role in the IDP:** Platform orchestrator. Spans three planes in the
 architecture: Developer Control Plane, Platform Orchestration Plane, and
@@ -85,7 +85,7 @@ the supporting namespaces `cert-manager`, `external-secrets`, `gitea`,
 
 ## 2. rational-reserve (RR)
 
-**Source:** `~/Projects/rational-reserve/` (built earlier from requirement
+**Source:** `~/Projects/Sovereign/rational-reserve/` (built earlier from requirement
 docs on an external volume).
 
 **Role in the IDP:** Developer Control Plane, Copilots/Agents/LLM slot.
@@ -100,7 +100,7 @@ state store all working. Integration into the portal is deferred to M7.
 
 ## 3. developer-portal (current focus)
 
-**Source:** `~/Projects/developer-portal/`. git repository, branch `main`.
+**Source:** `~/Projects/Sovereign/developer-portal/`. git repository, branch `main`.
 The 2026-05-22 M2 closeout work is implemented locally. Local Gitea origin
 uses the localhost:3333 port-forward and has received `main`; the latest
 gitea-com push reached `gitea.com` but failed authentication, so a fresh
@@ -122,11 +122,12 @@ and `seed-repos/hello-m2/catalog-info.yaml`; and the Playwright smoke test
 signs in as Guest and verifies both `developer-portal` and `hello-m2`
 component links.
 
-Open dependency-security gap: `yarn npm audit --all --recursive` reaches the
-registry with network escalation but fails on existing critical/high
-transitive advisories in the Backstage dependency tree. No dependency files
-changed in the Backstage catalog commit; remediation needs a dedicated
-Backstage dependency-alignment pass before production hardening.
+Dependency SCA: Backstage `package.json` resolutions pin High/Critical
+transitive advisories; `yarn npm audit --all --recursive --severity high
+--no-deprecations` is clean. `rr-verify-guard` now blocks push on High+
+yarn/npm audit findings and on `govulncheck` hits for every Go module root.
+Moderate deprecations (e.g. Material UI v4) remain until a coordinated
+Backstage UI upgrade.
 
 M3 is at the implementation/preflight stage. The spec package lives at
 `docs/specs/2026-05-28-M3-Production-Multi-Angle-Visibility-*`. Values files
@@ -139,7 +140,7 @@ traces.
 ### Repository layout (current)
 
 ```
-~/Projects/developer-portal/
+~/Projects/Sovereign/developer-portal/
 +-- PROJECT_SUMMARY.md              this file
 +-- SESSION_HANDOFF.md
 +-- TODO.md
@@ -168,16 +169,18 @@ traces.
 |       +-- ci.yaml                  canonical Gitea Actions workflow
 +-- plugins/
 |   +-- rr-policy-guards/            M1 plugin, extended in M2
-|       +-- hooks/hooks.json         emoji-guard + new Bash matcher for tofu-guard
+|       +-- hooks/hooks.json         six mandatory no-bypass pretool guards
 |       +-- plugin.json, README.md, .gitignore
 |       +-- tools/
 |       |   +-- emoji-guard/         M1
 |       |   +-- bash-guard/          M1
 |       |   +-- brew-guard/          M1
-|       |   +-- tofu-guard/          NEW in M2: go.mod, parser.go, parser_test.go,
-|       |                             audit.go, audit_test.go, main.go, main_test.go
+|       |   +-- tofu-guard/          OpenTofu lifecycle policy
+|       |   +-- commit-guard/        staged-file and commit-message policy
+|       |   +-- verify-guard/        commit and publication verification gate
 |       +-- bin/
-|           +-- rr-emoji-guard, rr-bash-guard, rr-brew-guard, rr-tofu-guard
+|           +-- rr-emoji-guard, rr-bash-guard, rr-brew-guard, rr-tofu-guard,
+|               rr-commit-guard, rr-verify-guard
 +-- tools/
 |   +-- score2openchoreo/            NEW in M2
 |       +-- go.mod (yaml.v3 + jsonschema/v5)

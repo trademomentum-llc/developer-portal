@@ -18,6 +18,15 @@ if (!fs.existsSync(GITEA_PASSWORD_FILE)) {
 }
 const GITEA_PASSWORD = fs.readFileSync(GITEA_PASSWORD_FILE, 'utf-8').trim();
 
+const ARTIFACT_DIR = process.env.ARTIFACT_DIR
+  ? (fs.mkdirSync(process.env.ARTIFACT_DIR, { recursive: true, mode: 0o700 }), process.env.ARTIFACT_DIR)
+  : fs.mkdtempSync(path.join(os.tmpdir(), 'gitea-signin-'));
+try {
+  fs.chmodSync(ARTIFACT_DIR, 0o700);
+} catch {
+  // best-effort
+}
+
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext();
 const page = await context.newPage();
@@ -76,6 +85,10 @@ const profile = await page.evaluate(async () => {
 });
 console.log('Profile via /api/auth/gitea/session:', profile);
 
-await page.screenshot({ path: '/tmp/backstage-after-gitea-signin.png', fullPage: true });
+await page.screenshot({
+  path: path.join(ARTIFACT_DIR, 'backstage-after-gitea-signin.png'),
+  fullPage: true,
+});
+console.log('Artifacts written under', ARTIFACT_DIR);
 
 await browser.close();

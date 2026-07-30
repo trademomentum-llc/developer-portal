@@ -6,6 +6,7 @@
  *   BACKSTAGE_URL         Backstage frontend URL (default http://localhost:3001)
  *   BACKEND_URL           Backstage backend URL (default http://localhost:7008)
  *   GITEA_USER            Gitea account to sign in with (default gitea_admin)
+ *   ARTIFACT_DIR          Optional private artifact directory (created if missing)
  *
  * Exit codes:
  *   0 = sign-in succeeded and the resulting session can refresh
@@ -37,6 +38,21 @@ const GITEA_PASSWORD = (() => {
   }
   return fs.readFileSync(passwordFile, 'utf-8').trim();
 })();
+
+// Private mode-0700 directory for screenshots/HTML (avoids predictable /tmp paths).
+const ARTIFACT_DIR = (() => {
+  if (process.env.ARTIFACT_DIR) {
+    fs.mkdirSync(process.env.ARTIFACT_DIR, { recursive: true, mode: 0o700 });
+    return process.env.ARTIFACT_DIR;
+  }
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'gitea-signin-'), { encoding: 'utf8' });
+})();
+try {
+  fs.chmodSync(ARTIFACT_DIR, 0o700);
+} catch {
+  // best-effort on platforms that ignore mode bits
+}
+console.log('Artifact directory:', ARTIFACT_DIR);
 
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext();
@@ -93,9 +109,14 @@ try {
   console.log('Popup closed by handler');
 } catch (e) {
   console.log('Popup still open; current URL:', popup.url());
-  await popup.screenshot({ path: '/tmp/gitea-popup-still-open.png', fullPage: true });
+  await popup.screenshot({
+    path: path.join(ARTIFACT_DIR, 'gitea-popup-still-open.png'),
+    fullPage: true,
+  });
   const html = await popup.content();
-  fs.writeFileSync('/tmp/gitea-popup-still-open.html', html);
+  fs.writeFileSync(path.join(ARTIFACT_DIR, 'gitea-popup-still-open.html'), html, {
+    mode: 0o600,
+  });
   await popup.close();
 }
 
@@ -114,7 +135,10 @@ console.log(`Sign-in card visible: ${stillOnSignIn}, sidebar visible: ${sidebarV
 
 if (stillOnSignIn || !sidebarVisible) {
   console.error('Sign-in did not complete; still on the sign-in page');
-  await page.screenshot({ path: '/tmp/backstage-after-gitea-signin.png', fullPage: true });
+  await page.screenshot({
+    path: path.join(ARTIFACT_DIR, 'backstage-after-gitea-signin.png'),
+    fullPage: true,
+  });
   await browser.close();
   process.exit(1);
 }
@@ -142,7 +166,11 @@ console.log(
   cookies.map(c => `${c.name}=${c.value.slice(0, 20)}... domain=${c.domain} path=${c.path}`),
 );
 
-await page.screenshot({ path: '/tmp/backstage-after-gitea-signin.png', fullPage: true });
+await page.screenshot({
+  path: path.join(ARTIFACT_DIR, 'backstage-after-gitea-signin.png'),
+  fullPage: true,
+});
 console.log('Gitea sign-in succeeded');
+console.log('Artifacts written under', ARTIFACT_DIR);
 
 await browser.close();

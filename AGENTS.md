@@ -1,10 +1,10 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## What this repo is
 
-Umbrella for a self-hosted Internal Developer Platform (IDP) broken into seven milestones (M1-M7), modeled on the Platform Engineering community reference architecture. M1 (substrate) is complete and healthy; M2 (IaC + CD loop) is code-complete but the live `tofu apply` run is blocked (see `TODO.md` "M2 install blockers" and memory `project_m2_install_blockers`).
+Umbrella for a self-hosted Internal Developer Platform (IDP) broken into seven milestones (M1-M7), modeled on the Platform Engineering community reference architecture. M1 (substrate), M2 (IaC + CD loop), M3 (observability), and M4 cost visibility are deployed and passing smoke tests. Remaining M4 networking (Cilium, Envoy Gateway) and non-guest Backstage auth are not yet implemented.
 
 The repo depends on two sibling checkouts -- do not expect to operate without them:
 - `~/Projects/Sovereign/openchoreo/` -- upstream platform orchestrator. Provides the shared `k3d-openchoreo` cluster. Five planes live there: control-plane, data-plane, observability-plane, workflow-plane (Argo Workflows, NOT Argo CD), plus cert-manager / external-secrets / gitea / openbao.
@@ -52,7 +52,9 @@ opa test --v0-compatible policies/*.rego -v
 
 The `--v0-compatible` flag is required for OPA 1.x because these policies use Rego v0 syntax (what Gatekeeper 3.17 still expects). Scope the glob to `*.rego` only -- the constraint YAMLs break OPA's bundle loader. Expected: 6/6 PASS.
 
-### Backstage (`backstage/`, yarn 4.4.1 via Corepack, Node 22/24)
+### Backstage (`backstage/`, yarn 4.4.1 via Corepack, Node 24)
+
+Use Node 24 (`/opt/homebrew/opt/node@24/bin`); Node 26 breaks `isolated-vm`.
 
 ```
 cd backstage
@@ -64,7 +66,9 @@ yarn lint                       # lints since origin/master
 yarn test:e2e                   # playwright
 ```
 
-Dev server runs on host (not containerized in M1/M2). Use `scripts/start-backstage.sh` / `scripts/stop-backstage.sh` for the managed-process variant.
+Dev server runs on host (not containerized in M1-M4). Use `scripts/start-backstage.sh` / `scripts/stop-backstage.sh` for the managed-process variant, which also keeps Gitea and OpenCost port-forwards alive.
+
+Local dev auth uses the guest provider by default. `app-config.local.yaml` is gitignored; new environments are auto-seeded from `app-config.local.yaml.example`. For production values see `app-config.production.yaml` (PostgreSQL, backend secret, permissions enabled, no guest provider). Gitea OAuth credentials are created idempotently by `scripts/setup-gitea-oauth.sh`.
 
 ### OpenTofu (`iac/`)
 
@@ -91,6 +95,42 @@ tofu plan
 ```
 
 Do not invent a "clean slate" path. If an install script fails mid-way, the blockers documented in `TODO.md` are the canonical remediation list.
+
+### M3 / M4 lifecycle scripts
+
+```
+./scripts/install-m3.sh           # deploy SigNoz + OTEL collector, configure Backstage tabs
+./scripts/smoke-m3.sh             # 22 checks: traces, metrics pipeline, Backstage entity tabs
+./scripts/teardown-m3.sh
+
+./scripts/install-m4.sh           # deploy OpenCost + Prometheus in the `opencost` namespace
+./scripts/smoke-m4.sh             # live OpenCost allocation, Backstage CostCard data
+./scripts/teardown-m4.sh
+
+./scripts/install-m4-networking.sh    # deploy Envoy Gateway ingress for gitea/signoz/opencost
+./scripts/teardown-m4-networking.sh
+./scripts/smoke-m4-networking.sh      # verify HTTP routes via Envoy Gateway
+./scripts/update-local-hosts.sh       # print /etc/hosts entries for .local hostnames
+
+./scripts/install-backstage-production.sh    # deploy PostgreSQL for production Backstage
+./scripts/start-backstage-production.sh
+./scripts/stop-backstage-production.sh
+./scripts/smoke-backstage-production.sh
+
+./scripts/smoke-auth.sh           # Backstage Gitea OAuth provider start-endpoint check
+./scripts/smoke-all.sh            # unified AUTH + M2 + M3 + M4 + BACKSTAGE-PRODUCTION validation harness
+```
+
+M4 networking uses Envoy Gateway on the existing cluster. Cilium as the CNI is implemented as a documented fresh-cluster rebuild path (`docs/specs/2026-06-30-M4-Networking-Technical-Specification.md`) rather than an in-place Flannel replacement.
+
+Required port-forwards for local Backstage dev (managed by `scripts/start-backstage.sh`):
+
+| Local port | Service | Purpose |
+|---|---|---|
+| 3333 | Gitea API / UI | Backstage catalog discovery, webhooks |
+| 3002 | Gitea raw URLs | Backstage catalog `raw` file fetching |
+| 29003 | OpenCost | Backstage proxy `/api/proxy/opencost` |
+| 3301 | SigNoz | Entity-page trace links (optional) |
 
 ## Architecture
 
@@ -119,28 +159,31 @@ M2 wires a push-to-deploy loop on top of the M1 substrate. The developer path:
 
 1. Push to `openchoreo/hello-m2` (Gitea, org `openchoreo`).
 2. Gitea Actions runner (`act-runner` helm, label `ubuntu-latest`) picks up `.gitea/workflows/ci.yaml`.
-3. CI validates Score YAML against its schema, runs `tofu plan` + Infracost, builds and pushes image to the in-cluster local registry.
+3. CI validates Score YAML against its schema, runs `tofu plan` + Infracost, builds and pushes image to the Gitea OCI registry.
 4. `score2openchoreo` renders OpenChoreo Component and Workload CRDs from the Score file (it does NOT emit raw Deployments; that is the locked-in design).
-5. CI commits the rendered Component and Workload into `openchoreo/platform-config/environments/dev/`.
-6. OpenChoreo reconciles the Component and Workload into a running pod.
-7. Promotion is a commit that copies the same rendered resources into `environments/staging/`.
+5. CI commits the rendered Component into `openchoreo/platform-config/environments/dev/`.
+6. OpenChoreo reconciles the Component into a running pod.
+7. Promotion is a commit that copies the same Component into `environments/staging/`.
 
 Only two OpenChoreo `Environment`s exist in the single k3d cluster: `dev` and `staging`.
 
-Root `iac/main.tf` composes five modules:
+Root `iac/main.tf` composes modules:
 - `flux/` -- cluster add-ons drift correction only; OpenChoreo remains the workload deployer.
 - `gatekeeper/` -- pulls forward three pipeline-scoped constraints from M6 (C-1 main-protected, C-2 Score schema valid, C-3 Infracost delta threshold). Broader runtime policies stay M6.
 - `gitea-runner/` -- the Actions runner; `depends_on = [module.flux]`.
 - `openchoreo-environments/` -- the two Environment CRDs.
 - `external-secrets-wiring/` -- wires OpenBao into `external-secrets` for per-app secret delivery.
+- `local-registry/` -- local Gitea OCI registry routing and auth.
+- `observability/` -- M3 SigNoz + OTEL collector for traces and metrics.
+- `cost/` -- M4 Prometheus + OpenCost for namespace-level cost allocation.
 
 ### Locked-in tool list (canonical) vs M2 additions
 
-The user's Integration & Delivery stack is fixed: **Gitea + Backstage Software Catalog & Score + OpenTofu + Gitea Actions + an OCI registry**. Roadmap tables in `PROJECT_SUMMARY.md` are drafts -- never treat their rows as decided. The implemented M2 image path uses the dedicated in-cluster `local-registry` module. Two explicit additions for M2 are:
+The user's Integration & Delivery stack is fixed: **Gitea + Backstage Software Catalog & Score + OpenTofu + Gitea Actions + Gitea OCI Registry**. Roadmap tables in `PROJECT_SUMMARY.md` are drafts -- never treat their rows as decided. Two explicit additions for M2 are:
 - Flux (cluster add-ons drift only; explicit approval 2026-04-20)
 - OPA/Gatekeeper (pipeline-scoped only, pulled forward from M6)
 
-Infracost lives in Observability; in M2 it is used pre-deploy for PR cost comments. Its post-deploy dashboard role is deferred to M3/M4.
+Infracost lives in Observability; in M2 it is used pre-deploy for PR cost comments. Its post-deploy dashboard role is handled by M4 OpenCost.
 
 ### Seed repos (`seed-repos/`)
 
@@ -164,7 +207,7 @@ Known gaps: `${resources.X.Y}` inline substitution is not implemented (see score
 
 ## Conventions
 
-- **Docs per module.** The canonical rule in `~/Projects/Sovereign/Structure/POLICIES.md` requires a Requirements, Design Spec, and Technical Spec for every project change. Milestone-specific packages live in `docs/specs/`.
+- **Docs per module.** The canonical rule in `~/Projects/Sovereign/Structure/POLICIES.md` requires a Requirements, Design Spec, and Technical Spec for every project change. M1, M2, M3, and M4 cost visibility each have three-doc packages in `docs/specs/`.
 - **Deterministic first.** Prefer deterministic logic; fall back to interpreted/scripted only when necessary.
 - **No emojis anywhere.** Enforced by `rr-emoji-guard`. Blank out any temptation to use them.
 - **No direct `tofu apply` from a Bash tool use.** Use install scripts. Plan and init are fine.
