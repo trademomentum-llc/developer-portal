@@ -1,0 +1,45 @@
+# Gitleaks ignore list -- false-positive suppressions only.
+#
+# All entries below suppress the `curl-auth-user` rule on lines where the
+# password is a RUNTIME command substitution (e.g. "gitea_admin:$(cat ...)"),
+# never a hardcoded secret. The flagged files are not modified; each
+# fingerprint pins the exact finding as reported by gitleaks 8.30.1.
+#
+# Format for git-history scans: <commit>:<file>:<rule>:<line>
+# Format for working-tree (dir) scans: <file>:<rule>:<line>
+# Both forms are listed so `gitleaks git`/`detect` and `gitleaks dir`
+# (the rr-verify-guard push check) both stay clean.
+
+# --- git-history fingerprints (gitleaks git / detect) ---
+# scripts/smoke-actions.sh (commit d3e9fb9)
+d3e9fb9b34bf771a738eeb247f852dced193ef08:scripts/smoke-actions.sh:curl-auth-user:5
+d3e9fb9b34bf771a738eeb247f852dced193ef08:scripts/smoke-actions.sh:curl-auth-user:14
+# scripts/ci/post-infracost-comment.sh (commit de3f383)
+de3f3837d6c745b41274e7ee3f1107e5a59b9e1f:scripts/ci/post-infracost-comment.sh:curl-auth-user:8
+# docs/specs/m2-iac-cd/technical-specification.md (commit 41db8f0)
+41db8f08e005b5643bebaa175bf34d0afff48b39:docs/specs/m2-iac-cd/technical-specification.md:curl-auth-user:1543
+41db8f08e005b5643bebaa175bf34d0afff48b39:docs/specs/m2-iac-cd/technical-specification.md:curl-auth-user:1549
+# docs/superpowers/plans/2026-04-20-m2-iac-cd.md (commit 3392c3e)
+3392c3edc439fbdf66aa4fd3772ef04d63c22924:docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3114
+3392c3edc439fbdf66aa4fd3772ef04d63c22924:docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3381
+3392c3edc439fbdf66aa4fd3772ef04d63c22924:docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3390
+3392c3edc439fbdf66aa4fd3772ef04d63c22924:docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3468
+3392c3edc439fbdf66aa4fd3772ef04d63c22924:docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3502
+3392c3edc439fbdf66aa4fd3772ef04d63c22924:docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3512
+3392c3edc439fbdf66aa4fd3772ef04d63c22924:docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3546
+3392c3edc439fbdf66aa4fd3772ef04d63c22924:docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3553
+
+# --- working-tree fingerprints (gitleaks dir) ---
+scripts/smoke-actions.sh:curl-auth-user:5
+scripts/smoke-actions.sh:curl-auth-user:14
+scripts/ci/post-infracost-comment.sh:curl-auth-user:8
+docs/specs/m2-iac-cd/technical-specification.md:curl-auth-user:1535
+docs/specs/m2-iac-cd/technical-specification.md:curl-auth-user:1541
+docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3147
+docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3414
+docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3423
+docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3501
+docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3535
+docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3545
+docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3579
+docs/superpowers/plans/2026-04-20-m2-iac-cd.md:curl-auth-user:3586

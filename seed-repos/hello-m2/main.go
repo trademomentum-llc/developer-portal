@@ -145,6 +145,7 @@ func main() {
 			r = r.WithContext(ctx)
 		}
 
+		// nosemgrep: go.lang.security.audit.xss.no-fprintf-to-responsewriter.no-fprintf-to-responsewriter -- demo endpoint prints only server-side env values (secret redacted) as plaintext; no request-controlled input, no HTML context; cluster-internal demo behind OpenChoreo
 		fmt.Fprintf(w, "hello from hello-m2 env=%s secret=%s\n",
 			os.Getenv("ENVIRONMENT"),
 			redact(os.Getenv("EXAMPLE_SECRET")),
@@ -153,6 +154,7 @@ func main() {
 
 	addr := ":8080"
 	log.Printf("listening on %s", addr)
+	// nosemgrep: go.lang.security.audit.net.use-tls.use-tls -- cluster-internal demo service behind OpenChoreo; no external exposure, TLS terminates at the Envoy gateway per M4 networking
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 

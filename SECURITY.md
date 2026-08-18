@@ -69,6 +69,22 @@ Priority order for inbound reports and scanner findings:
 Material UI v4 deprecation notices and similar non-CVE deprecations are tracked
 as upgrade debt, not as security emergencies.
 
+## Known residual advisories
+
+Accepted residual risks, recorded with evidence and review dates:
+
+- **react-router / react-router-dom 6.30.4** (Backstage app dependencies and
+  exact Yarn resolution pins) -- three moderate advisories:
+  GHSA-wrjc-x8rr-h8h6 (>=6.0.0 <7.18.0), GHSA-337j-9hxr-rhxg
+  (>=6.4.0 <7.18.0), GHSA-jjmj-jmhj-qwj2 (>=6.30.2 <=6.30.4). No fixed 6.x
+  exists (max published 6.x = 6.30.4, verified via `npm view` 2026-08-18);
+  v7 is outside every installed `@backstage/*` peer range (`^6.30.2`), so
+  forcing v7 was rejected as an unsupported major against all Backstage peer
+  declarations. Remediation path: upstream Backstage shipping v7-compatible
+  peer ranges. Accepted 2026-08-18.
+- **@material-ui/core v4** deprecation -- tracked as upgrade debt, not a
+  security emergency (see "What we fix first" above).
+
 ## Controls in this repository
 
 ### Publication gate (`rr-verify-guard`)
