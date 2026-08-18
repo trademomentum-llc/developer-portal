@@ -28,6 +28,33 @@ Delivered and critic-approved:
   U16, U17 -- re-run when Colima/k3d is up). Certificate re-issued as
   `PRC-developer-portal-2026-08-18-r3`. Critic-approved, zero defects.
 
+## 2026-08-18 Tier-1/Tier-2 execution -- DONE
+
+The user approved the decision batch (Tier 1 with backup + staged-commit
++ zero-medium+ condition; Tier 2 blessed; Tier 3 = security plane pulled
+forward). Outcome:
+
+- Backup catalogue: `~/Projects/Sovereign/backups/developer-portal/
+  2026-08-18/` (verified, sha256-recorded).
+- 7 cluster-blocked U-rows resolved live; provenance at 192 entries, 3
+  U-rows (U7/U19/U25); certificate r6.
+- Repo-local SSH signing on user-designated `~/.ssh/id_ed25519_pqc`.
+- 12 signed commits on main (d85e568..82783ee, all %G?=G), per-stage
+  full-spectrum checks; the final sweep initially failed the zero-medium+
+  gate, was remediated (19/22 advisories eliminated, vm2 eradicated,
+  yarn 4.18.0 + npmMinimalAgeGate, 6 CI actions SHA-pinned, .gitleaksignore,
+  govulncheck clean in all 8 Go roots), and closed with S11/S12.
+- First signed checkpoint tag `checkpoint-2026-08` pushed to origin
+  (gitea.com) AND github -- immutable-record anchoring live; gitea.com
+  push auth proven working (old blocker resolved).
+- Gate caveat: 3 react-router 6.30.4 moderates remain as a documented
+  accepted risk (no fixed 6.x; v7 outside all @backstage peer ranges;
+  remediation = upstream Backstage v7 support). See SECURITY.md "Known
+  residual advisories".
+- User actions remaining: branch protection on gitea.com (OQ-06);
+  rotate .env.local Vercel OIDC token if ever shared (local-only,
+  gitignored).
+
 ## 2026-08-18 Active goal: five-plane collaborative portal
 
 Goal-mode directive now in progress. Required planes: observation
