@@ -7,7 +7,7 @@
     {
       "name": "rr-policy-guards",
       "source": "./plugins/rr-policy-guards",
-      "description": "Four PreToolUse guards enforcing Rational Reserve platform rules: rr-emoji-guard (pure-ASCII file writes), rr-bash-guard (no bare $VAR expansion), rr-brew-guard (supply-chain-risky brew flags/URL installs/untrusted taps), rr-tofu-guard (no direct tofu apply/destroy/import from a Bash tool use). Bypass env vars per-guard; every use audit-logged to ~/.rational-reserve/logs/."
+      "description": "Six PreToolUse guards enforcing Rational Reserve platform rules: rr-emoji-guard (pure-ASCII file writes), rr-bash-guard (no bare $VAR expansion), rr-brew-guard (supply-chain-risky brew flags/URL installs/untrusted taps), rr-tofu-guard (no direct tofu apply/destroy/import from a Bash tool use), rr-commit-guard (staged-file and commit-message policy), rr-verify-guard (CI-equivalent verification before commit/push; no bypass path). No message-tag waivers; the other five guards carry an audit-logged RR_<NAME>_GUARD_BYPASS env var. Every use audit-logged to ~/.rational-reserve/logs/."
     }
   ]
 }

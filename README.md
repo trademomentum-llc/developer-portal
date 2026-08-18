@@ -39,7 +39,7 @@ Stops all services, deletes the k3d cluster, removes credentials. Preserves sour
 
 ## Policy Guards
 
-Four PreToolUse hooks enforce safety in Claude Code sessions:
+Six PreToolUse guards enforce safety in Claude Code sessions (the four below plus `rr-commit-guard` and `rr-verify-guard`; full set in `plugins/rr-policy-guards/`, registered via `.claude-plugin/marketplace.json`):
 
 - **rr-emoji-guard** -- blocks non-ASCII in file writes
 - **rr-bash-guard** -- blocks bare $VAR expansion, suggests safe syntax

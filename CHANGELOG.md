@@ -19,5 +19,5 @@ All notable changes to this repository are tracked here.
 
 ### Known Issues
 
-- `git push gitea-com main` reaches `gitea.com` but fails authentication until the cloud Gitea credential/PAT is refreshed.
+- `git push gitea-com main` reaches `gitea.com` but fails authentication until the cloud Gitea credential/PAT is refreshed. **Stale as of 2026-08-18:** `origin` and `gitea-com` now point at `https://gitea.com/trademomentum.net/developer-portal.git` (gitea.com SaaS), `github` is the trademomentum-llc mirror, local Gitea `localhost:3333` is not a configured remote, and HEAD `67a17f9` is fetch-verified in sync with `origin` (`git ls-remote`); push itself remains UNVERIFIED.
 - `yarn npm audit --all --recursive` reports existing critical/high Backstage dependency advisories; no dependency files changed in the Backstage catalog work.

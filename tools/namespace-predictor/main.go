@@ -15,7 +15,7 @@ const (
 	separator     = "-"
 )
 
-// sanitizeName mirrors openchoreo/internal/dataplane/kubernetes.name.go.
+// sanitizeName mirrors openchoreo/internal/dataplane/kubernetes/name.go.
 func sanitizeName(name string) string {
 	name = strings.ToLower(name)
 	var sanitized []rune
