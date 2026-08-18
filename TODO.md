@@ -2,7 +2,84 @@
 
 > Action list ordered by priority and dependency.
 
-**Snapshot date:** 2026-06-30
+**Snapshot date:** 2026-06-30 (2026-08-18 addendum prepended)
+
+---
+
+## 2026-08-18 Attribution and provenance package -- DONE
+
+Standing directive: every project with third-party software keeps a
+license file + provenance listing + provenance recognition certificate.
+Delivered and critic-approved:
+
+- `THIRD-PARTY-LICENSES.md` -- full third-party inventory, 8 groups.
+- `provenance/PROVENANCE.md` -- 189 evidenced entries + 25 openly
+  recorded UNVERIFIED gaps (U1-U25).
+- `provenance/PROVENANCE-RECOGNITION-CERTIFICATE.md` --
+  `PRC-developer-portal-2026-08-18-r2`, self-attested, SHA-256 digests
+  embedded; regenerate listing + re-issue certificate on any dependency
+  change.
+- `AGENTS.md` Conventions -- attribution triple recorded as portfolio
+  practice.
+- All uncommitted in the working tree.
+- 2026-08-18 resolution pass: the 25 UNVERIFIED rows (U1-U25) were
+  worked through with hard evidence. 15 fully resolved, 4 narrowed (U7,
+  U11, U19, U25), 6 blocked by the stopped cluster (U8, U9, U12, U13,
+  U16, U17 -- re-run when Colima/k3d is up). Certificate re-issued as
+  `PRC-developer-portal-2026-08-18-r3`. Critic-approved, zero defects.
+
+## 2026-08-18 Active goal: five-plane collaborative portal
+
+Goal-mode directive now in progress. Required planes: observation
+(telemetry), control (project files), orchestration (toolsets), security
+(threat intelligence), engagement (execution testing) -- plus record
+immutability for all project documents. Execution rule: break work into
+manageable tasks, assign to single-task subagents, critic review,
+correct, re-review; no agent drift, no assumptions, no fabrication.
+
+Next slices (in order):
+1. Five-plane portal roadmap -- **DONE 2026-08-18** --
+   `docs/specs/2026-08-18-Five-Plane-Collaborative-Portal-Requirements.md`:
+   evidence-backed current state for all five planes, 53 gap registers,
+   5x5 traversal matrix (12 breakdowns), 40 FRs + 10 NFRs, 45 PROPOSED
+   components (locked-stack boundary restated; nothing decided), 4
+   RECOMMENDED phases, 31 open questions (OQ-19 security vertical slice =
+   explicit user decision). Critic-approved after correction pass.
+2. Record-immutability mechanism for project documents -- **TRIAD DONE
+   2026-08-18** -- `docs/specs/2026-08-18-Record-Immutability-
+   {Requirements,Design-Specification,Technical-Specification}.md`
+   (12 FRs, 7 NFRs, 8 OQs incl. OQ-08 proposed-amendment; 10 design
+   elements; 12-section implementation-grade tech spec; critic-approved
+   round 2). Mechanism: git history + no-rewrite policy enforced by
+   guards (IN-H-001 amend block, --pre-push non-ff block) + commit
+   signing + signed checkpoint tags to a second remote + ADRs +
+   append-only JOURNAL.md. REMAINING: implementation per the tech spec's
+   12-step rollout, gated on user decisions OQ-01..OQ-08 (signing key
+   choice/generation, checkpoint cadence, OTS on/off, guard-log chaining
+   scope, git-fix-*.sh disposition, gitea.com branch protection, baseline
+   commit approval, emergency-rewrite proposal).
+3. Anomaly cleanup (from the provenance/immutability passes) -- **DONE
+   2026-08-18** (critic-approved, 3 rounds): marketplace.json six-guard
+   truth, rr-policy-guards README (phantom files, rotation, bypass
+   reality at :16), dead minimatch pins removed, namespace-predictor
+   comment typo, stale remote-topology entries annotated (history
+   preserved), root README guard count; certificate re-issued r4.
+   Deferred: SigNoz localhost:8080 links (gated on OQ-03); pre-existing
+   TODO.md em-dashes (cosmetic).
+4. Guard enforcement implementation per RECORD-IMMUTABILITY-TECH-001
+   (IN-H-001 amend block + --pre-push force-push block + tests) --
+   **DONE 2026-08-18** (critic-approved; 63/63 tests; e2e vs real git;
+   installer updated but NOT run -- activation is a user action;
+   compound-hidden-amend residual accepted and documented).
+5. Rationale-layer instantiation per TECH-001 s6/s7 -- **DONE
+   2026-08-18** (critic-approved): docs/adr/ (TEMPLATE.md, ADR-0001
+   accepted, index) + docs/JOURNAL.md (13 [seed] entries, all facts
+   line-checked by the critic). Checkpoint script done earlier same day
+   (10/10 tests). UNGATED WORK EXHAUSTED -- everything below is gated.
+6. Plane build-out per roadmap phases, gated on the 31 open questions.
+   NOTE: ungated code slices are now exhausted -- remaining work needs
+   the user's decision batch (immutability OQ-01..08, roadmap OQs,
+   Colima start for the 6 cluster-blocked provenance rows).
 
 ---
 
@@ -105,7 +182,7 @@ What was proved on 2026-05-02: a push to `openchoreo/hello-m2` triggers CI, CI b
 | T21 install-m2.sh end-to-end | DONE 2026-05-02 | Cluster healthy with all M2 namespaces; tofu apply ran successfully; m2i-1..m2i-6 closed |
 | T22 first pipeline run on hello-m2 | DONE 2026-05-22 | Run #24 succeeded from push through image build, platform-config commit, Flux apply, OpenChoreo Ready ReleaseBinding, and Running data-plane pod |
 | Score2openchoreo renderer rewrite | DONE 2026-05-17 | Emits Component + SecretReference + Workload multi-doc YAML; Go tests, score smoke, and live server-side dry-run passed |
-| Push to gitea-com | BLOCKED 2026-05-23 | 2026-05-21 push could not connect to `gitea.com:443`; 2026-05-23 retry reached `gitea.com` but failed authentication. Refresh the cloud Gitea credential/PAT before retrying. |
+| Push to gitea-com | BLOCKED 2026-05-23 | 2026-05-21 push could not connect to `gitea.com:443`; 2026-05-23 retry reached `gitea.com` but failed authentication. Refresh the cloud Gitea credential/PAT before retrying. **Updated 2026-08-18:** `origin`/`gitea-com` = `https://gitea.com/trademomentum.net/developer-portal.git` (gitea.com SaaS), local Gitea `localhost:3333` is not a configured remote, HEAD `67a17f9` fetch-verified in sync with `origin`, push UNVERIFIED; see "Push / remote resolution -- update". |
 | Push to local Gitea origin | DONE 2026-05-21 | Created `openchoreo/developer-portal` in local Gitea and pushed `main` through the localhost:3333 port-forward |
 
 ---
@@ -212,6 +289,13 @@ The 2026-04-21 entry suggested gitea.com URL had embedded credentials. As of 202
 - osxkeychain caches credentials but expires when PATs are revoked
 
 origin (local Gitea) now points at `http://localhost:3333/openchoreo/developer-portal.git` and has received `main`. gitea-com push is blocked by cloud authentication as of 2026-05-23; the remote is reachable but rejected the cached credential.
+
+**2026-08-18 verified current state (supersedes the 2026-05-02 and 2026-05-23 notes above):**
+
+- `origin` = `https://gitea.com/trademomentum.net/developer-portal.git` (gitea.com SaaS, not local Gitea); the `gitea-com` remote carries the same URL
+- `github` = `https://github.com/trademomentum-llc/developer-portal.git` (trademomentum-llc mirror)
+- local Gitea `localhost:3333` is NOT a configured remote today
+- HEAD `67a17f9` fetch-verified in sync with `origin` (`git ls-remote`); push NOT tested (UNVERIFIED)
 
 ---
 

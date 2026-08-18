@@ -4,8 +4,173 @@
 > what is now committed that was not before, what is still outstanding, and
 > exactly what to do first.
 
-**Last updated:** 2026-06-30
-**Reason for handoff:** M3 Production Multi-Angle Visibility and M4 cost visibility are live. `./scripts/smoke-all.sh` reports `ALL SMOKE SUITES PASSED (M2, M3, M4)`. `AGENTS.md` has been refreshed with current commands, module list, and port-forwards.
+**Last updated:** 2026-08-18
+**Reason for handoff:** Attribution/provenance package landed (see section 0). M3 Production Multi-Angle Visibility and M4 cost visibility remain live; `./scripts/smoke-all.sh` previously reported `ALL SMOKE SUITES PASSED (M2, M3, M4)`.
+
+---
+
+## 0. 2026-08-18 addendum -- provenance package (this session)
+
+Landed under a goal-mode directive (five-plane collaborative portal +
+record immutability + mandatory attribution practice). The attribution
+triple now exists and passed an adversarial critic review:
+
+- `THIRD-PARTY-LICENSES.md` -- expanded from 5 entries to the full
+  third-party inventory in 8 groups.
+- `provenance/PROVENANCE.md` -- 189 evidenced entries (version/pin,
+  upstream URL, SPDX license, copyright holder, usage mode, repo evidence
+  path) plus 25 openly recorded UNVERIFIED gaps (U1-U25).
+- `provenance/PROVENANCE-RECOGNITION-CERTIFICATE.md` -- certificate
+  `PRC-developer-portal-2026-08-18-r2`, self-attested, SHA-256 integrity
+  digests of the two files above embedded; supersede/revocation rule
+  recorded.
+- `AGENTS.md` Conventions -- the attribution triple is now recorded as
+  standing portfolio practice.
+
+State notes:
+- All of the above is UNCOMMITTED (working tree only), along with a
+  pre-existing uncommitted edit to
+  `plugins/rr-policy-guards/tools/verify-guard/main.go` and untracked
+  `.claude/` that predate this session.
+- Git log moved since the 2026-06-30 handoff below: HEAD is now
+  `67a17f9 fix(security): patch Dependabot moderate/high dependency
+  alerts` (security sync commits `3c8cd30`, `24c33fb` precede it).
+  Section 2's git-state block reflects 2026-06-30.
+- 2026-08-18 (same session, second slice): five-plane portal roadmap
+  requirements doc landed at
+  `docs/specs/2026-08-18-Five-Plane-Collaborative-Portal-Requirements.md`
+  -- evidence-backed current state for all five planes (observation,
+  control, orchestration, security, engagement), 53 gap registers,
+  5x5 traversal matrix with 12 breakdowns, 40 FRs + 10 NFRs, 45 PROPOSED
+  candidate components (nothing decided outside the locked stack), 4
+  RECOMMENDED phases, 31 open questions (OQ-19 security vertical slice
+  flagged as an explicit user decision). Critic-approved after a
+  correction pass. Uncommitted like the rest.
+- 2026-08-18 (same session, third slice -- user-directed): resolved the
+  25 UNVERIFIED gap rows (U1-U25) in `provenance/PROVENANCE.md` via five
+  evidence-forced resolver bundles. Outcome: 15 fully resolved and
+  removed, 4 narrowed (U7, U11, U19, U25), 6 blocked by an unreachable
+  cluster (U8, U9, U12, U13, U16, U17 -- Colima stopped; re-run when
+  the cluster is up). Corrections applied: uuid holder (Robert Kieffer
+  and other contributors), alpine:3.20 full 14-package license
+  enumeration, golang:1.26-alpine now Alpine 3.24.1-based (stale claim
+  fixed), Semgrep Inc. (no comma), Cilium eBPF SPDX wording, Score
+  schema upstream commit pinned (3ecb17d430c2..., byte-identical).
+  Certificate re-issued as `PRC-developer-portal-2026-08-18-r3`
+  (digests: TPL 1c5ee689..., PROVENANCE 66173422...). Critic round 3:
+  APPROVE, zero defects. Cross-document anomalies surfaced to the user:
+  sibling openchoreo checkout is ABSENT on this machine (contradicts
+  AGENTS.md/PROJECT_SUMMARY.md); .claude-plugin/marketplace.json is
+  stale (says four guards + bypass vars; reality is six, no bypass);
+  minimatch descriptor pins at backstage/package.json:67-70 are dead
+  config shadowed by the bare pin at :93; tools/namespace-predictor/
+  main.go:18 comment cites a wrong upstream path.
+- 2026-08-18 (same session, fourth slice): Record Immutability spec
+  pair landed and critic-approved (2 rounds, 8 minor corrections, one
+  critic error adjudicated against the critic on evidence):
+  - `docs/specs/2026-08-18-Record-Immutability-Requirements.md`
+    (RECORD-IMMUTABILITY-REQ-001: 12 FRs, 7 NFRs, 7 OQs)
+  - `docs/specs/2026-08-18-Record-Immutability-Design-Specification.md`
+    (RECORD-IMMUTABILITY-DES-001: 10 design elements, 5 layers, 3
+    phases, full traceability)
+  Mechanism in one line: git history as the record + a no-rewrite policy
+  enforced by guards (commit-guard amend block via the already-parsed
+  inv.Amend; new pre-push non-fast-forward block) + commit signing and
+  signed checkpoint tags anchored to a second remote + ADRs (Nygard) and
+  an append-only docs/JOURNAL.md as the rationale/training-log corpus.
+  Considered-and-rejected recorded with reasoning: Merkle infra, Rekor,
+  sha256 repo migration, in-toto/SLSA. GATE: implementation waits on 7
+  user decisions (OQ-01..OQ-07), most importantly OQ-07 (commit the
+  uncommitted baseline -- needs commit approval) and OQ-01 (SSH vs GPG
+  signing key -- user generates). Also recorded: five of six guards
+  carry a live bypass var (verify-guard is the test-pinned exception),
+  contradicting AGENTS.md's no-bypass claim.
+- 2026-08-18 (same session, fifth slice): Record Immutability triad
+  COMPLETE and critic-approved. Third document landed:
+  `docs/specs/2026-08-18-Record-Immutability-Technical-Specification.md`
+  (RECORD-IMMUTABILITY-TECH-001, 12 sections, implementation-grade:
+  commit-guard amend block as new rule family IN-H-001 placed before the
+  bypass check so it cannot be bypassed; fourth `--pre-push` guard mode
+  with full stdin ref-update parsing and zero-sha edge cases;
+  scripts/checkpoint-immutability.sh with signed-tag chaining that
+  refuses unsigned tags; decision-neutral SSH/GPG signing config;
+  Nygard ADR system incl. full ADR-0001 draft; docs/JOURNAL.md templates;
+  phase-2 guard-log hash chaining sketch; 50-test-grounded test plan;
+  12-step gated rollout). Critic round 1 found one BLOCKER: the
+  emergency-rewrite hatch (orchestrator-briefed) contradicted approved
+  REQ-001 FR-003 / DES-001 s4 -- reframed as PROPOSED amendment OQ-08,
+  NOT APPROVED, excluded from rollout. Critic round 2: APPROVE; the
+  critic also empirically reproduced and withdrew its own M6 claim
+  (git tag --sort=-version:refname handles -r2/-r10 correctly; its
+  suggested replacement would have introduced a real bug).
+- 2026-08-18 (same session, sixth slice): anomaly cleanup DONE and
+  critic-approved (3 rounds). Fixed: .claude-plugin/marketplace.json (4
+  guards + bypass advertising -> six guards + five-of-six bypass
+  reality); plugins/rr-policy-guards/README.md (phantom
+  plugin.json/hooks/hooks.json layout refs, packaged-config pointer,
+  bash-rotation overstatement, and the round-2 catch at :16 "no bypass
+  variables" -> five-of-six + verify-guard exception); backstage/
+  package.json (four dead descriptor-scoped minimatch pins removed;
+  resolution no-op, yarn.lock untouched); tools/namespace-predictor/
+  main.go:18 (comment path typo -> internal/dataplane/kubernetes/
+  name.go; go vet + canonical vector verified); TODO.md/CHANGELOG.md
+  stale gitea-com-blocked/origin entries (dated annotations appended,
+  history preserved, push status honestly UNVERIFIED); root README.md:42
+  (four hooks -> six guards). Certificate re-issued r4
+  (PRC-developer-portal-2026-08-18-r4; PROVENANCE.md digest
+  a6c647b7..., TPL digest unchanged) after the U7 row recorded the
+  main.go correction. NOT done: ObservabilityLinksCard localhost:8080
+  (gated on roadmap OQ-03 canonical SigNoz path); TODO.md pre-existing
+  em-dashes (cosmetic, pre-existing).
+- 2026-08-18 (same session, seventh slice): guard enforcement
+  IMPLEMENTED and critic-approved per RECORD-IMMUTABILITY-TECH-001.
+  rr-commit-guard gained: (a) IN-H-001 amend block in PreToolUse mode,
+  placed before the bypass check so it cannot be bypassed (bypass-ignored
+  test-pinned); (b) fourth mode `--pre-push` with IN-H-002 blocking
+  deletion of main and non-fast-forward updates of main (githooks(5)
+  stdin parsing, merge-base --is-ancestor, fail-closed incl. the
+  lost-race case); new git-hooks/pre-push wrapper (no bypass comments)
+  + installer updated to three hooks (NOT run -- activation stays with
+  the user; .git/hooks untouched). Tests: 63/63 pass (50 pre-existing +
+  13 new); e2e against real git verified independently by the critic;
+  binary rebuilt at plugins/rr-policy-guards/bin/rr-commit-guard.
+  README three-hook text + layout tree updated. ACCEPTED RESIDUAL
+  (documented): IN-H-001 fires only when `git commit --amend` is the
+  leading invocation; a compound-hidden amend (e.g. `git add x && git
+  commit --amend`) passes the PreToolUse gate -- same risk class as a
+  raw-terminal amend; IN-H-002 blocks publishing it to main at push
+  time; extractor widening deferred to the commit-guard's own spec.
+  AGENTS.md rr-commit-guard row updated to match.
+- 2026-08-18 (same session, eighth slice): checkpoint script
+  IMPLEMENTED and critic-approved per TECH-001 s4/s10:
+  `scripts/checkpoint-immutability.sh` (signed annotated
+  checkpoint-YYYY-MM tags, prev:-chained via the M6-adjudicated
+  --sort=-version:refname, refuses unsigned tags AND refuses when
+  either origin/github remote is missing -- preflight added after the
+  critic's MINOR-1; verify-before-push; dry-run via env var or
+  --dry-run) plus `scripts/tests/test-checkpoint-immutability.sh`
+  (10/10 PASS: refusal, signed happy path vs throwaway SSH key, -r2
+  rerun chaining, base/-r2/-r10 -> chains to -r10, dual-remote push,
+  missing-remote refusal, dry-run purity, bash -n + shellcheck).
+  Real repo untouched (zero checkpoint tags, no config changes, .git/
+  hooks untouched). AGENTS.md gained a Record immutability command note.
+- 2026-08-18 (same session, ninth slice): rationale layer INSTANTIATED
+  and critic-approved per TECH-001 s6/s7: docs/adr/ (TEMPLATE.md --
+  consumes no decision number; 0001-record-architecture-decisions.md --
+  accepted 2026-08-18; README.md index) and docs/JOURNAL.md (header +
+  13 [seed]-marked retrospective entries: origin, M1-M4, and the eight
+  2026-08-18 slices + this one; end-of-seed-block marker bars
+  non-contemporaneous appends). Critic line-checked every seed-entry
+  fact against the state docs and live artifacts: all accurate.
+  Files-only; OQ-07 (baseline commit) remains genuinely open.
+- UNGATED WORK IS NOW EXHAUSTED. Remaining: everything is gated on the
+  user's decision batch (presented 2026-08-18, turn 2 of waiting):
+  Tier 1 = OQ-07 baseline commit approval, OQ-01 signing key (SSH
+  recommended; user generates), Colima start (6 provenance U-rows +
+  smokes). Tier 2 = OQ-02..06, OQ-08 (recommendations recorded in TODO/
+  session report). Tier 3 = roadmap OQ-19/15/20/25/03 + Phase 1
+  approval. If the batch stays unanswered next turn, mark the goal
+  blocked (3-turn rule).
 
 ---
 

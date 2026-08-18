@@ -121,6 +121,13 @@ Do not invent a "clean slate" path. If an install script fails mid-way, the bloc
 ./scripts/smoke-all.sh            # unified AUTH + M2 + M3 + M4 + BACKSTAGE-PRODUCTION validation harness
 ```
 
+### Record immutability
+
+```
+./scripts/checkpoint-immutability.sh [--dry-run]   # monthly signed checkpoint-YYYY-MM tag (chains prev:, pushes to origin AND github); refuses unsigned
+./scripts/tests/test-checkpoint-immutability.sh    # integration tests in throwaway scratch repos (never touches the real repo or git config)
+```
+
 M4 networking uses Envoy Gateway on the existing cluster. Cilium as the CNI is implemented as a documented fresh-cluster rebuild path (`docs/specs/2026-06-30-M4-Networking-Technical-Specification.md`) rather than an in-place Flannel replacement.
 
 Required port-forwards for local Backstage dev (managed by `scripts/start-backstage.sh`):
@@ -144,7 +151,7 @@ Required port-forwards for local Backstage dev (managed by `scripts/start-backst
 | rr-bash-guard  | Bash | Unquoted `$VAR` or `${VAR}` expansion; quoted expansion is allowed |
 | rr-brew-guard  | Bash | Dangerous brew flags, URL installs, untrusted taps |
 | rr-tofu-guard  | Bash | `tofu apply \| destroy \| import` only; a fast `IsTofuCommandPrefix` gate skips the quote-aware tokenizer for non-tofu commands so heredocs with apostrophes or the word "tofu" in data no longer false-positive |
-| rr-commit-guard | Bash | Staged-file and commit-message policy, including commits inside compound shell commands |
+| rr-commit-guard | Bash | Staged-file and commit-message policy, including commits inside compound shell commands; `git commit --amend` (IN-H-001, no bypass); in `--pre-push` hook mode, non-fast-forward updates and deletion of `refs/heads/main` (IN-H-002, no bypass) |
 | rr-verify-guard | Bash | CI-equivalent verification for commits and fresh Semgrep, Gitleaks, dependency SCA (yarn/npm audit high+, govulncheck), and quality gates for every clean push |
 
 Mandatory guards have no bypass variables or message-tag waivers. Commit and verification guards inspect every Bash request internally so compound commands cannot evade prefix matching. Use the Bash working directory or one explicit `git -C PATH`; directory-changing commit or push commands fail closed. Hooks load at session start, so changes require a session restart.
@@ -213,3 +220,5 @@ Known gaps: `${resources.X.Y}` inline substitution is not implemented (see score
 - **No direct `tofu apply` from a Bash tool use.** Use install scripts. Plan and init are fine.
 - **Runner label convention:** workflows use `runs-on: ubuntu-latest` even on the self-hosted `act-runner` (see memory `project_runner_labels`).
 - **Commit discipline:** all commits land on `main`; many commits may be unpushed pending remote-resolution decisions in TODO.md. Check `git log origin/main..HEAD` before assuming anything is published.
+- **Third-party attribution triple.** Every project in this portfolio that incorporates third-party software keeps three artifacts: `THIRD-PARTY-LICENSES.md` (licenses), `provenance/PROVENANCE.md` (per-component listing with repo evidence paths), and `provenance/PROVENANCE-RECOGNITION-CERTIFICATE.md` (credentialised recognition with SHA-256 digests of the other two). The listing is regenerated and the certificate re-issued whenever dependencies change; superseded certificates stay in git history.
+- **Attribution is never claimed.** Third-party works remain the property and achievement of their original authors under their original licenses; this portfolio records attribution, it does not take credit for others' work.
