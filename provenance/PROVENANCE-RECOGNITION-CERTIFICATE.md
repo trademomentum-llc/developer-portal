@@ -1,17 +1,18 @@
 # Provenance Recognition Certificate
 
-**Certificate ID:** PRC-developer-portal-2026-08-18-r5
+**Certificate ID:** PRC-developer-portal-2026-08-18-r6
 
-**Supersedes:** PRC-developer-portal-2026-08-18-r4 (same-day cluster
-resolution re-issue: the 7 cluster-blocked UNVERIFIED rows were resolved
-with live read-only evidence and folded into the listed entries -- Gitea,
-Envoy Gateway, act-runner, k3s, Gatekeeper deployed versions and images,
-plus cert-manager and Argo Workflows confirmed as sibling-managed live
-context; no components added or removed). r1, r2, r3, and r4 were all
-issued and superseded before the provenance package's first commit, so
-they exist in no retained history; the retention-in-git-history rule in
-the Revocation and update rule section applies to superseding events from
-the first commit onward.
+**Supersedes:** PRC-developer-portal-2026-08-18-r5 (same-day security
+remediation re-issue: six resolution pins bumped and three added in
+backstage/package.json, vendored Yarn bumped 4.4.1 -> 4.18.0 to gain
+npmMinimalAgeGate, golang.org/x module bumps in hello-m2, and the three
+CI actions pinned to commit SHAs; three new listed entries added in
+group 5, so the component total is 192, up from 189). Chain history:
+r1-r4 were issued and superseded before the provenance package's first
+commit and exist in no retained history; r5 is the first certificate
+generation to enter git history, at commit d85e568 (2026-08-18); the
+retention-in-git-history rule in the Revocation and update rule section
+is in force from r5 onward, so this r6 and r5 are both retained.
 
 ---
 
@@ -25,7 +26,7 @@ the first commit onward.
 
 ## Subject
 
-The third-party works recognized by this certificate are the 189
+The third-party works recognized by this certificate are the 192
 components listed in `provenance/PROVENANCE.md`, grouped as follows:
 
 | Group | Entries |
@@ -34,22 +35,22 @@ components listed in `provenance/PROVENANCE.md`, grouped as follows:
 | 2. Helm Charts and Container Images | 16 |
 | 3. IaC Providers | 5 |
 | 4. Go Tooling and Modules | 22 |
-| 5. Backstage and Node.js | 122 |
+| 5. Backstage and Node.js | 125 |
 | 6. CI/CD Actions and Images | 6 |
 | 7. Schemas and Specifications | 1 |
 | 8. Documentation Tooling | 2 |
-| **Total** | **189** |
+| **Total** | **192** |
 
 In addition, 3 UNVERIFIED items and honest gaps are recorded in the
 UNVERIFIED subsection of the listing (original U-numbers retained: U7,
-U19, U25). They are carried openly rather than guessed or hidden. A
-residual caveat carried forward from the closed U17 is recorded in the
-act-runner listed entry: the catthehacker/ubuntu:act-* CI job image
-exists only while a CI job is in flight; its tag is observable only
-during a CI run. cert-manager and Argo Workflows are confirmed live as
-sibling-openchoreo-managed components (v1.19.4 and v3.6.2, both
-Apache-2.0) but remain outside this repo's component scope -- no repo
-references -- and are explicitly not listed as components.
+U19, U25), one residual caveat carried forward from the closed U17 (the
+ephemeral catthehacker CI job image), and one documented accepted
+residual risk (react-router/react-router-dom 6.30.4, three moderate
+advisories, no fixed 6.x, v7 rejected as unsupported against all
+Backstage peer ranges; accepted 2026-08-18). cert-manager and Argo
+Workflows are confirmed live as sibling-openchoreo-managed components
+(v1.19.4 and v3.6.2, both Apache-2.0) but remain outside this repo's
+component scope and are not listed as components.
 
 ## Recognition statement
 
@@ -79,9 +80,9 @@ is `provenance/PROVENANCE.md`; this table is a summary, not a duplicate.
 | 1. Platform and Infrastructure | 15 | MPL-2.0, Apache-2.0, MIT, BSD-2-Clause (deployed k3s server v1.32.9+k3s1; k3d host binary v5.9.0) | github.com/opentofu/opentofu; github.com/openchoreo/openchoreo; github.com/kubernetes/kubernetes |
 | 2. Helm Charts and Container Images | 16 | Apache-2.0, MIT, BSD-3-Clause, PostgreSQL (Cilium userspace Apache-2.0 with eBPF objects dual GPL-2.0-only OR BSD-2-Clause); deployed versions firmed 2026-08-18: Gitea chart gitea-12.5.0 / app 1.25.4, Gatekeeper v3.17.1 (matches pin), Envoy gateway v1.3.1 with envoy distroless-v1.33.0, act_runner 0.3.1 with dind 29.4.0-dind | github.com/fluxcd/flux2; gitea.com/gitea/helm-chart; github.com/SigNoz/signoz; github.com/envoyproxy/gateway |
 | 3. IaC Providers | 5 | MPL-2.0 | github.com/hashicorp/terraform-provider-kubernetes; github.com/alekc/terraform-provider-kubectl |
-| 4. Go Tooling and Modules | 22 | BSD-3-Clause, Apache-2.0, MIT, LGPL-2.1, MIT AND Apache-2.0 | go.dev; github.com/go-yaml/yaml; github.com/open-telemetry/opentelemetry-go |
-| 5. Backstage and Node.js | 122 | Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, ISC, BlueOak-1.0.0, (MPL-2.0 OR Apache-2.0) | github.com/backstage/backstage; github.com/facebook/react; github.com/yarnpkg/berry |
-| 6. CI/CD Actions and Images | 6 | MIT, MPL-2.0, BSD-3-Clause, GPL-2.0-only, Apache-2.0, MPL-2.0 AND MIT, MIT AND BSD-2-Clause AND GPL-2.0-or-later, Zlib (alpine:3.20 fully enumerated 2026-08-18; floating-tag snapshot; node image Debian layer DFSG-free main-only, per-package list PARTIAL) | github.com/actions/checkout; hub.docker.com/_/golang; hub.docker.com/_/alpine; hub.docker.com/_/node |
+| 4. Go Tooling and Modules | 22 | BSD-3-Clause, Apache-2.0, MIT, LGPL-2.1, MIT AND Apache-2.0 (x/net v0.56.0, x/sys v0.46.0, x/text v0.39.0 as of 2026-08-18) | go.dev; github.com/go-yaml/yaml; github.com/open-telemetry/opentelemetry-go |
+| 5. Backstage and Node.js | 125 | Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, ISC, BlueOak-1.0.0, (MPL-2.0 OR Apache-2.0); 47 resolution override pins (six bumped, three added 2026-08-18; vm2 eliminated); vendored Yarn 4.18.0 with npmMinimalAgeGate "7d" | github.com/backstage/backstage; github.com/facebook/react; github.com/yarnpkg/berry |
+| 6. CI/CD Actions and Images | 6 | MIT, MPL-2.0, BSD-3-Clause, GPL-2.0-only, Apache-2.0, MPL-2.0 AND MIT, MIT AND BSD-2-Clause AND GPL-2.0-or-later, Zlib; actions SHA-pinned 2026-08-18 (checkout v4.4.0, setup-go v5.6.0, setup-opentofu v1.0.8); base images floating-tag snapshots | github.com/actions/checkout; hub.docker.com/_/golang; hub.docker.com/_/alpine; hub.docker.com/_/node |
 | 7. Schemas and Specifications | 1 | Apache-2.0 (vendored schema byte-identical to score-spec/spec commit 3ecb17d430c2bbf46d2dfc161fabc7d432d6d1f5) | github.com/score-spec/spec |
 | 8. Documentation Tooling | 2 | BSD-2-Clause, Apache-2.0 | github.com/mkdocs/mkdocs; github.com/backstage/mkdocs-techdocs-core |
 
@@ -91,9 +92,9 @@ SHA-256 digests computed with `shasum -a 256` at generation time
 (2026-08-18):
 
 - `THIRD-PARTY-LICENSES.md`:
-  `7f0bf49b8a1b17878ba579ea384596420c9c3554786fef309e3f303f78cd84d8`
+  `5ee898808d4fe1c81cb96d9583e47d53903861ecc73c9b841ec92515aee40f81`
 - `provenance/PROVENANCE.md`:
-  `0c6ba547b1412fc83470ba57e204b6b6f98a3fb3cf3f1ef8fa039bc30022fc38`
+  `e17d2ec5f43f144e029a62c6bcf232c1a6de58c55269dedbf7cecfd73d71dfd0`
 
 Any change to either file invalidates the corresponding digest and
 requires this certificate to be regenerated. Verify with:

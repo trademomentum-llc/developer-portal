@@ -32,7 +32,7 @@ are the authoritative complete dependency closure:
 
 Only two third-party artifacts are vendored (bytes committed in-repo): the
 Score JSON schema (`tools/score2openchoreo/assets/score.schema.json`) and
-the Yarn release (`backstage/.yarn/releases/yarn-4.4.1.cjs`). Everything
+the Yarn release (`backstage/.yarn/releases/yarn-4.18.0.cjs`). Everything
 else is fetched at install time (helm charts, tofu providers, brew/npx
 tools) or pulled at container runtime or image build time (container
 images; for example the `node:24-trixie-slim` base is pulled by
@@ -145,14 +145,14 @@ per-repo from the module cache at the exact pinned versions (2026-08-18).
 | 14 | github.com/go-logr/stdr (indirect) | v1.2.2 | https://github.com/go-logr/stdr | Apache-2.0 | go-logr contributors | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:16 |
 | 15 | github.com/google/uuid (indirect) | v1.6.0 | https://github.com/google/uuid | BSD-3-Clause | Google Inc. (2009, 2014) | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:17 |
 | 16 | github.com/grpc-ecosystem/grpc-gateway/v2 (indirect) | v2.29.0 | https://github.com/grpc-ecosystem/grpc-gateway | BSD-3-Clause | Gengo, Inc. (2015) | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:18 |
-| 17 | golang.org/x/net (indirect) | v0.55.0 | https://pkg.go.dev/golang.org/x/net | BSD-3-Clause (per-repo LICENSE at the pinned version; PATENTS file present) | The Go Authors (per-repo LICENSE first line: Copyright 2009 The Go Authors.) | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:23 |
-| 18 | golang.org/x/sys (indirect) | v0.45.0 | https://pkg.go.dev/golang.org/x/sys | BSD-3-Clause (per-repo LICENSE at the pinned version; PATENTS file present) | The Go Authors (per-repo LICENSE first line: Copyright 2009 The Go Authors.) | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:24 |
-| 19 | golang.org/x/text (indirect) | v0.37.0 | https://pkg.go.dev/golang.org/x/text | BSD-3-Clause (per-repo LICENSE at the pinned version; PATENTS file present) | The Go Authors (per-repo LICENSE first line: Copyright 2009 The Go Authors.) | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:25 |
+| 17 | golang.org/x/net (indirect) | v0.56.0 | https://pkg.go.dev/golang.org/x/net | BSD-3-Clause (per-repo LICENSE at the pinned version; PATENTS file present) | The Go Authors (per-repo LICENSE first line: Copyright 2009 The Go Authors.) | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:23 |
+| 18 | golang.org/x/sys (indirect) | v0.46.0 | https://pkg.go.dev/golang.org/x/sys | BSD-3-Clause (per-repo LICENSE at the pinned version; PATENTS file present) | The Go Authors (per-repo LICENSE first line: Copyright 2009 The Go Authors.) | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:24 |
+| 19 | golang.org/x/text (indirect) | v0.39.0 | https://pkg.go.dev/golang.org/x/text | BSD-3-Clause (per-repo LICENSE at the pinned version; PATENTS file present) | The Go Authors (per-repo LICENSE first line: Copyright 2009 The Go Authors.) | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:25 |
 | 20 | google.golang.org/genproto (googleapis/api + googleapis/rpc, indirect) | v0.0.0-20260526163538-3dc84a4a5aaa | https://github.com/googleapis/go-genproto | Apache-2.0 | Google LLC | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:26-27 |
 | 21 | google.golang.org/grpc (indirect) | v1.83.0 | https://github.com/grpc/grpc-go | Apache-2.0 | gRPC authors / Google LLC (CNCF) | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:28 |
 | 22 | google.golang.org/protobuf (indirect) | v1.36.11 | https://github.com/protocolbuffers/protobuf-go | BSD-3-Clause | The Go Authors (2018) / Google LLC | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:29 |
 
-## 5. Backstage and Node.js (122 entries)
+## 5. Backstage and Node.js (125 entries)
 
 `backstage/` was scaffolded with `@backstage/create-app` and tracks the
 Backstage release line 1.49.1. Scaffold-originating files are Apache-2.0;
@@ -174,7 +174,7 @@ Framework, scaffold, and package manager (3 entries):
 |---|---|---|---|---|---|---|---|
 | 1 | @backstage/create-app (scaffold tool) | unpinned (@latest at scaffold time; produced release line 1.49.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors (CNCF; originally Spotify AB) | scaffold origin | docs/specs/m1-substrate/technical-specification.md:693; scripts/install-m1.sh:270; THIRD-PARTY-LICENSES.md |
 | 2 | Backstage framework release line | 1.49.1 | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | scaffold origin (release manifest) | backstage/backstage.json:2 |
-| 3 | Yarn (vendored release) | 4.4.1 | https://github.com/yarnpkg/berry | BSD-2-Clause | Yarn Contributors (2016-present) | vendored | backstage/package.json:114; backstage/.yarnrc.yml:3; backstage/.yarn/releases/yarn-4.4.1.cjs |
+| 3 | Yarn (vendored release) | 4.18.0 (bumped from 4.4.1 on 2026-08-18 to gain npmMinimalAgeGate support; npmMinimalAgeGate: "7d" set at backstage/.yarnrc.yml:5) | https://github.com/yarnpkg/berry | BSD-2-Clause | Yarn Contributors (2016-present) | vendored | backstage/package.json:113; backstage/.yarnrc.yml:3; backstage/.yarn/releases/yarn-4.18.0.cjs |
 
 Root workspace devDependencies (11 entries; build/test tooling; installed
 version in parentheses):
@@ -277,12 +277,16 @@ Backend workspace dependencies (30 entries; backend runtime):
 | 77 | better-sqlite3 | ^12.0.0 (12.8.0) | https://github.com/WiseLibs/better-sqlite3 | MIT (bundles SQLite, public domain) | Joshua Wise | runtime dependency (dev database, app-config.yaml:43-45) | packages/backend/package.json:48 |
 | 78 | pg (node-postgres) | ^8.11.3 (8.20.0) | https://github.com/brianc/node-postgres | MIT | Brian Carlson | runtime dependency (production database, app-config.production.yaml:19-26) | packages/backend/package.json:50 |
 
-Resolution override pins (44 entries; security-override layer in
-backstage/package.json:51-103 applying repo-wide to all workspaces;
+Resolution override pins (47 entries; security-override layer in
+backstage/package.json:51-101 applying repo-wide to all workspaces;
 transitive-only packages. react-router, react-router-dom, and
 @types/react-dom also carry resolution pins and are listed in the app
 table above. Copyright holders are taken from the installed tarball
-LICENSE headers, verified 2026-08-18):
+LICENSE headers, verified 2026-08-18. Security remediation of
+2026-08-18: bumped undici, brace-expansion, fast-uri, dompurify, js-yaml,
+ip-address; added pins nanoid, file-type, typescript-json-schema (the
+last drops vm2, eliminating it from the tree); removed the four dead
+descriptor-scoped minimatch pins):
 
 | # | Component | Version/pin | Upstream URL | License (SPDX) | Copyright holder | Usage mode | Evidence |
 |---|---|---|---|---|---|---|---|
@@ -292,58 +296,61 @@ LICENSE headers, verified 2026-08-18):
 | 82 | @protobufjs/utf8 | ^1.1.1 (1.1.2) | https://github.com/protobufjs/protobuf.js | BSD-3-Clause | Daniel Wirtz (protobufjs) | runtime dependency (resolution override) | backstage/package.json:56 |
 | 83 | ws | ^8.21.0 (8.21.0) | https://github.com/websockets/ws | MIT | Einar Otto Stangvik | runtime dependency (resolution override) | backstage/package.json:57 |
 | 84 | axios | ^1.13.5 (1.19.0) | https://github.com/axios/axios | MIT | Matt Zabriskie and collaborators | runtime dependency (resolution override) | backstage/package.json:58 |
-| 85 | undici | ^7.28.0 (7.28.0) | https://github.com/nodejs/undici | MIT | Node.js contributors | runtime dependency (resolution override) | backstage/package.json:59 |
+| 85 | undici | ^7.29.0 (7.29.0) | https://github.com/nodejs/undici | MIT | Node.js contributors | runtime dependency (resolution override) | backstage/package.json:59 |
 | 86 | lodash | 4.18.1 | https://github.com/lodash/lodash | MIT | John-David Dalton / Lodash contributors | runtime dependency (resolution override) | backstage/package.json:62 |
 | 87 | protobufjs | 7.6.5 | https://github.com/protobufjs/protobuf.js | BSD-3-Clause | Daniel Wirtz | runtime dependency (resolution override) | backstage/package.json:63 |
 | 88 | shell-quote | 1.10.0 | https://github.com/ljharb/shell-quote | MIT | James Halliday | build dependency (resolution override) | backstage/package.json:64 |
 | 89 | websocket-driver | 0.7.5 | https://github.com/faye/websocket-driver-node | Apache-2.0 | James Coglan | runtime dependency (resolution override) | backstage/package.json:65 |
 | 90 | form-data | 4.0.6 | https://github.com/form-data/form-data | MIT | Felix Geisendoerfer and contributors | runtime dependency (resolution override) | backstage/package.json:66 |
-| 91 | minimatch | 9.0.9 (exactly one installed copy; exactly one yarn.lock resolution, line 25452) | https://github.com/isaacs/minimatch | ISC | Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:93; the descriptor-scoped pins at package.json:67-70 are dead config shadowed by the bare pin at :93 |
-| 92 | immutable | 4.3.9 | https://github.com/immutable-js/immutable-js | MIT | Lee Byron and contributors | runtime dependency (resolution override) | backstage/package.json:71 |
-| 93 | tar | 7.5.22 | https://github.com/isaacs/node-tar | BlueOak-1.0.0 | Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:72 |
-| 94 | linkify-it | 6.1.0 | https://github.com/markdown-it/linkify-it | MIT | Vitaly Puzrin (2015) | runtime dependency (resolution override) | backstage/package.json:73 |
-| 95 | fast-xml-builder | 1.3.0 | https://github.com/NaturalIntelligence/fast-xml-builder | MIT | Natural Intelligence (2026); author Amit Gupta | runtime dependency (resolution override) | backstage/package.json:74 |
-| 96 | brace-expansion | 5.0.8 | https://github.com/juliangruber/brace-expansion | MIT | Julian Gruber; TypeScript port Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:75 |
-| 97 | fast-uri | 4.1.1 | https://github.com/fastify/fast-uri | BSD-3-Clause | Vincent Le Goff | runtime dependency (resolution override) | backstage/package.json:76 |
-| 98 | postcss | 8.5.25 | https://github.com/postcss/postcss | MIT | Andrey Sitnik | build dependency (resolution override) | backstage/package.json:77 |
-| 99 | basic-ftp | 6.0.2 | https://github.com/patrickjuchli/basic-ftp | MIT | Patrick Juchli | runtime dependency (resolution override) | backstage/package.json:78 |
-| 100 | js-cookie | 3.0.8 | https://github.com/js-cookie/js-cookie | MIT | Klaus Hartl | runtime dependency (resolution override) | backstage/package.json:79 |
-| 101 | multer | 2.2.0 | https://github.com/expressjs/multer | MIT | Hage Yaapa, Jaret Pfluger, et al. | runtime dependency (resolution override) | backstage/package.json:80 |
-| 102 | http-proxy-middleware | 2.0.10 | https://github.com/chimurai/http-proxy-middleware | MIT | Steven Chim | build dependency (resolution override) | backstage/package.json:81 |
-| 103 | dompurify | 3.4.12 | https://github.com/cure53/DOMPurify | (MPL-2.0 OR Apache-2.0) | Mario Heiderich, Cure53 | runtime dependency (resolution override) | backstage/package.json:82 |
-| 104 | follow-redirects | 1.16.0 | https://github.com/follow-redirects/follow-redirects | MIT | Ruben Verborgh and contributors | runtime dependency (resolution override) | backstage/package.json:83 |
-| 105 | qs | 6.15.3 | https://github.com/ljharb/qs | BSD-3-Clause | Jordan Harband | runtime dependency (resolution override) | backstage/package.json:84 |
-| 106 | uuid | 11.1.1 | https://github.com/uuidjs/uuid | MIT | Robert Kieffer and other contributors (2010-2020) | runtime dependency (resolution override) | backstage/package.json:85 |
-| 107 | svgo | 3.3.4 | https://github.com/svg/svgo | MIT | Kir Belevich and contributors | build dependency (resolution override) | backstage/package.json:86 |
-| 108 | koa | 2.16.4 | https://github.com/koajs/koa | MIT | Koa contributors (LICENSE: (c) 2019 Koa contributors) | runtime dependency (resolution override) | backstage/package.json:87 |
-| 109 | adm-zip | 0.6.0 | https://github.com/cthackers/adm-zip | MIT | Nasca Iacob (cthackers) | build dependency (resolution override) | backstage/package.json:88 |
-| 110 | js-yaml | 4.3.0 | https://github.com/nodeca/js-yaml | MIT | Vladimir Zapparov and contributors | runtime dependency (resolution override) | backstage/package.json:89 |
-| 111 | webpack-dev-server | 5.2.6 | https://github.com/webpack/webpack-dev-server | MIT | Tobias Koppers (webpack contributors) | build dependency (resolution override) | backstage/package.json:90 |
-| 112 | prismjs | 1.30.0 | https://github.com/PrismJS/prism | MIT | Lea Verou and contributors | runtime dependency (resolution override) | backstage/package.json:91 |
-| 113 | body-parser | 1.20.6 | https://github.com/expressjs/body-parser | MIT | Douglas Christopher Wilson, Jonathan Ong, et al. | runtime dependency (resolution override) | backstage/package.json:92 |
-| 114 | fast-xml-parser | 5.7.0 | https://github.com/NaturalIntelligence/fast-xml-parser | MIT | Amit Gupta (NaturalIntelligence) | runtime dependency (resolution override) | backstage/package.json:94 |
-| 115 | markdown-it | 14.2.0 | https://github.com/markdown-it/markdown-it | MIT | Vitaly Puzrin, Alex Kocharin (LICENSE: (c) 2014) | runtime dependency (resolution override) | backstage/package.json:95 |
-| 116 | launch-editor | 2.14.1 | https://github.com/yyx990803/launch-editor | MIT | Evan You | build dependency (resolution override) | backstage/package.json:96 |
-| 117 | ip-address | 10.1.1 | https://github.com/beaugunderson/ip-address | MIT | Beau Gunderson | runtime dependency (resolution override) | backstage/package.json:97 |
-| 118 | @octokit/request | 8.4.1 | https://github.com/octokit/request.js | MIT | Gregor Martynus (Octokit) | runtime dependency (resolution override) | backstage/package.json:98 |
-| 119 | @octokit/request-error | 5.1.1 | https://github.com/octokit/request-error.js | MIT | Octokit contributors (LICENSE-verified: Copyright (c) 2019 Octokit contributors; installed author field Gregor Martynus) | runtime dependency (resolution override) | backstage/package.json:99 |
-| 120 | @octokit/plugin-paginate-rest | 11.4.1 | https://github.com/octokit/plugin-paginate-rest.js | MIT | Octokit contributors (LICENSE-verified: Copyright (c) 2019 Octokit contributors) | runtime dependency (resolution override) | backstage/package.json:100 |
-| 121 | @tootallnate/once | 2.0.1 | https://github.com/TooTallNate/once | MIT | Nathan Rajlich | build dependency (resolution override) | backstage/package.json:101 |
-| 122 | esbuild | 0.28.1 | https://github.com/evanw/esbuild | MIT | Evan Wallace (LICENSE: (c) 2020 Evan Wallace) | build dependency (resolution override) | backstage/package.json:102 |
+| 91 | minimatch | 9.0.9 (exactly one installed copy; exactly one yarn.lock resolution) | https://github.com/isaacs/minimatch | ISC | Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:89; the descriptor-scoped pins formerly at :67-70 were dead config and were removed in the 2026-08-18 remediation |
+| 92 | immutable | 4.3.9 | https://github.com/immutable-js/immutable-js | MIT | Lee Byron and contributors | runtime dependency (resolution override) | backstage/package.json:67 |
+| 93 | tar | 7.5.22 | https://github.com/isaacs/node-tar | BlueOak-1.0.0 | Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:68 |
+| 94 | linkify-it | 6.1.0 | https://github.com/markdown-it/linkify-it | MIT | Vitaly Puzrin (2015) | runtime dependency (resolution override) | backstage/package.json:69 |
+| 95 | fast-xml-builder | 1.3.0 | https://github.com/NaturalIntelligence/fast-xml-builder | MIT | Natural Intelligence (2026); author Amit Gupta | runtime dependency (resolution override) | backstage/package.json:70 |
+| 96 | brace-expansion | 5.0.9 | https://github.com/juliangruber/brace-expansion | MIT | Julian Gruber; TypeScript port Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:71 |
+| 97 | fast-uri | 4.1.2 | https://github.com/fastify/fast-uri | BSD-3-Clause | Vincent Le Goff | runtime dependency (resolution override) | backstage/package.json:72 |
+| 98 | postcss | 8.5.25 | https://github.com/postcss/postcss | MIT | Andrey Sitnik | build dependency (resolution override) | backstage/package.json:73 |
+| 99 | basic-ftp | 6.0.2 | https://github.com/patrickjuchli/basic-ftp | MIT | Patrick Juchli | runtime dependency (resolution override) | backstage/package.json:74 |
+| 100 | js-cookie | 3.0.8 | https://github.com/js-cookie/js-cookie | MIT | Klaus Hartl | runtime dependency (resolution override) | backstage/package.json:75 |
+| 101 | multer | 2.2.0 | https://github.com/expressjs/multer | MIT | Hage Yaapa, Jaret Pfluger, et al. | runtime dependency (resolution override) | backstage/package.json:76 |
+| 102 | http-proxy-middleware | 2.0.10 | https://github.com/chimurai/http-proxy-middleware | MIT | Steven Chim | build dependency (resolution override) | backstage/package.json:77 |
+| 103 | dompurify | 3.4.13 | https://github.com/cure53/DOMPurify | (MPL-2.0 OR Apache-2.0) | Mario Heiderich, Cure53 | runtime dependency (resolution override) | backstage/package.json:78 |
+| 104 | follow-redirects | 1.16.0 | https://github.com/follow-redirects/follow-redirects | MIT | Ruben Verborgh and contributors | runtime dependency (resolution override) | backstage/package.json:79 |
+| 105 | qs | 6.15.3 | https://github.com/ljharb/qs | BSD-3-Clause | Jordan Harband | runtime dependency (resolution override) | backstage/package.json:80 |
+| 106 | uuid | 11.1.1 | https://github.com/uuidjs/uuid | MIT | Robert Kieffer and other contributors (2010-2020) | runtime dependency (resolution override) | backstage/package.json:81 |
+| 107 | svgo | 3.3.4 | https://github.com/svg/svgo | MIT | Kir Belevich and contributors | build dependency (resolution override) | backstage/package.json:82 |
+| 108 | koa | 2.16.4 | https://github.com/koajs/koa | MIT | Koa contributors (LICENSE: (c) 2019 Koa contributors) | runtime dependency (resolution override) | backstage/package.json:83 |
+| 109 | adm-zip | 0.6.0 | https://github.com/cthackers/adm-zip | MIT | Nasca Iacob (cthackers) | build dependency (resolution override) | backstage/package.json:84 |
+| 110 | js-yaml | 4.3.1 | https://github.com/nodeca/js-yaml | MIT | Vladimir Zapparov and contributors | runtime dependency (resolution override) | backstage/package.json:85 |
+| 111 | webpack-dev-server | 5.2.6 | https://github.com/webpack/webpack-dev-server | MIT | Tobias Koppers (webpack contributors) | build dependency (resolution override) | backstage/package.json:86 |
+| 112 | prismjs | 1.30.0 | https://github.com/PrismJS/prism | MIT | Lea Verou and contributors | runtime dependency (resolution override) | backstage/package.json:87 |
+| 113 | body-parser | 1.20.6 | https://github.com/expressjs/body-parser | MIT | Douglas Christopher Wilson, Jonathan Ong, et al. | runtime dependency (resolution override) | backstage/package.json:88 |
+| 114 | fast-xml-parser | 5.7.0 | https://github.com/NaturalIntelligence/fast-xml-parser | MIT | Amit Gupta (NaturalIntelligence) | runtime dependency (resolution override) | backstage/package.json:90 |
+| 115 | markdown-it | 14.2.0 | https://github.com/markdown-it/markdown-it | MIT | Vitaly Puzrin, Alex Kocharin (LICENSE: (c) 2014) | runtime dependency (resolution override) | backstage/package.json:91 |
+| 116 | launch-editor | 2.14.1 | https://github.com/yyx990803/launch-editor | MIT | Evan You | build dependency (resolution override) | backstage/package.json:92 |
+| 117 | ip-address | 10.3.1 | https://github.com/beaugunderson/ip-address | MIT | Beau Gunderson | runtime dependency (resolution override) | backstage/package.json:93 |
+| 118 | nanoid | 3.3.18 (pin added 2026-08-18) | https://github.com/ai/nanoid | MIT | Andrey Sitnik | runtime dependency (resolution override) | backstage/package.json:94 |
+| 119 | file-type | 21.3.2 (pin added 2026-08-18; ESM-only, and the only dependent never imports it) | https://github.com/sindresorhus/file-type | MIT | Sindre Sorhus | build dependency (resolution override) | backstage/package.json:95 |
+| 120 | typescript-json-schema | 0.68.0 (pin added 2026-08-18; this pin drops vm2, so vm2 is eliminated from the tree -- it was never a listed entry) | https://github.com/YousefED/typescript-json-schema | BSD-3-Clause | Yousef El-Dardiry and Dominik Moritz | build dependency (resolution override) | backstage/package.json:96 |
+| 121 | @octokit/request | 8.4.1 | https://github.com/octokit/request.js | MIT | Gregor Martynus (Octokit) | runtime dependency (resolution override) | backstage/package.json:97 |
+| 122 | @octokit/request-error | 5.1.1 | https://github.com/octokit/request-error.js | MIT | Octokit contributors (LICENSE-verified: Copyright (c) 2019 Octokit contributors; installed author field Gregor Martynus) | runtime dependency (resolution override) | backstage/package.json:98 |
+| 123 | @octokit/plugin-paginate-rest | 11.4.1 | https://github.com/octokit/plugin-paginate-rest.js | MIT | Octokit contributors (LICENSE-verified: Copyright (c) 2019 Octokit contributors) | runtime dependency (resolution override) | backstage/package.json:99 |
+| 124 | @tootallnate/once | 2.0.1 | https://github.com/TooTallNate/once | MIT | Nathan Rajlich | build dependency (resolution override) | backstage/package.json:100 |
+| 125 | esbuild | 0.28.1 | https://github.com/evanw/esbuild | MIT | Evan Wallace (LICENSE: (c) 2020 Evan Wallace) | build dependency (resolution override) | backstage/package.json:101 |
 
 ## 6. CI/CD Actions and Images (6 entries)
 
 | # | Component | Version/pin | Upstream URL | License (SPDX) | Copyright holder | Usage mode | Evidence |
 |---|---|---|---|---|---|---|---|
-| 1 | actions/checkout | @v4 (mutable tag) | https://github.com/actions/checkout | MIT | GitHub, Inc. and contributors (2018) | fetched at install time (CI action) | iac/templates/ci.yaml:13; seed-repos/hello-m2/.gitea/workflows/ci.yaml:13 |
-| 2 | actions/setup-go | @v5 (mutable tag); installs Go 1.26 | https://github.com/actions/setup-go | MIT | GitHub, Inc. and contributors (2018) | fetched at install time (CI action) | iac/templates/ci.yaml:16-18; seed-repos/hello-m2/.gitea/workflows/ci.yaml:16-18 |
-| 3 | opentofu/setup-opentofu | @v1 (mutable tag); installs OpenTofu 1.9.0 | https://github.com/opentofu/setup-opentofu | MPL-2.0 | OpenTofu Authors (LICENSE records Copyright (c) 2020 HashiCorp, Inc., inherited from forked hashicorp/setup-terraform) | fetched at install time (CI action) | iac/templates/ci.yaml:31; seed-repos/hello-m2/.gitea/workflows/ci.yaml:31 |
+| 1 | actions/checkout | pinned SHA 11d5960a326750d5838078e36cf38b85af677262 (v4.4.0, lightweight tag; pinned 2026-08-18, previously the mutable @v4 tag) | https://github.com/actions/checkout | MIT | GitHub, Inc. and contributors (2018) | fetched at install time (CI action) | iac/templates/ci.yaml:13; seed-repos/hello-m2/.gitea/workflows/ci.yaml:13 |
+| 2 | actions/setup-go | pinned SHA 40f1582b2485089dde7abd97c1529aa768e1baff (v5.6.0; pinned 2026-08-18, previously the mutable @v5 tag); installs Go 1.26 | https://github.com/actions/setup-go | MIT | GitHub, Inc. and contributors (2018) | fetched at install time (CI action) | iac/templates/ci.yaml:16-18; seed-repos/hello-m2/.gitea/workflows/ci.yaml:16-18 |
+| 3 | opentofu/setup-opentofu | pinned SHA 9d84900f3238fab8cd84ce47d658d25dd008be2f (v1.0.8; pinned 2026-08-18, previously the mutable @v1 tag); installs OpenTofu 1.9.0 | https://github.com/opentofu/setup-opentofu | MPL-2.0 | OpenTofu Authors (LICENSE records Copyright (c) 2020 HashiCorp, Inc., inherited from forked hashicorp/setup-terraform) | fetched at install time (CI action) | iac/templates/ci.yaml:31; seed-repos/hello-m2/.gitea/workflows/ci.yaml:31 |
 | 4 | golang (Docker Official Image) | tag 1.26-alpine (no digest) | https://hub.docker.com/_/golang | BSD-3-Clause (Go toolchain) | The Go Authors / Google LLC | runtime image (CI build stage) | seed-repos/hello-m2/Dockerfile:1 |
 | 5 | alpine (Docker Official Image) | tag 3.20 (no digest; floating tag, snapshot 2026-08-18) | https://hub.docker.com/_/alpine | Multi-license aggregate; Alpine 3.20.10, 14 packages enumerated 2026-08-18 (sha256-verified blobs): GPL-2.0-only (alpine-baselayout 3.6.5-r0, alpine-baselayout-data 3.6.5-r0, apk-tools 2.14.4-r1, busybox 1.36.1-r31, busybox-binsh 1.36.1-r31, scanelf 1.3.7-r2, ssl_client 1.36.1-r31), MIT (alpine-keys 2.4-r1, musl 1.2.5-r3), MPL-2.0 AND MIT (ca-certificates-bundle 20260413-r0), Apache-2.0 (libcrypto3 3.3.7-r0, libssl3 3.3.7-r0), MIT AND BSD-2-Clause AND GPL-2.0-or-later (musl-utils 1.2.5-r3), Zlib (zlib 1.3.2-r0) | Alpine Linux development team | runtime image (hello-m2 runtime stage) | seed-repos/hello-m2/Dockerfile:6 |
 | 6 | node (Docker Official Image) | tag 24-trixie-slim (no digest; floating tag, snapshot 2026-08-18) | https://hub.docker.com/_/node + https://github.com/nodejs/docker-node | MIT (image build files and Node.js runtime; runtime bundles third-party libraries under their own licenses incl. Apache-2.0, Unicode-3.0, BSD variants); Debian trixie-slim base layer: debootstrap minbase from Debian main only (all packages DFSG-free per the Debian Social Contract), per-package list not enumerated (PARTIAL) | Joyent, Inc. and Node.js contributors; Debian Project (base layer, not enumerated) | runtime image (Backstage backend image base; pulled at docker build time via yarn build-image; upstream Dockerfile FROM debian:trixie-slim, NODE_VERSION=24.19.0) | backstage/packages/backend/Dockerfile:15; backstage/packages/backend/package.json:16 |
 
-No digest pinning exists anywhere in this group: all three base images are
-tag-only and the three actions are mutable major-version tags.
+Base images in this group remain tag-only (no digests); the three actions
+were pinned to commit SHAs on 2026-08-18 (see the entries above).
 `.github/workflows/sync-from-gitea.yml` uses no third-party GitHub
 Actions. jq, curl, docker, and git in CI steps are runner-image-provided
 binaries with no repo-level pin.
@@ -388,7 +395,7 @@ image are not enumerated (see U19 below).
 
 An honest gap is recorded here rather than hidden. Each row states what
 could not be verified, what IS verified, and where the evidence sits.
-Nothing in this section is counted among the 189 listed entries above
+Nothing in this section is counted among the 192 listed entries above
 unless explicitly noted as a caveat on a listed entry.
 
 Resolution passes of 2026-08-18: a first pass resolved 15 rows with hard
@@ -446,6 +453,19 @@ while a CI job is in flight (zero matches in a full-cluster scan
 | U19 | spotify/techdocs generator image | per-component licenses inside the image (Python, Alpine packages, OpenJDK, PlantUML, graphviz) not enumerated | default tag v1.2.8 verified (TechdocsGenerator.defaultDockerImage in installed @backstage/plugin-techdocs-node 1.14.4 and upstream; no dockerImage override in app-config); built from github.com/backstage/techdocs-container (main), Apache-2.0, Copyright 2020 Spotify AB; image is FROM python:3.14-alpine and bundles PlantUML v1.2026.2 jar and pip mkdocs-techdocs-core==1.7.0; Docker Hub tag v1.2.8 exists (pushed 2026-01-19) | backstage/app-config.yaml:82-83 |
 | U25 | node:24-trixie-slim Debian base layer (listed entry, group 6 #6) | exact per-package list and license names of the deployed layer (daemon down, pull disallowed) | upstream Dockerfile is FROM debian:trixie-slim (NODE_VERSION=24.19.0); debian:trixie-slim is debootstrap minbase built from Debian main only, so every package is DFSG-free per the Debian Social Contract (clauses 1 and 5, debian.org/social_contract); per-package license texts are mechanically extractable at /usr/share/doc/<pkg>/copyright per Debian Policy 12.5; current trixie-slim = 13.6-slim (snapshot trixie-20260803) | backstage/packages/backend/Dockerfile:15 |
 
+## Accepted residual risks (documented, not unverified)
+
+- react-router / react-router-dom 6.30.4 (listed entries, group 5 #40-41;
+  also exact resolution pins at backstage/package.json:60-61): three
+  moderate advisories -- GHSA-wrjc-x8rr-h8h6 (>=6.0.0 <7.18.0),
+  GHSA-337j-9hxr-rhxg (>=6.4.0 <7.18.0), GHSA-jjmj-jmhj-qwj2
+  (>=6.30.2 <=6.30.4). No fixed 6.x exists (max published 6.x = 6.30.4,
+  verified via npm view 2026-08-18); v7 is outside every installed
+  @backstage/* peer range (^6.30.2), so forcing v7 was rejected as an
+  unsupported major against all Backstage peer declarations. Remediation
+  path: upstream Backstage shipping v7-compatible peer ranges. Recorded
+  as an accepted residual risk 2026-08-18.
+
 ## First-party works (for completeness, not third-party)
 
 The following are original work by this project and carry no third-party
@@ -457,5 +477,7 @@ scripts/ci/*.sh; seed-repos/platform-addons/ kustomize and Gatekeeper
 constraint content; seed-repos/platform-config/ (empty environment dirs);
 root and hello-m2 catalog-info.yaml; index.html (self-contained);
 scripts/gitea-values.yaml and observability/**/values*.yaml (values files
-for third-party charts). External services used but not incorporated
+for third-party charts); .gitleaksignore (first-party false-positive
+fingerprints for gitleaks, added 2026-08-18). External services used but
+not incorporated
 (gitea.com SaaS, GitHub, Vercel) are out of scope for this listing.

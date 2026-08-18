@@ -491,9 +491,9 @@ verified per-repo from the module cache at the exact pinned versions
 | github.com/go-logr/stdr (indirect) | v1.2.2 | Apache-2.0 | go-logr contributors |
 | github.com/google/uuid (indirect) | v1.6.0 | BSD-3-Clause | Google Inc. (2009, 2014) |
 | github.com/grpc-ecosystem/grpc-gateway/v2 (indirect) | v2.29.0 | BSD-3-Clause | Gengo, Inc. (2015) |
-| golang.org/x/net (indirect) | v0.55.0 | BSD-3-Clause | The Go Authors ("Copyright 2009 The Go Authors.", per-repo LICENSE at the pinned version; PATENTS file present) |
-| golang.org/x/sys (indirect) | v0.45.0 | BSD-3-Clause | The Go Authors ("Copyright 2009 The Go Authors.", per-repo LICENSE at the pinned version; PATENTS file present) |
-| golang.org/x/text (indirect) | v0.37.0 | BSD-3-Clause | The Go Authors ("Copyright 2009 The Go Authors.", per-repo LICENSE at the pinned version; PATENTS file present) |
+| golang.org/x/net (indirect) | v0.56.0 | BSD-3-Clause | The Go Authors ("Copyright 2009 The Go Authors.", per-repo LICENSE at the pinned version; PATENTS file present) |
+| golang.org/x/sys (indirect) | v0.46.0 | BSD-3-Clause | The Go Authors ("Copyright 2009 The Go Authors.", per-repo LICENSE at the pinned version; PATENTS file present) |
+| golang.org/x/text (indirect) | v0.39.0 | BSD-3-Clause | The Go Authors ("Copyright 2009 The Go Authors.", per-repo LICENSE at the pinned version; PATENTS file present) |
 | google.golang.org/genproto (googleapis/api + googleapis/rpc, indirect) | v0.0.0-20260526163538-3dc84a4a5aaa | Apache-2.0 | Google LLC |
 | google.golang.org/grpc (indirect) | v1.83.0 | Apache-2.0 | gRPC authors / Google LLC (CNCF) |
 | google.golang.org/protobuf (indirect) | v1.36.11 | BSD-3-Clause | The Go Authors (2018) / Google LLC |
@@ -522,7 +522,7 @@ the authoritative full transitive closure.
 |---|---|---|---|
 | @backstage/create-app (scaffold tool) | unpinned (`@latest` at scaffold time; produced release line 1.49.1) | Apache-2.0 | The Backstage Authors (CNCF; originally Spotify AB) |
 | Backstage framework release line | 1.49.1 (backstage/backstage.json:2) | Apache-2.0 | The Backstage Authors |
-| Yarn (vendored release) | 4.4.1 (`packageManager` field; backstage/.yarn/releases/yarn-4.4.1.cjs) | BSD-2-Clause | Yarn Contributors (2016-present) |
+| Yarn (vendored release) | 4.18.0 (bumped from 4.4.1 on 2026-08-18 to gain npmMinimalAgeGate support; `npmMinimalAgeGate: "7d"` set at backstage/.yarnrc.yml:5; `packageManager` field; backstage/.yarn/releases/yarn-4.18.0.cjs) | BSD-2-Clause | Yarn Contributors (2016-present) |
 
 ### Root workspace devDependencies (backstage/package.json)
 
@@ -638,39 +638,42 @@ LICENSE headers (verified 2026-08-18).
 | @protobufjs/utf8 | ^1.1.1 (1.1.2) | BSD-3-Clause | Daniel Wirtz (protobufjs) |
 | ws | ^8.21.0 (8.21.0) | MIT | Einar Otto Stangvik |
 | axios | ^1.13.5 (1.19.0) | MIT | Matt Zabriskie and collaborators |
-| undici | ^7.28.0 (7.28.0) | MIT | Node.js contributors |
+| undici | ^7.29.0 (7.29.0) | MIT | Node.js contributors |
 | lodash | 4.18.1 | MIT | John-David Dalton / Lodash contributors |
 | protobufjs | 7.6.5 | BSD-3-Clause | Daniel Wirtz |
 | shell-quote | 1.10.0 | MIT | James Halliday |
 | websocket-driver | 0.7.5 | Apache-2.0 | James Coglan |
 | form-data | 4.0.6 | MIT | Felix Geisendoerfer and contributors |
-| minimatch | 9.0.9 (single installed copy; the descriptor pins at package.json:67-70 are dead config shadowed by the bare pin at :93) | ISC | Isaac Z. Schlueter |
+| minimatch | 9.0.9 (single installed copy and single pin at package.json:89; the dead descriptor-scoped pins were removed in the 2026-08-18 remediation) | ISC | Isaac Z. Schlueter |
 | immutable | 4.3.9 | MIT | Lee Byron and contributors |
 | tar | 7.5.22 | BlueOak-1.0.0 | Isaac Z. Schlueter |
 | linkify-it | 6.1.0 | MIT | Vitaly Puzrin (2015) |
 | fast-xml-builder | 1.3.0 | MIT | Natural Intelligence (2026); author Amit Gupta |
-| brace-expansion | 5.0.8 | MIT | Julian Gruber; TypeScript port Isaac Z. Schlueter |
-| fast-uri | 4.1.1 | BSD-3-Clause | Vincent Le Goff |
+| brace-expansion | 5.0.9 | MIT | Julian Gruber; TypeScript port Isaac Z. Schlueter |
+| fast-uri | 4.1.2 | BSD-3-Clause | Vincent Le Goff |
 | postcss | 8.5.25 | MIT | Andrey Sitnik |
 | basic-ftp | 6.0.2 | MIT | Patrick Juchli |
 | js-cookie | 3.0.8 | MIT | Klaus Hartl |
 | multer | 2.2.0 | MIT | Hage Yaapa, Jaret Pfluger, et al. |
 | http-proxy-middleware | 2.0.10 | MIT | Steven Chim |
-| dompurify | 3.4.12 | (MPL-2.0 OR Apache-2.0) | Mario Heiderich, Cure53 |
+| dompurify | 3.4.13 | (MPL-2.0 OR Apache-2.0) | Mario Heiderich, Cure53 |
 | follow-redirects | 1.16.0 | MIT | Ruben Verborgh and contributors |
 | qs | 6.15.3 | BSD-3-Clause | Jordan Harband |
 | uuid | 11.1.1 | MIT | Robert Kieffer and other contributors (2010-2020) |
 | svgo | 3.3.4 | MIT | Kir Belevich and contributors |
 | koa | 2.16.4 | MIT | Koa contributors ((c) 2019) |
 | adm-zip | 0.6.0 | MIT | Nasca Iacob (cthackers) |
-| js-yaml | 4.3.0 | MIT | Vladimir Zapparov and contributors |
+| js-yaml | 4.3.1 | MIT | Vladimir Zapparov and contributors |
 | webpack-dev-server | 5.2.6 | MIT | Tobias Koppers (webpack contributors) |
 | prismjs | 1.30.0 | MIT | Lea Verou and contributors |
 | body-parser | 1.20.6 | MIT | Douglas Christopher Wilson, Jonathan Ong, et al. |
 | fast-xml-parser | 5.7.0 | MIT | Amit Gupta (NaturalIntelligence) |
 | markdown-it | 14.2.0 | MIT | Vitaly Puzrin, Alex Kocharin ((c) 2014) |
 | launch-editor | 2.14.1 | MIT | Evan You |
-| ip-address | 10.1.1 | MIT | Beau Gunderson |
+| ip-address | 10.3.1 | MIT | Beau Gunderson |
+| nanoid | 3.3.18 (pin added 2026-08-18) | MIT | Andrey Sitnik |
+| file-type | 21.3.2 (pin added 2026-08-18; ESM-only, and the only dependent never imports it) | MIT | Sindre Sorhus |
+| typescript-json-schema | 0.68.0 (pin added 2026-08-18; drops vm2, eliminating it from the tree) | BSD-3-Clause | Yousef El-Dardiry and Dominik Moritz |
 | @octokit/request | 8.4.1 | MIT | Gregor Martynus (Octokit) |
 | @octokit/request-error | 5.1.1 | MIT | Octokit contributors (LICENSE: Copyright (c) 2019 Octokit contributors) |
 | @octokit/plugin-paginate-rest | 11.4.1 | MIT | Octokit contributors (LICENSE: Copyright (c) 2019 Octokit contributors) |
@@ -703,7 +706,9 @@ their own licenses.
 - **Source:** https://github.com/actions/checkout
 - **License:** MIT
 - **Copyright:** GitHub, Inc. and contributors (2018)
-- **Usage:** `@v4` (mutable major tag) in iac/templates/ci.yaml:13 and
+- **Usage:** Pinned to commit 11d5960a326750d5838078e36cf38b85af677262
+  (v4.4.0, lightweight tag) on 2026-08-18, previously the mutable `@v4`
+  tag, in iac/templates/ci.yaml:13 and
   seed-repos/hello-m2/.gitea/workflows/ci.yaml:13.
 
 ### actions/setup-go
@@ -711,7 +716,9 @@ their own licenses.
 - **Source:** https://github.com/actions/setup-go
 - **License:** MIT
 - **Copyright:** GitHub, Inc. and contributors (2018)
-- **Usage:** `@v5` (mutable major tag) in iac/templates/ci.yaml:16-18 and
+- **Usage:** Pinned to commit 40f1582b2485089dde7abd97c1529aa768e1baff
+  (v5.6.0) on 2026-08-18, previously the mutable `@v5` tag, in
+  iac/templates/ci.yaml:16-18 and
   seed-repos/hello-m2/.gitea/workflows/ci.yaml:16-18; installs Go 1.26
   (Go toolchain covered under Go Tooling and Modules).
 
@@ -721,7 +728,9 @@ their own licenses.
 - **License:** MPL-2.0
 - **Copyright:** OpenTofu Authors; the LICENSE records Copyright (c) 2020
   HashiCorp, Inc., inherited from the forked hashicorp/setup-terraform
-- **Usage:** `@v1` (mutable major tag) in iac/templates/ci.yaml:31 and
+- **Usage:** Pinned to commit 9d84900f3238fab8cd84ce47d658d25dd008be2f
+  (v1.0.8) on 2026-08-18, previously the mutable `@v1` tag, in
+  iac/templates/ci.yaml:31 and
   seed-repos/hello-m2/.gitea/workflows/ci.yaml:31; installs OpenTofu 1.9.0.
 
 ### golang (Docker Official Image)
@@ -846,3 +855,17 @@ catthehacker/ubuntu:act-* CI job image exists only while a CI job is in
 flight (zero matches in a full-cluster scan 2026-08-18); its tag is
 observable only during a CI run. The runner itself is measured:
 act_runner 0.3.1 with dind docker.io/docker:29.4.0-dind.
+
+## Accepted residual risks
+
+Documented accepted risks (not unverified items):
+
+- react-router / react-router-dom 6.30.4 (app dependencies and exact
+  resolution pins): three moderate advisories -- GHSA-wrjc-x8rr-h8h6
+  (>=6.0.0 <7.18.0), GHSA-337j-9hxr-rhxg (>=6.4.0 <7.18.0),
+  GHSA-jjmj-jmhj-qwj2 (>=6.30.2 <=6.30.4). No fixed 6.x exists (max
+  published 6.x = 6.30.4, verified via npm view 2026-08-18); v7 is
+  outside every installed @backstage/* peer range (^6.30.2), so forcing
+  v7 was rejected as an unsupported major against all Backstage peer
+  declarations. Remediation path: upstream Backstage shipping
+  v7-compatible peer ranges. Accepted as a residual risk 2026-08-18.
