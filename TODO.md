@@ -55,6 +55,20 @@ forward). Outcome:
   rotate .env.local Vercel OIDC token if ever shared (local-only,
   gitignored).
 
+## 2026-08-18 Tier-3 kickoff: security plane pull-forward -- REQ DONE
+
+`docs/specs/2026-08-18-Security-Plane-Pull-Forward-Requirements.md`
+(commit fbbd26d): decision-complete requirements, 15 FRs / 10 NFRs /
+6 decisions, all 15 SEC-G gaps dispositioned; critic-approved. Wave 0
+(now, 2 vCPU/3.9 GB): digest-pinned Trivy + OSV-Scanner in CI,
+Gatekeeper violation visibility, custom Security tab, RBAC policy
+module, TLS via Certificate resources, dependabot/code scanning,
+guard-log chaining. Wave 1 (after Colima resize to >=6c/12GB, user
+step): Falco + Falcosidekick -> SigNoz, Trivy Operator, MISP slim as
+the TIP of record. Wave 2 (scale-out docs): TheHive disqualified
+(proprietary), Wazuh/OpenCTI/Velociraptor/Custodian deferred. Next:
+Wave-0 technical specification, then implementation.
+
 ## 2026-08-18 Active goal: five-plane collaborative portal
 
 Goal-mode directive now in progress. Required planes: observation

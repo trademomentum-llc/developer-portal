@@ -214,9 +214,39 @@ State notes:
     .env.local holds a live Vercel OIDC token (gitignored, local-only,
     deliberately still flagged by gitleaks dir -- rotate if ever
     shared); .claude/ stays untracked by design.
-- Next: Tier-3 security plane pull-forward (the major build workstream:
-  threat intelligence plane "more than just functional" per the
-  roadmap SEC register), then five-plane build-out phases.
+- 2026-08-18 (same session, TIER-3 KICKOFF): security plane
+  pull-forward requirements landed and committed (fbbd26d, signed):
+  `docs/specs/2026-08-18-Security-Plane-Pull-Forward-Requirements.md`
+  (SEC-PLANE-PULLFORWARD-REQ-001; 15 FRs / 10 NFRs / 6 decisions;
+  critic-approved + 3 framing fixes). Grounded in a two-lane verified
+  research pass. Load-bearing facts of record:
+  - HOST REALITY: the Colima VM is 2 vCPU / 3.9 GB (older 6c/10GB
+    claims are stale); ~84% memory used. Wave 0 = zero-new-standing-
+    workload items only.
+  - Wave 0 (now): Trivy CLI + OSV-Scanner in CI pinned by digest
+    (March 2026 Trivy supply-chain compromise CVE-2026-33634 is the
+    cited reason); Gatekeeper violation visibility (constraint
+    .status.violations + gatekeeper_violations metric + audit JSON to
+    OTEL/SigNoz); custom Security tab (Roadie plugin is GitHub-only,
+    useless vs Gitea); RBAC custom permission policy (admin/developer/
+    viewer from Gitea group claims); TLS via Certificate resources on
+    the existing Gateway; dependabot.yml + code scanning; guard-log
+    hash chaining (resolves the "at all" half of OQ-04).
+  - Wave 1 (after one documented Colima resize to >=6c/12GB): Falco
+    0.44.1 (modern_ebpf verified working on this kernel: 6.8.0-100,
+    BTF present) + Falcosidekick OTLP -> SigNoz; Trivy Operator;
+    MISP 2.5.44 slim (AGPL-3.0, ~3-4GB) as the threat-intel platform
+    of record with CIRCL feed + restSearch egress.
+  - Wave 2 (scale-out docs only): TheHive 5 DISQUALIFIED (license
+    drift to proprietary; 3/4 AGPL EOL), Wazuh/OpenCTI deferred on
+    capacity, Velociraptor lab-only, Cloud Custodian deferred.
+  - SigNoz pipeline is the security-event sink, honestly labeled
+    "security observability, not a SIEM".
+  - Environmental flags: cert-manager 1.19 EOL 2026-07-08 (upstream
+    1.21.x; sibling-owned upgrade); Envoy Gateway pin 1.3.1 vs
+    upstream v1.9.0.
+- Next: Wave-0 technical specification (triad third leg), then Wave-0
+  implementation via the mandated loop.
 
 ---
 
