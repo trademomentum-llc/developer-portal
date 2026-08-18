@@ -65,6 +65,16 @@ func TestExtract_Amend(t *testing.T) {
 	if !inv.Amend || !inv.NoEdit {
 		t.Errorf("got %+v", inv)
 	}
+
+	inv = ExtractCommit("git -C /x commit --amend")
+	if !inv.Amend || inv.RepoDir != "/x" {
+		t.Errorf("got %+v", inv)
+	}
+
+	inv = ExtractCommit(`git commit --amend -m "x"`)
+	if !inv.Amend || len(inv.MessageArgs) != 1 || inv.MessageArgs[0] != "x" {
+		t.Errorf("got %+v", inv)
+	}
 }
 
 func TestExtract_EnvVarPrefix(t *testing.T) {

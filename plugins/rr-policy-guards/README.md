@@ -13,7 +13,7 @@ Six compiled Go guards run as Claude Code `PreToolUse` hooks:
 - `rr-commit-guard` scans staged paths and inline commit messages. It detects commits in compound shell commands and fails closed when directory-changing shell state makes the repository ambiguous.
 - `rr-verify-guard` detects `git commit` and `git push` in executable shell segments, including pipelines, subshells, and command substitutions. It resolves an explicit `git -C PATH` target, runs local CI-equivalent checks, and blocks degraded verification.
 
-There are no guard bypass variables or commit-message waiver tags.
+Five of the six guards carry a live, audit-logged bypass variable (`RR_<NAME>_GUARD_BYPASS=1`); `rr-verify-guard` has no bypass path, and its test suite pins both `RR_VERIFY_GUARD_BYPASS` and the `[skip-verify]` commit-message tag as ineffective. There are no commit-message waiver tags.
 
 ## Publication gate
 
@@ -37,11 +37,11 @@ Use the Bash tool working directory or one explicit `git -C PATH` target. Comman
 
 ```text
 plugins/rr-policy-guards/
-|-- plugin.json
-|-- hooks/hooks.json
+|-- README.md
 |-- git-hooks/
 |   |-- pre-commit
-|   `-- commit-msg
+|   |-- commit-msg
+|   `-- pre-push
 |-- scripts/install-git-hooks.sh
 |-- tools/
 |   |-- emoji-guard/
@@ -75,7 +75,7 @@ The implementation uses the Go standard library. The verification guard invokes 
 
 ## Hook configuration
 
-The packaged configuration is `hooks/hooks.json`. Active Sovereign configuration is mirrored in:
+The packaged configuration is the repo-root `.claude-plugin/marketplace.json`. Active Sovereign configuration is mirrored in:
 
 - `~/Projects/Sovereign/Structure/hooks/hooks.json`
 - `~/Projects/Sovereign/.claude/settings.json`
@@ -89,13 +89,13 @@ Hook and binary changes require a new Claude Code session before they become act
 
 Default logs are mode-0600 JSONL files under `~/.rational-reserve/logs/`. Override paths remain available through each guard's `RR_<NAME>_GUARD_AUDIT_LOG` variable; this changes only the audit destination and never changes a decision.
 
-The Bash and verification logs rotate at 8 MiB with three numbered backups. Their byte limits can be tuned with `RR_BASH_GUARD_AUDIT_MAX_BYTES` and `RR_VERIFY_GUARD_AUDIT_MAX_BYTES`. The Structure-owned posttool guard applies the same default through `RR_POSTTOOL_GUARD_AUDIT_MAX_BYTES`.
+The verification log rotates at 8 MiB with three numbered backups. Its byte limit can be tuned with `RR_VERIFY_GUARD_AUDIT_MAX_BYTES`. The Structure-owned posttool guard applies the same default through `RR_POSTTOOL_GUARD_AUDIT_MAX_BYTES`.
 
 Audit records omit secrets and do not create a policy waiver.
 
 ## Git commit hooks
 
-`scripts/install-git-hooks.sh [REPO_PATH]` installs `pre-commit` and `commit-msg` hooks that delegate to `rr-commit-guard`. Existing unrelated hooks are backed up before replacement. These Git hooks supplement the agent pretool hooks; they do not replace the publication gate.
+`scripts/install-git-hooks.sh [REPO_PATH]` installs `pre-commit`, `commit-msg`, and `pre-push` hooks that delegate to `rr-commit-guard`. Existing unrelated hooks are backed up before replacement. These Git hooks supplement the agent pretool hooks; they do not replace the publication gate.
 
 ## License
 

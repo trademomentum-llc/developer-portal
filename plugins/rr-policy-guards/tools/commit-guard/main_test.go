@@ -220,3 +220,70 @@ func TestPreToolUse_HappyPath(t *testing.T) {
 		t.Fatalf("got %d, stderr=%s", code, stderr)
 	}
 }
+
+// ---- IN-H-001 amend block (record immutability) -------------------------
+
+func TestPreToolUse_BlocksAmend(t *testing.T) {
+	auditPath := filepath.Join(t.TempDir(), "audit.jsonl")
+	t.Setenv("RR_COMMIT_GUARD_AUDIT_LOG", auditPath)
+	t.Setenv("RR_COMMIT_GUARD_BYPASS", "")
+	input, _ := json.Marshal(ToolInput{
+		ToolName: "Bash",
+		ToolInput: map[string]any{
+			"command": "git commit --amend --no-edit",
+		},
+	})
+	var stderr bytes.Buffer
+	code := run(nil, strings.NewReader(string(input)), &stderr)
+	if code != exitBlock {
+		t.Fatalf("got %d, want block; stderr=%s", code, stderr.String())
+	}
+	if !strings.Contains(stderr.String(), "IN-H-001") {
+		t.Errorf("expected IN-H-001 in stderr; got %s", stderr.String())
+	}
+	if strings.Contains(stderr.String(), "RR_COMMIT_GUARD_BYPASS") {
+		t.Errorf("amend block must not print the bypass hint; got %s", stderr.String())
+	}
+	raw, _ := os.ReadFile(auditPath)
+	if !strings.Contains(string(raw), `"rule":"IN-H-001"`) {
+		t.Errorf("expected IN-H-001 in audit log; got %s", raw)
+	}
+	if !strings.Contains(string(raw), `"mode":"pretooluse"`) {
+		t.Errorf("expected pretooluse mode in audit log; got %s", raw)
+	}
+}
+
+func TestPreToolUse_BlocksAmend_BypassIgnored(t *testing.T) {
+	auditPath := filepath.Join(t.TempDir(), "audit.jsonl")
+	t.Setenv("RR_COMMIT_GUARD_AUDIT_LOG", auditPath)
+	// The bypass var is evaluated only after the amend check, so it cannot
+	// waive IN-H-001. Pins the no-bypass rule.
+	t.Setenv("RR_COMMIT_GUARD_BYPASS", "1")
+	input, _ := json.Marshal(ToolInput{
+		ToolName: "Bash",
+		ToolInput: map[string]any{
+			"command": "git commit --amend --no-edit",
+		},
+	})
+	var stderr bytes.Buffer
+	code := run(nil, strings.NewReader(string(input)), &stderr)
+	if code != exitBlock {
+		t.Fatalf("bypass must not waive IN-H-001; got %d, stderr=%s", code, stderr.String())
+	}
+}
+
+func TestPreToolUse_BlocksAmend_Compound(t *testing.T) {
+	input, _ := json.Marshal(ToolInput{
+		ToolName: "Bash",
+		ToolInput: map[string]any{
+			"command": "git commit --amend --no-edit && git push origin main",
+		},
+	})
+	code, stderr := runWithEnv(t, nil, string(input))
+	if code != exitBlock {
+		t.Fatalf("got %d, want block; stderr=%s", code, stderr)
+	}
+	if !strings.Contains(stderr, "IN-H-001") {
+		t.Errorf("expected IN-H-001 in stderr; got %s", stderr)
+	}
+}

@@ -10,9 +10,10 @@
 # After installation:
 #   .git/hooks/pre-commit   -> calls rr-commit-guard --scan-staged
 #   .git/hooks/commit-msg   -> calls rr-commit-guard --validate-msg "$1"
+#   .git/hooks/pre-push     -> calls rr-commit-guard --pre-push "$1" "$2"
 #
-# Both hooks expect rr-commit-guard on PATH, or RR_COMMIT_GUARD_BIN to point
-# at the binary.
+# All three hooks expect rr-commit-guard on PATH, or RR_COMMIT_GUARD_BIN to
+# point at the binary.
 
 set -eu
 
@@ -39,7 +40,7 @@ if [ ! -d "${SRC}" ]; then
   exit 1
 fi
 
-for hook in pre-commit commit-msg; do
+for hook in pre-commit commit-msg pre-push; do
   src="${SRC}/${hook}"
   dst="${HOOKS_DIR}/${hook}"
   if [ -e "${dst}" ] && ! grep -q "rr-commit-guard" "${dst}" 2>/dev/null; then

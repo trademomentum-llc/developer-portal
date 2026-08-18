@@ -1,14 +1,16 @@
 // rr-commit-guard -- mechanical enforcement of commit-discipline principles.
 //
-// Three invocation modes, one binary. See TEC-RR-COMMIT-GUARD-001 for the
+// Four invocation modes, one binary. See TEC-RR-COMMIT-GUARD-001 for the
 // full contract.
 //
 //   rr-commit-guard                       PreToolUse mode (read stdin)
 //   rr-commit-guard --scan-staged         pre-commit hook mode
 //   rr-commit-guard --validate-msg FILE   commit-msg hook mode
+//   rr-commit-guard --pre-push REMOTE URL pre-push hook mode (read stdin)
 //
 // Exit codes: 0 allow / 2 block / 1 internal error.
-// Bypass:     RR_COMMIT_GUARD_BYPASS=1 (still audit-logged).
+// Bypass:     RR_COMMIT_GUARD_BYPASS=1 (still audit-logged). The IN-H-*
+// record-immutability rules have no bypass path.
 package main
 
 import (
@@ -47,6 +49,8 @@ func run(args []string, stdin io.Reader, stderr io.Writer) int {
 		return runScanStaged(args, stderr)
 	case hasFlag(args, "--validate-msg"):
 		return runValidateMsg(args, stderr)
+	case hasFlag(args, "--pre-push"):
+		return runPrePush(args, stdin, stderr)
 	default:
 		return runPreToolUse(stdin, stderr)
 	}
@@ -78,6 +82,17 @@ func runPreToolUse(stdin io.Reader, stderr io.Writer) int {
 	inv := ExtractCommit(command)
 	if !inv.IsCommit {
 		return exitAllow
+	}
+
+	// 0. Record immutability (FR-002/FR-010): --amend rewrites published
+	// history. No bypass: this check precedes bypassActive() on purpose.
+	if inv.Amend {
+		appendAudit(AuditRecord{Decision: DecisionBlock,
+			Mode: ModePreToolUse.String(), Rule: "IN-H-001",
+			Session: input.SessionID, Command: command})
+		fmt.Fprintln(stderr, "rr-commit-guard: BLOCKED -- commit invocation fails record-immutability rules:")
+		fmt.Fprintln(stderr, "  [IN-H-001] --amend rewrites published history; corrections must be new commits referencing the mistaken commit (RECORD-IMMUTABILITY-REQ-001 FR-002, FR-010)")
+		return exitBlock
 	}
 
 	// 1. Scan staged paths.
@@ -304,6 +319,7 @@ Usage:
   rr-commit-guard --scan-staged [--repo PATH]
                                         pre-commit hook mode
   rr-commit-guard --validate-msg FILE   commit-msg hook mode
+  rr-commit-guard --pre-push REMOTE URL pre-push hook mode (read stdin)
   rr-commit-guard --version
   rr-commit-guard --help
 

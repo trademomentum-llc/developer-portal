@@ -1,0 +1,23 @@
+#!/bin/sh
+# rr-commit-guard pre-push hook.
+#
+# Delegates to the rr-commit-guard binary in --pre-push mode. The binary
+# reads the proposed ref updates from stdin and blocks any non-fast-forward
+# update or deletion of refs/heads/main (record immutability, FR-011).
+# Exits 0 on allow, 2 on block, 1 on internal error.
+#
+# Override binary path: set RR_COMMIT_GUARD_BIN=/abs/path/to/rr-commit-guard.
+
+set -eu
+
+GUARD="${RR_COMMIT_GUARD_BIN:-rr-commit-guard}"
+
+if ! command -v "${GUARD}" >/dev/null 2>&1; then
+  cat >&2 <<EOF
+rr-commit-guard: binary not found on PATH (${GUARD}).
+Install or set RR_COMMIT_GUARD_BIN to the absolute path.
+EOF
+  exit 1
+fi
+
+exec "${GUARD}" --pre-push "$1" "$2"

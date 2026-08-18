@@ -4,13 +4,14 @@
 // and grep-friendly. See TEC-RR-COMMIT-GUARD-001 Section 3 for the shapes.
 package main
 
-// Mode names the three invocation modes of the binary.
+// Mode names the four invocation modes of the binary.
 type Mode int
 
 const (
 	ModePreToolUse Mode = iota
 	ModeScanStaged
 	ModeValidateMsg
+	ModePrePush
 )
 
 func (m Mode) String() string {
@@ -21,6 +22,8 @@ func (m Mode) String() string {
 		return "scan-staged"
 	case ModeValidateMsg:
 		return "validate-msg"
+	case ModePrePush:
+		return "pre-push"
 	default:
 		return "unknown"
 	}
