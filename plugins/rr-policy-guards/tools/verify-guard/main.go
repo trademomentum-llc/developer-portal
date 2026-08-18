@@ -15,6 +15,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -37,6 +38,11 @@ func run(stdin io.Reader, stdout, stderr io.Writer) int {
 	if err != nil {
 		fmt.Fprintln(stderr, "rr-verify-guard: failed to read stdin")
 		return exitBlock
+	}
+	// Hosts that do not speak the Claude Code hook protocol (empty stdin)
+	// must not fail-closed every shell call. Real PreToolUse always sends JSON.
+	if len(bytes.TrimSpace(raw)) == 0 {
+		return exitAllow
 	}
 	var input ToolInput
 	if jerr := json.Unmarshal(raw, &input); jerr != nil {
