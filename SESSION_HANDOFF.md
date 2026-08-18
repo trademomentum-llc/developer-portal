@@ -245,8 +245,29 @@ State notes:
   - Environmental flags: cert-manager 1.19 EOL 2026-07-08 (upstream
     1.21.x; sibling-owned upgrade); Envoy Gateway pin 1.3.1 vs
     upstream v1.9.0.
-- Next: Wave-0 technical specification (triad third leg), then Wave-0
-  implementation via the mandated loop.
+- 2026-08-18 (same session, TIER-3 SPEC COMPLETE): Wave-0 technical
+  specification landed and committed (8ff505a, signed):
+  `docs/specs/2026-08-18-Security-Plane-Wave0-Technical-Specification.md`
+  (SEC-PLANE-WAVE0-TECH-001, ~73KB, 14 sections). Implementation-grade
+  for all 11 Wave-0 FRs; external pins re-resolved independently by the
+  critic and byte-exact (trivy 0.74.0 sha256:62b1e65e..., osv-scanner
+  v2.5.1 sha256:8108ae94..., codeql-action v4.37.7 peeled ff2f1c62...);
+  live cluster claims verified (no gatekeeper metrics Service, 4 pods
+  on 8888, zero current violations); one BLOCKER found and fixed
+  (policyExtensionPoint is alpha-subpath-only) + smoke-suite ownership
+  assigned (accretes per lane; smoke-all edit is acceptance-time). The
+  security plane triad is now complete (REQ fbbd26d + TECH 8ff505a).
+  Five implementation lanes: A CI scanning (FR-01..03), B Gatekeeper
+  visibility (FR-05..07), C portal surfaces (FR-04, FR-08), D
+  infra/config (FR-09 TLS, FR-10 dependabot/CodeQL), E guards (FR-11
+  hash chaining).
+- Also flagged this pass (not fixed, noted): scripts/
+  start-backstage.sh:5 hardcodes BACKSTAGE_DIR=/Users/nnos/Projects/
+  developer-portal/backstage (the non-Sovereign path) - verify whether
+  that path still exists/symlinks before relying on the script.
+- Next: Wave-0 implementation, Lane A first (CI scanning FR-01..03:
+  Trivy + OSV-Scanner gates in the seed workflow + template, artifacts
+  to platform-config), via the mandated loop.
 
 ---
 

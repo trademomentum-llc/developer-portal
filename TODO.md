@@ -66,8 +66,11 @@ module, TLS via Certificate resources, dependabot/code scanning,
 guard-log chaining. Wave 1 (after Colima resize to >=6c/12GB, user
 step): Falco + Falcosidekick -> SigNoz, Trivy Operator, MISP slim as
 the TIP of record. Wave 2 (scale-out docs): TheHive disqualified
-(proprietary), Wazuh/OpenCTI/Velociraptor/Custodian deferred. Next:
-Wave-0 technical specification, then implementation.
+(proprietary), Wazuh/OpenCTI/Velociraptor/Custodian deferred. Wave-0
+technical specification DONE (commit 8ff505a): SEC-PLANE-WAVE0-TECH-001,
+implementation-grade for all 11 Wave-0 FRs, digests byte-exact and
+critic-re-resolved, five lanes mapped. Next: Wave-0 implementation,
+Lane A (CI scanning FR-01..03) first.
 
 ## 2026-08-18 Active goal: five-plane collaborative portal
 
