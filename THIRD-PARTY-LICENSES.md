@@ -612,7 +612,7 @@ Runtime dependencies of the Backstage backend.
 | @backstage/plugin-permission-node | ^0.10.11 (0.10.11) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-proxy-backend | ^0.6.11 (0.6.11) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-scaffolder-backend | ^3.2.0 (3.3.0) | Apache-2.0 | The Backstage Authors |
-| @backstage/plugin-scaffolder-backend-module-github | ^0.9.7 (0.9.7) | Apache-2.0 | The Backstage Authors |
+| @backstage/plugin-scaffolder-backend-module-github | REMOVED 2026-08-19 (was ^0.9.7, installed 0.9.7; dead dependency -- declared but never registered since June; replaced by the Gitea module below; gone from package.json and yarn.lock) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-scaffolder-backend-module-notifications | ^0.1.20 (0.1.20) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-search-backend | ^2.1.0 (2.1.0) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-search-backend-module-catalog | ^0.3.13 (0.3.13) | Apache-2.0 | The Backstage Authors |
@@ -625,9 +625,14 @@ Runtime dependencies of the Backstage backend.
 | pg (node-postgres) | ^8.11.3 (8.20.0) | MIT | Brian Carlson |
 | @backstage/plugin-catalog-common | ^1.1.8 (1.1.8) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-kubernetes-common | ^0.9.10 (0.9.10) | Apache-2.0 | The Backstage Authors |
+| @backstage/plugin-scaffolder-backend-module-gitea | ^0.2.19 (0.2.23) | Apache-2.0 | The Backstage Authors |
 
 (The two `-common` packages above became direct backend dependencies on
-2026-08-18; they were previously transitive/app-side only.)
+2026-08-18; they were previously transitive/app-side only. The Gitea
+scaffolder module provides the `publish:gitea` action, registered at
+packages/backend/src/index.ts:17-19, with an example at
+backstage/examples/template/template.yaml; the GitHub scaffolder module
+it replaces is marked REMOVED above.)
 
 ### Resolution override pins (backstage/package.json, resolutions block)
 
