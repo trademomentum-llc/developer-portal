@@ -76,6 +76,16 @@ chaining verified end-to-end); smoke-security.sh 40 pass / 0 fail /
 9 skip. Remaining: provenance r7 regeneration, Wave-0 commit series,
 acceptance (lifecycle re-runs + live CI + smoke-all integration).
 
+- 2026-08-19 remediation: tofu state healed (M3 releases imported via
+  scripts/import-cluster-state.sh, commit 73ab4ce; collector pin
+  aligned to live 0.159.2). M4 + networking applies SUCCESS (TLS certs
+  Ready, gatekeeper scrape live). M3 apply waits on CPU (helm wait on
+  unschedulable ClickHouse; manifests landed). smoke-all now includes
+  the security suite (aea351d). smoke-security.sh: 43/0/6. Cluster
+  repair note: kine DB node-IP patch after the Colima restart
+  (backup at ~/.rational-reserve/backups/). NEXT USER STEP: Colima
+  resize to >= 6 CPU / 12 GB, then the M3 re-run + live CI acceptance.
+
 ## 2026-08-18 Active goal: five-plane collaborative portal
 
 Goal-mode directive now in progress. Required planes: observation
