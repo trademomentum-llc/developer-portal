@@ -34,6 +34,8 @@ go build -o ../../bin/rr-<name>-guard .
 
 `scripts/install-m1.sh` rebuilds the M1 guards (emoji, bash, brew); `scripts/install-m2.sh` rebuilds `rr-tofu-guard`.
 
+The audit-log chain verifier (`tools/audit-chain/`) follows the same pattern: `go test ./...` then `go build -o ../../bin/rr-audit-chain .`. Verify a guard log with `plugins/rr-policy-guards/bin/rr-audit-chain verify <log-path>`; pre-chaining legacy logs are archived as `~/.rational-reserve/logs/<guard>.jsonl.prechain`.
+
 ### score2openchoreo (Go, `tools/score2openchoreo/`)
 
 ```
