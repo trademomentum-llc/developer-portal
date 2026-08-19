@@ -15126,8 +15126,8 @@ __metadata:
     cross-env: "npm:^7.0.0"
     react: "npm:^18.0.2"
     react-dom: "npm:^18.0.2"
-    react-router: "npm:^6.30.4"
-    react-router-dom: "npm:^6.30.4"
+    react-router: "npm:^8.3.0"
+    react-router-dom: "npm:^7.0.0"
   languageName: unknown
   linkType: soft
 
@@ -28945,16 +28945,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:6.30.4":
-  version: 6.30.4
-  resolution: "react-router-dom@npm:6.30.4"
+"react-router-dom@npm:7.0.0":
+  version: 7.0.0
+  resolution: "react-router-dom@npm:7.0.0"
   dependencies:
-    "@remix-run/router": "npm:1.23.3"
-    react-router: "npm:6.30.4"
+    react-router: "npm:7.0.0"
   peerDependencies:
-    react: ">=16.8"
-    react-dom: ">=16.8"
-  checksum: 10c0/1b25ab26a288da852f7b58eec5c14b3f37919e6773a557cd846d3a05d7a7d890c8d49bda93c0a7f497f240df1df8b0ad50635f990aafb55f2fc545ad8269a822
+    react: ">=18"
+    react-dom: ">=18"
+  checksum: 10c0/2860f24491192392ab2f3e4732bc494b9c01a3eae6109f6ed1be9c11d5b7dd740a134874f1d1f5c70742c0616f214269bb7a800440129b0984cce3d8603e1f50
   languageName: node
   linkType: hard
 
