@@ -7,7 +7,13 @@ variable "signoz_chart_version" {
 variable "otel_collector_chart_version" {
   description = "OpenTelemetry Collector Helm chart version"
   type        = string
-  default     = "0.155.0"
+  # Aligned to the live deployed release on 2026-08-18 (state-heal): the
+  # otel-collector release was installed raw-helm at chart 0.159.2 and was
+  # never tracked in tofu state. The module must describe reality. All values
+  # keys we override (mode, image, command, clusterRole, resources,
+  # extraVolumes, extraVolumeMounts, config) are unchanged between 0.155.0
+  # and 0.159.2 chart defaults; 0.159.2 only adds optional presets.
+  default     = "0.159.2"
 }
 
 variable "signoz_values_file" {
