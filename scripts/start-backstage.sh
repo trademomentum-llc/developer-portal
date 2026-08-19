@@ -2,7 +2,10 @@
 # scripts/start-backstage.sh -- Start Backstage dev server.
 set -euo pipefail
 
-BACKSTAGE_DIR="/Users/nnos/Projects/developer-portal/backstage"
+# Fixed 2026-08-18 (SEC-PLANE-WAVE0-TECH-001, Lane B): this previously pointed
+# at /Users/nnos/Projects/developer-portal, which does not exist; the real
+# checkout lives under ~/Projects/Sovereign/.
+BACKSTAGE_DIR="/Users/nnos/Projects/Sovereign/developer-portal/backstage"
 RUNTIME_DIR="${HOME}/.rational-reserve"
 APP_HOST="${BACKSTAGE_APP_HOST:-localhost}"
 APP_PORT="${BACKSTAGE_APP_PORT:-3001}"
@@ -47,8 +50,36 @@ ensure_gitea_port() {
     return 1
 }
 
+# Wave 0 (SEC-PLANE-WAVE0-TECH-001 section 5): Backstage's kubernetes plugin
+# reaches the cluster through this host-side proxy (authProvider
+# localKubectlProxy, cluster k3d-openchoreo-local). Reaped by
+# scripts/stop-backstage.sh.
+ensure_kubectl_proxy() {
+    local pid_file="$RUNTIME_DIR/kubectl-proxy-8001.pid"
+    if curl -s -o /dev/null -w '%{http_code}' "http://localhost:8001/api" | grep -q '^200$'; then
+        return 0
+    fi
+    if [ -f "$pid_file" ]; then
+        kill "$(cat "$pid_file")" 2>/dev/null || true
+        rm -f "$pid_file"
+    fi
+    pkill -f "kubectl.*proxy.*--port=8001" 2>/dev/null || true
+    nohup kubectl --context k3d-openchoreo proxy --port=8001 \
+        > "/tmp/kubectl-proxy-8001.log" 2>&1 &
+    echo $! > "$pid_file"
+    for i in $(seq 1 30); do
+        if curl -s -o /dev/null -w '%{http_code}' "http://localhost:8001/api" | grep -q '^200$'; then
+            return 0
+        fi
+        sleep 1
+    done
+    echo "kubectl proxy on 8001 did not become ready" >&2
+    return 1
+}
+
 ensure_gitea_port 3333
 ensure_gitea_port 3002
+ensure_kubectl_proxy
 
 ensure_opencost_port() {
     local local_port="$1"

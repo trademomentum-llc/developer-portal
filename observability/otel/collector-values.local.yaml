@@ -27,6 +27,19 @@ resources:
     cpu: 500m
     memory: 512Mi
 
+# Wave 0 (SEC-PLANE-WAVE0-TECH-001 section 7): mount pod logs read-only so the
+# filelog/gatekeeper-audit receiver can tail the Gatekeeper audit pod.
+# Caveat: this works because k3d-openchoreo is a single-node cluster and this
+# collector is a Deployment; on a multi-node cluster this must become a DaemonSet.
+extraVolumes:
+  - name: varlogpods
+    hostPath:
+      path: /var/log/pods
+extraVolumeMounts:
+  - name: varlogpods
+    mountPath: /var/log/pods
+    readOnly: true
+
 config:
   receivers:
     otlp:
@@ -38,6 +51,15 @@ config:
           cors:
             allowed_origins:
               - "*"
+    # Wave 0 (SEC-PLANE-WAVE0-TECH-001 section 7): tail the Gatekeeper audit
+    # pod's JSON logs; json_parser promotes fields so SigNoz can query
+    # process = "audit" AND event_type = "violation_audited".
+    filelog/gatekeeper-audit:
+      include:
+        - /var/log/pods/gatekeeper-system_gatekeeper-audit-*/*/*.log
+      start_at: end
+      operators:
+        - type: json_parser
 
   processors:
     batch: {}
@@ -72,6 +94,6 @@ config:
         processors: [k8s_attributes, batch]
         exporters: [otlp/signoz]
       logs:
-        receivers: [otlp]
+        receivers: [otlp, filelog/gatekeeper-audit]
         processors: [k8s_attributes, batch]
         exporters: [otlp/signoz]

@@ -12,3 +12,20 @@ alertmanager:
 
 pushgateway:
   enabled: false
+
+# Wave 0 (SEC-PLANE-WAVE0-TECH-001 section 6): scrape Gatekeeper metrics.
+# gatekeeper-system has NO metrics Service (verified live 2026-08-18: only
+# gatekeeper-webhook-service on 443), so pod-role discovery is required.
+# Targets are the 4 pods' container port 8888 (1 audit + 3 controller-manager).
+extraScrapeConfigs: |
+  - job_name: gatekeeper
+    kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names: [gatekeeper-system]
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        regex: "8888"
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: pod
