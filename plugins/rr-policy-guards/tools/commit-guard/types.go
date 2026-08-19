@@ -57,6 +57,8 @@ type Finding struct {
 }
 
 // AuditRecord is the JSON shape persisted to the audit log.
+// PrevHash chains each line to the previous raw line's bytes
+// (RECORD-IMMUTABILITY-TECH-001 section 9.1).
 type AuditRecord struct {
 	TS       string   `json:"ts"`
 	Decision Decision `json:"decision"`
@@ -66,6 +68,7 @@ type AuditRecord struct {
 	Subject  string   `json:"subject,omitempty"`
 	Session  string   `json:"session,omitempty"`
 	Command  string   `json:"command,omitempty"`
+	PrevHash string   `json:"prev_hash"`
 }
 
 // CommitInvocation describes a parsed `git commit ...` Bash command.
