@@ -349,6 +349,19 @@ State notes:
   New flag: neurodios-llm namespace has an unrelated ErrImagePull
   workload (ghcr.io/yourorg/neurodios-llm:latest, 403 - placeholder
   image reference, pre-existing, outside scope).
+- 2026-08-19 (TRAVERSAL QUICK WINS, committed 940b41c): five-plane
+  roadmap TRV-B repairs - the three cards' SigNoz links now use
+  http://localhost:3301 (AGENTS.md-documented forward) with
+  https://signoz.local noted as the ingress path (OQ-03 resolved with
+  reasoning); DeploymentCard's dead /iac/environments/<env> route
+  repointed to the platform-config environments tree in the Gitea UI
+  (the env-name mismatch made the per-env path a guaranteed 404);
+  start-backstage.sh now manages the 3301 (svc/signoz:8080) and 9090
+  (svc/openchoreo-api:8080) forwards in the established ensure_* idiom
+  with matching reaps in stop-backstage.sh. Critic caught one BLOCKER
+  in my own edit (openchoreo-api 404s on /; the readiness probe now
+  targets /health) - fixed pre-commit. yarn tsc clean; no 8080 or
+  /iac references remain in the app source.
 - Next: USER STEP - Colima resize (colima stop && colima start --cpu 6
   --memory 12, then k3d cluster start openchoreo); then I re-run
   install-m3.sh, run the live CI acceptance (seed push with the new
