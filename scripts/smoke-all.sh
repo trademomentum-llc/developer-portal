@@ -4,7 +4,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SUITES=(auth m2 m3 m4)
+SUITES=(auth m2 m3 m4 security)
 FAILED=()
 
 for suite in "${SUITES[@]}"; do
@@ -31,7 +31,7 @@ fi
 echo
 
 if [ ${#FAILED[@]} -eq 0 ]; then
-    echo "ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4, BACKSTAGE-PRODUCTION)"
+    echo "ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4, SECURITY, BACKSTAGE-PRODUCTION)"
     exit 0
 else
     echo "SMOKE FAILURES: ${FAILED[*]}" >&2
