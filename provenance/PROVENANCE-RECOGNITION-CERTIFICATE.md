@@ -1,18 +1,18 @@
 # Provenance Recognition Certificate
 
-**Certificate ID:** PRC-developer-portal-2026-08-18-r6
+**Certificate ID:** PRC-developer-portal-2026-08-18-r7
 
-**Supersedes:** PRC-developer-portal-2026-08-18-r5 (same-day security
-remediation re-issue: six resolution pins bumped and three added in
-backstage/package.json, vendored Yarn bumped 4.4.1 -> 4.18.0 to gain
-npmMinimalAgeGate, golang.org/x module bumps in hello-m2, and the three
-CI actions pinned to commit SHAs; three new listed entries added in
-group 5, so the component total is 192, up from 189). Chain history:
-r1-r4 were issued and superseded before the provenance package's first
-commit and exist in no retained history; r5 is the first certificate
-generation to enter git history, at commit d85e568 (2026-08-18); the
-retention-in-git-history rule in the Revocation and update rule section
-is in force from r5 onward, so this r6 and r5 are both retained.
+**Supersedes:** PRC-developer-portal-2026-08-18-r6 (same-day Wave-0
+security-plane re-issue: five new listed entries -- Trivy, OSV-Scanner,
+and the CodeQL action in group 6, plus @backstage/plugin-catalog-common
+and @backstage/plugin-kubernetes-common as new direct backend
+dependencies in group 5 -- and govulncheck firmed to v1.7.0; component
+total 197, up from 192). Chain history: r1-r4 were issued and superseded
+before the provenance package's first commit and exist in no retained
+history; r5 entered git history at commit d85e568 and r6 at commit
+82783ee (2026-08-18); the retention-in-git-history rule in the Revocation
+and update rule section has been in force since r5, so r5, r6, and this
+r7 are all retained.
 
 ---
 
@@ -26,7 +26,7 @@ is in force from r5 onward, so this r6 and r5 are both retained.
 
 ## Subject
 
-The third-party works recognized by this certificate are the 192
+The third-party works recognized by this certificate are the 197
 components listed in `provenance/PROVENANCE.md`, grouped as follows:
 
 | Group | Entries |
@@ -35,11 +35,11 @@ components listed in `provenance/PROVENANCE.md`, grouped as follows:
 | 2. Helm Charts and Container Images | 16 |
 | 3. IaC Providers | 5 |
 | 4. Go Tooling and Modules | 22 |
-| 5. Backstage and Node.js | 125 |
-| 6. CI/CD Actions and Images | 6 |
+| 5. Backstage and Node.js | 127 |
+| 6. CI/CD Actions and Images | 9 |
 | 7. Schemas and Specifications | 1 |
 | 8. Documentation Tooling | 2 |
-| **Total** | **192** |
+| **Total** | **197** |
 
 In addition, 3 UNVERIFIED items and honest gaps are recorded in the
 UNVERIFIED subsection of the listing (original U-numbers retained: U7,
@@ -80,9 +80,9 @@ is `provenance/PROVENANCE.md`; this table is a summary, not a duplicate.
 | 1. Platform and Infrastructure | 15 | MPL-2.0, Apache-2.0, MIT, BSD-2-Clause (deployed k3s server v1.32.9+k3s1; k3d host binary v5.9.0) | github.com/opentofu/opentofu; github.com/openchoreo/openchoreo; github.com/kubernetes/kubernetes |
 | 2. Helm Charts and Container Images | 16 | Apache-2.0, MIT, BSD-3-Clause, PostgreSQL (Cilium userspace Apache-2.0 with eBPF objects dual GPL-2.0-only OR BSD-2-Clause); deployed versions firmed 2026-08-18: Gitea chart gitea-12.5.0 / app 1.25.4, Gatekeeper v3.17.1 (matches pin), Envoy gateway v1.3.1 with envoy distroless-v1.33.0, act_runner 0.3.1 with dind 29.4.0-dind | github.com/fluxcd/flux2; gitea.com/gitea/helm-chart; github.com/SigNoz/signoz; github.com/envoyproxy/gateway |
 | 3. IaC Providers | 5 | MPL-2.0 | github.com/hashicorp/terraform-provider-kubernetes; github.com/alekc/terraform-provider-kubectl |
-| 4. Go Tooling and Modules | 22 | BSD-3-Clause, Apache-2.0, MIT, LGPL-2.1, MIT AND Apache-2.0 (x/net v0.56.0, x/sys v0.46.0, x/text v0.39.0 as of 2026-08-18) | go.dev; github.com/go-yaml/yaml; github.com/open-telemetry/opentelemetry-go |
-| 5. Backstage and Node.js | 125 | Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, ISC, BlueOak-1.0.0, (MPL-2.0 OR Apache-2.0); 47 resolution override pins (six bumped, three added 2026-08-18; vm2 eliminated); vendored Yarn 4.18.0 with npmMinimalAgeGate "7d" | github.com/backstage/backstage; github.com/facebook/react; github.com/yarnpkg/berry |
-| 6. CI/CD Actions and Images | 6 | MIT, MPL-2.0, BSD-3-Clause, GPL-2.0-only, Apache-2.0, MPL-2.0 AND MIT, MIT AND BSD-2-Clause AND GPL-2.0-or-later, Zlib; actions SHA-pinned 2026-08-18 (checkout v4.4.0, setup-go v5.6.0, setup-opentofu v1.0.8); base images floating-tag snapshots | github.com/actions/checkout; hub.docker.com/_/golang; hub.docker.com/_/alpine; hub.docker.com/_/node |
+| 4. Go Tooling and Modules | 22 | BSD-3-Clause, Apache-2.0, MIT, LGPL-2.1, MIT AND Apache-2.0 (x/net v0.56.0, x/sys v0.46.0, x/text v0.39.0 as of 2026-08-18; govulncheck firmed to v1.7.0, host-installed via go install) | go.dev; github.com/go-yaml/yaml; github.com/open-telemetry/opentelemetry-go |
+| 5. Backstage and Node.js | 127 | Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, ISC, BlueOak-1.0.0, (MPL-2.0 OR Apache-2.0); 47 resolution override pins (six bumped, three added 2026-08-18; vm2 eliminated); vendored Yarn 4.18.0 with npmMinimalAgeGate "7d"; plugin-catalog-common and plugin-kubernetes-common direct since 2026-08-18 | github.com/backstage/backstage; github.com/facebook/react; github.com/yarnpkg/berry |
+| 6. CI/CD Actions and Images | 9 | MIT, MPL-2.0, BSD-3-Clause, GPL-2.0-only, Apache-2.0, MPL-2.0 AND MIT, MIT AND BSD-2-Clause AND GPL-2.0-or-later, Zlib; actions SHA-pinned 2026-08-18 (checkout v4.4.0, setup-go v5.6.0, setup-opentofu v1.0.8, codeql-action v4.37.7 mirror-scope); Trivy 0.74.0 and OSV-Scanner v2.5.1 digest-pinned (registry-manifest verified); base images floating-tag snapshots | github.com/actions/checkout; hub.docker.com/_/golang; hub.docker.com/_/alpine; hub.docker.com/_/node |
 | 7. Schemas and Specifications | 1 | Apache-2.0 (vendored schema byte-identical to score-spec/spec commit 3ecb17d430c2bbf46d2dfc161fabc7d432d6d1f5) | github.com/score-spec/spec |
 | 8. Documentation Tooling | 2 | BSD-2-Clause, Apache-2.0 | github.com/mkdocs/mkdocs; github.com/backstage/mkdocs-techdocs-core |
 
@@ -92,9 +92,9 @@ SHA-256 digests computed with `shasum -a 256` at generation time
 (2026-08-18):
 
 - `THIRD-PARTY-LICENSES.md`:
-  `5ee898808d4fe1c81cb96d9583e47d53903861ecc73c9b841ec92515aee40f81`
+  `8d0a3e519df2d6bf038a3bbb1f622855012f9880f2fb19c52ab05e5df2c310ef`
 - `provenance/PROVENANCE.md`:
-  `e17d2ec5f43f144e029a62c6bcf232c1a6de58c55269dedbf7cecfd73d71dfd0`
+  `b99095b360a1eadfe9547d4100609a9866cfd8ba89a5fdd877c3c5dbe1ca472d`
 
 Any change to either file invalidates the corresponding digest and
 requires this certificate to be regenerated. Verify with:

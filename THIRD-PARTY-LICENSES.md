@@ -463,14 +463,17 @@ hash-pinned in `iac/.terraform.lock.hcl`, which is the authoritative record.
   (plugins/rr-policy-guards/tools/verify-guard/exec.go:110-111). Resolved
   from PATH, unpinned.
 
-### govulncheck (golang.org/x/vuln)
+### govulncheck (golang.org/x/vuln/cmd/govulncheck)
 
 - **Source:** https://github.com/golang/vuln
 - **License:** BSD-3-Clause
-- **Copyright:** The Go Authors
-- **Usage:** Invoked by rr-verify-guard for go.mod roots
-  (plugins/rr-policy-guards/tools/verify-guard/exec.go:168-169). Resolved
-  from PATH, unpinned.
+- **Copyright:** The Go Authors (module cache LICENSE at v1.7.0, first
+  line: Copyright 2009 The Go Authors.)
+- **Usage:** v1.7.0, host-installed 2026-08-18 via `go install`
+  (~/go/bin/govulncheck; previously unpinned PATH-resolved). Invoked by
+  rr-verify-guard for go.mod roots
+  (plugins/rr-policy-guards/tools/verify-guard/exec.go:168-169) and used in
+  the 2026-08-18 full-spectrum sweeps.
 
 ### Seed application Go modules (seed-repos/hello-m2)
 
@@ -620,6 +623,11 @@ Runtime dependencies of the Backstage backend.
 | @backstage/plugin-techdocs-backend | ^2.1.6 (2.1.6) | Apache-2.0 | The Backstage Authors |
 | better-sqlite3 | ^12.0.0 (12.8.0) | MIT (bundles SQLite, public domain) | Joshua Wise |
 | pg (node-postgres) | ^8.11.3 (8.20.0) | MIT | Brian Carlson |
+| @backstage/plugin-catalog-common | ^1.1.8 (1.1.8) | Apache-2.0 | The Backstage Authors |
+| @backstage/plugin-kubernetes-common | ^0.9.10 (0.9.10) | Apache-2.0 | The Backstage Authors |
+
+(The two `-common` packages above became direct backend dependencies on
+2026-08-18; they were previously transitive/app-side only.)
 
 ### Resolution override pins (backstage/package.json, resolutions block)
 
@@ -785,6 +793,47 @@ their own licenses.
   (backstage/packages/backend/Dockerfile:15), built via `yarn build-image`
   (backstage/packages/backend/package.json:16). Pulled at docker build
   time.
+
+### Trivy
+
+- **Source:** https://github.com/aquasecurity/trivy
+- **License:** Apache-2.0
+- **Copyright:** Aqua Security (upstream org; stock Apache-2.0 LICENSE, no
+  filled copyright line)
+- **Usage:** Digest-pinned scanner image
+  `aquasec/trivy:0.74.0@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969`
+  (digest verified against the registry manifest for tag 0.74.0,
+  2026-08-18), run in the CI scanning gates (filesystem and image scans,
+  SARIF artifacts) in seed-repos/hello-m2/.gitea/workflows/ci.yaml:29-45,92-107
+  and iac/templates/ci.yaml:29-45,77-92. Digest-pinned following the March
+  2026 Trivy supply-chain compromise (CVE-2026-33634).
+
+### OSV-Scanner
+
+- **Source:** https://github.com/google/osv-scanner
+- **License:** Apache-2.0
+- **Copyright:** Google
+- **Usage:** Digest-pinned scanner image
+  `ghcr.io/google/osv-scanner:v2.5.1@sha256:8108ae94eadea5a02c9bec6e646909d5b790b44bd62d7f5b7f0b1d6d0ffc7734`
+  (digest verified against the registry manifest for tag v2.5.1,
+  2026-08-18), run as the CI dependency scan gate
+  (seed-repos/hello-m2/.gitea/workflows/ci.yaml:44;
+  iac/templates/ci.yaml:44); suppression file
+  seed-repos/hello-m2/osv-scanner.toml.
+
+### CodeQL action (github/codeql-action)
+
+- **Source:** https://github.com/github/codeql-action
+- **License:** MIT (fetched from the upstream repo: LICENSE reads MIT,
+  Copyright (c) 2020 GitHub). The CodeQL CLI binaries the action downloads
+  at runtime carry their own custom terms (github/codeql-cli-binaries, no
+  SPDX identifier).
+- **Copyright:** GitHub
+- **Usage:** Pinned to commit ff2f1c621b7c889edc0d3c761ac2e6a3f8cdb0dd
+  (annotated tag v4.37.7 peeled commit; re-verified via ls-remote
+  2026-08-18) in `.github/workflows/code-scanning.yml`. Mirror scope only:
+  that workflow runs only on the GitHub mirror; Gitea Actions runs
+  `.gitea/workflows` only, so it never executes on the forge.
 
 CI also uses OpenTofu, Infracost, Docker, jq, and git; these are covered in
 the groups above or are runner-image-provided binaries with no repo-level
