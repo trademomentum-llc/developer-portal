@@ -15,7 +15,8 @@ backend.add(import('@backstage/plugin-proxy-backend'));
 
 // scaffolder plugin
 backend.add(import('@backstage/plugin-scaffolder-backend'));
-// GitHub scaffolder module removed -- using Gitea
+// Gitea scaffolder module: provides the publish:gitea action (owner = org)
+backend.add(import('@backstage/plugin-scaffolder-backend-module-gitea'));
 backend.add(
   import('@backstage/plugin-scaffolder-backend-module-notifications'),
 );

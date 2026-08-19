@@ -58,6 +58,15 @@ export POSTGRES_PASSWORD
 export POSTGRES_DATABASE="backstage"
 export GITEA_OAUTH_CLIENT_ID="$(cat "${RUNTIME_DIR}/backstage-oauth-client-id")"
 export GITEA_OAUTH_CLIENT_SECRET="$(cat "${RUNTIME_DIR}/backstage-oauth-client-secret")"
+
+# app-config.yaml's integrations.gitea block (loaded alongside the production
+# config) references ${GITEA_ADMIN_PASSWORD}; mirror start-backstage.sh.
+if [ ! -f "${RUNTIME_DIR}/m1-gitea-admin-password" ]; then
+    echo "ERROR: Gitea admin password not found at ${RUNTIME_DIR}/m1-gitea-admin-password" >&2
+    exit 1
+fi
+export GITEA_ADMIN_PASSWORD="$(cat "${RUNTIME_DIR}/m1-gitea-admin-password")"
+
 export GITEA_HOSTNAME="localhost:3333"
 export APP_BASE_URL="http://localhost:3002"
 export BACKEND_BASE_URL="http://localhost:7009"
