@@ -69,8 +69,12 @@ the TIP of record. Wave 2 (scale-out docs): TheHive disqualified
 (proprietary), Wazuh/OpenCTI/Velociraptor/Custodian deferred. Wave-0
 technical specification DONE (commit 8ff505a): SEC-PLANE-WAVE0-TECH-001,
 implementation-grade for all 11 Wave-0 FRs, digests byte-exact and
-critic-re-resolved, five lanes mapped. Next: Wave-0 implementation,
-Lane A (CI scanning FR-01..03) first.
+critic-re-resolved, five lanes mapped. Wave-0 IMPLEMENTATION in tree
+2026-08-18: all five lanes critic-approved (Lane A gate proven with the
+exact CVE fixture; Lane C fixed 2 spec errors with evidence; Lane E
+chaining verified end-to-end); smoke-security.sh 40 pass / 0 fail /
+9 skip. Remaining: provenance r7 regeneration, Wave-0 commit series,
+acceptance (lifecycle re-runs + live CI + smoke-all integration).
 
 ## 2026-08-18 Active goal: five-plane collaborative portal
 

@@ -265,9 +265,45 @@ State notes:
   start-backstage.sh:5 hardcodes BACKSTAGE_DIR=/Users/nnos/Projects/
   developer-portal/backstage (the non-Sovereign path) - verify whether
   that path still exists/symlinks before relying on the script.
-- Next: Wave-0 implementation, Lane A first (CI scanning FR-01..03:
-  Trivy + OSV-Scanner gates in the seed workflow + template, artifacts
-  to platform-config), via the mandated loop.
+- 2026-08-18 (same session, WAVE-0 IMPLEMENTED): all five lanes of
+  SEC-PLANE-WAVE0-TECH-001 are in the working tree, critic-reviewed (2
+  critics, split for depth). Lane A (CI scanning: Trivy 0.74.0 +
+  OSV-Scanner v2.5.1 digest-pinned gates in the seed workflow +
+  template, commit-security-artifacts.sh, smoke harness) - APPROVED,
+  gate proven locally (vulnerable fixture exit 1 with the exact CVE;
+  clean tree exit 0). Lane B (Gatekeeper visibility: app-config
+  localKubectlProxy, gatekeeper.ts, PolicyCard live rewrite, Prometheus
+  gatekeeper scrape, collector filelog) - APPROVED. Lane C (Security
+  tab + SecurityCard, RBAC SecurityRbacPolicy replacing allow-all) -
+  APPROVED (2 spec errors found and fixed with evidence:
+  createConditionalDecision does not exist in the installed tree ->
+  createCatalogConditionalDecision; scalar YAML env-substitution would
+  crash -> quoted flow list). Lane D (TLS via tls.tf issuer chain +
+  HTTPS listeners, dependabot.yml 9 go.mod roots, code-scanning.yml
+  pinned CodeQL) - APPROVED after fix-backs. Lane E (prev_hash hash
+  chaining in all six guards + tools/audit-chain verifier, 14 tests) -
+  APPROVED. Assembly pass: smoke-security.sh now 40 pass / 0 fail /
+  9 skip (exit 0); legacy pre-chain guard logs archived aside as
+  *.prechain (nothing deleted); dependabot audit-chain entry added;
+  AGENTS.md audit-chain lines added. Four spec deviations all
+  adjudicated CORRECT against evidence (msg->message dual-key,
+  BACKSTAGE_DIR stale-path repair, the two Lane C substitutions).
+  Known live-cluster caveats: prometheus-server + M3 collector pods
+  Pending (2c/4GB host pressure - Wave 1 resize prerequisite);
+  FR-06/FR-07 live checks SKIP until lifecycle re-runs.
+- 2026-08-18 (WAVE-0 COMMITTED): provenance r7 (197 entries; Trivy,
+  OSV-Scanner, CodeQL-MIT-verified, govulncheck firmed; chain wording:
+  r5 at d85e568, r6 at 82783ee in history) and the seven-commit Wave-0
+  series, all signed (%G?=G): d17a06e Lane A, 67ce13f Lane B, de1ac07
+  Lane C, ba40190 Lane D, c10e4cb Lane E, 429e730 smoke suite,
+  f20cff8 provenance r7. Tree clean except .claude/ (untracked by
+  design).
+- Next: Wave-0 acceptance: lifecycle re-runs (install-m3.sh collector
+  filelog, install-m4.sh gatekeeper scrape, install-m4-networking.sh
+  TLS), live CI acceptance (seed push with the new gates),
+  smoke-all.sh SUITES integration, then the section-14.3 acceptance
+  checklist sign-off. Watch capacity: 2c/4GB host already has Pending
+  pods (prometheus-server, M3 collectors).
 
 ---
 
