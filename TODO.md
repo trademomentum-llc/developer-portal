@@ -138,6 +138,13 @@ Next slices (in order):
    NOTE: ungated code slices are now exhausted -- remaining work needs
    the user's decision batch (immutability OQ-01..08, roadmap OQs,
    Colima start for the 6 cluster-blocked provenance rows).
+   UPDATE 2026-08-19: the batch was answered (Tier 1 conditional
+   approval, Tier 2 blessed, Tier 3 pull-security-forward); immutability
+   mechanism fully implemented and committed; Wave-0 security plane
+   code-complete and committed; control-plane project creation now works
+   (publish:gitea, live-proven; d46934b). The serious latent
+   serviceLocatorMethod bug (catalog ingestion silently dead since the
+   Lane B commit) was found by going live and fixed (48960a5).
 
 ---
 

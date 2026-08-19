@@ -362,6 +362,30 @@ State notes:
   in my own edit (openchoreo-api 404s on /; the readiness probe now
   targets /health) - fixed pre-commit. yarn tsc clean; no 8080 or
   /iac references remain in the app source.
+- 2026-08-19 (CONTROL PLANE: PROJECT CREATION WORKS): the scaffolder
+  now publishes to the local Gitea (commits 48960a5 + d46934b +
+  cbd4c04). Registered the first-party Apache-2.0
+  @backstage/plugin-scaffolder-backend-module-gitea (^0.2.19 ->
+  0.2.23), removed the dead module-github dep, fixed the template
+  (publish:gitea, allowedHosts localhost:3333, allowedOwners
+  [openchoreo], repoVisibility enum, RELATIVE catalogInfoPath - the
+  installed GiteaIntegration resolver is branch-blind for absolute
+  paths, an upstream @backstage/integration gap recorded in the
+  template comment). Live e2e proven: task completed, repo created in
+  org openchoreo, catalog entity registered, all test artifacts
+  cleaned (critic-verified: 4 baseline repos, empty locations).
+  SERIOUS LATENT BUG found + fixed by going live: the Lane B commit
+  de1ac07's kubernetes block used serviceLocator: where the installed
+  plugin requires serviceLocatorMethod: - plugin startup failure was
+  silently suppressing ALL catalog ingestion since yesterday (June 30
+  rows were fossils). One-key fix (48960a5), critic-verified against
+  the installed schema. Lesson recorded: static review (tsc-only)
+  missed it; live e2e caught it - the acceptance habit holds.
+  Environment actions during the fix (reported transparently):
+  neurodios-rag deploy scaled to 0 to free CPU (restore: kubectl -n
+  neurodios-llm scale deploy/neurodios-rag --replicas=2); Gitea had
+  been crash-looping on Valkey scheduling and is now 1/1 Running;
+  the dev sqlite catalog DB was rebuilt. Provenance r8 (198 entries).
 - Next: USER STEP - Colima resize (colima stop && colima start --cpu 6
   --memory 12, then k3d cluster start openchoreo); then I re-run
   install-m3.sh, run the live CI acceptance (seed push with the new
