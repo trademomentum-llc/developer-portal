@@ -1,0 +1,29 @@
+# FR-10 (SEC-PLANE-WAVE0 spec section 10): CodeQL code scanning on the mirror.
+# Mirror-scope honesty note: this workflow is mirror-side assurance only. The
+# Gitea remotes are the source of truth (synced here by sync-from-gitea.yml);
+# Gitea Actions never executes .github/workflows (it runs .gitea/workflows),
+# so nothing double-runs on the forge. CodeQL diversifies the local Semgrep
+# gate in rr-verify-guard; it does not replace or weaken any local gate.
+# Action pins are peeled commit SHAs (D4), re-verified via ls-remote on
+# 2026-08-18: codeql-action v4.37.7 -> ff2f1c62..., checkout v4.4.0 -> 11d5960a...
+name: Code scanning
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1"
+permissions:
+  security-events: write
+  contents: read
+jobs:
+  codeql:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        language: [go, javascript-typescript]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: github/codeql-action/init@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4.37.7
+        with:
+          languages: ${{ matrix.language }}
+      - uses: github/codeql-action/analyze@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4.37.7

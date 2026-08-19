@@ -1,0 +1,41 @@
+# FR-10 (SEC-PLANE-WAVE0 spec section 10): scanner posture as config-as-code.
+# Mirror-scope honesty note: the Gitea remotes are the source of truth and
+# GitHub is the mirror (workflows/sync-from-gitea.yml); dependabot takes
+# effect GitHub-side only, and PRs raised on the mirror must flow back through
+# the sync discipline -- an accepted asymmetry recorded in the spec.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: npm
+    directory: /backstage
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+  - package-ecosystem: gomod
+    directory: /tools/score2openchoreo
+    schedule: { interval: weekly }
+  - package-ecosystem: gomod
+    directory: /seed-repos/hello-m2
+    schedule: { interval: weekly }
+  - package-ecosystem: gomod
+    directory: /plugins/rr-policy-guards/tools/audit-chain
+    schedule: { interval: weekly }
+  - package-ecosystem: gomod
+    directory: /plugins/rr-policy-guards/tools/bash-guard
+    schedule: { interval: weekly }
+  - package-ecosystem: gomod
+    directory: /plugins/rr-policy-guards/tools/brew-guard
+    schedule: { interval: weekly }
+  - package-ecosystem: gomod
+    directory: /plugins/rr-policy-guards/tools/commit-guard
+    schedule: { interval: weekly }
+  - package-ecosystem: gomod
+    directory: /plugins/rr-policy-guards/tools/emoji-guard
+    schedule: { interval: weekly }
+  - package-ecosystem: gomod
+    directory: /plugins/rr-policy-guards/tools/tofu-guard
+    schedule: { interval: weekly }
+  - package-ecosystem: gomod
+    directory: /plugins/rr-policy-guards/tools/verify-guard
+    schedule: { interval: weekly }
