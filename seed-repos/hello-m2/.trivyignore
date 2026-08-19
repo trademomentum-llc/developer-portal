@@ -1,0 +1,3 @@
+# Suppressions require: reviewer, date, reason, and re-review date.
+# reviewed-by: <name>  reviewed: 2026-MM-DD  re-review: 2026-MM-DD+N
+# CVE-2026-XXXXX  reason: <why this does not affect the artifact>

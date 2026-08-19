@@ -1,0 +1,6 @@
+# Suppressions require: reviewer, date, reason, and re-review date (comment above each entry).
+# reviewed-by: <name>  reviewed: 2026-MM-DD  re-review: 2026-MM-DD+N
+# [[IgnoredVulns]]
+# id = "GHSA-xxxx-yyyy-zzzz"
+# reason = "<why this does not affect the artifact>"
+# expiry = 2026-MM-DD

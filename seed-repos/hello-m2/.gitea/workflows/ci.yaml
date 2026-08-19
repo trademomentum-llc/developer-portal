@@ -26,6 +26,24 @@ jobs:
       - name: Validate Score schema
         run: score2openchoreo --validate-only --input score.yaml
 
+      - name: Trivy filesystem scan (gate)
+        run: |
+          docker run --rm -v "$PWD:/src" aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
+            fs --severity HIGH,CRITICAL --exit-code 1 \
+            --format json -o /src/trivy-fs.json /src
+
+      - name: Trivy filesystem report (SARIF artifact)
+        if: always()
+        run: |
+          docker run --rm -v "$PWD:/src" aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
+            fs --severity HIGH,CRITICAL --exit-code 0 \
+            --format sarif -o /src/trivy-fs.sarif /src
+
+      - name: OSV dependency scan (gate)
+        run: |
+          docker run --rm -v "$PWD:/src" ghcr.io/google/osv-scanner@sha256:8108ae94eadea5a02c9bec6e646909d5b790b44bd62d7f5b7f0b1d6d0ffc7734 \
+            scan source -r /src --format json --output /src/osv.json
+
       - name: Set up OpenTofu
         if: github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'iac/')
         uses: opentofu/setup-opentofu@9d84900f3238fab8cd84ce47d658d25dd008be2f # v1.0.8
@@ -70,6 +88,23 @@ jobs:
       - name: Build image
         run: |
           docker build -t registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7} .
+
+      - name: Trivy image scan (gate)
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD:/src" \
+            aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
+            image --severity HIGH,CRITICAL --exit-code 1 --ignorefile /src/.trivyignore \
+            --format json -o /src/trivy-image.json \
+            registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7}
+
+      - name: Trivy image report (SARIF artifact)
+        if: always()
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD:/src" \
+            aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
+            image --severity HIGH,CRITICAL --exit-code 0 --ignorefile /src/.trivyignore \
+            --format sarif -o /src/trivy-image.sarif \
+            registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7}
 
       - name: Push image
         if: github.event_name == 'push'
@@ -127,6 +162,36 @@ jobs:
       - name: Commit cost artifact to platform-config
         if: github.event_name == 'push'
         run: /tmp/dp/scripts/ci/commit-cost-artifact.sh development hello-m2 /tmp/cost-artifact.json
+        env:
+          GITEA_TOKEN: ${{ secrets.PLATFORM_CONFIG_TOKEN }}
+      - name: Assemble security scan artifact
+        if: github.event_name == 'push'
+        run: |
+          jq -n \
+            --arg component "hello-m2" \
+            --arg environment "development" \
+            --arg git_sha "${GITHUB_SHA::7}" \
+            --arg run_id "${GITHUB_RUN_ID}" \
+            --arg generated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --slurpfile trivy_fs trivy-fs.json \
+            --slurpfile trivy_image trivy-image.json \
+            --slurpfile osv osv.json \
+            '{
+              artifact_type: "security-scan",
+              component: $component, environment: $environment,
+              git_sha: $git_sha, run_id: $run_id, generated_at: $generated_at,
+              gate: { severity_threshold: ["HIGH","CRITICAL"], status: "pass",
+                      suppressions: [".trivyignore", "osv-scanner.toml"] },
+              results: {
+                trivy_fs:    { report: $trivy_fs[0] },
+                trivy_image: { report: $trivy_image[0] },
+                osv:         { report: $osv[0] }
+              }
+            }' > /tmp/security-artifact.json
+
+      - name: Commit security artifact to platform-config
+        if: github.event_name == 'push'
+        run: /tmp/dp/scripts/ci/commit-security-artifacts.sh development hello-m2 /tmp/security-artifact.json "${GITHUB_RUN_ID}"
         env:
           GITEA_TOKEN: ${{ secrets.PLATFORM_CONFIG_TOKEN }}
       - name: Commit to platform-config
