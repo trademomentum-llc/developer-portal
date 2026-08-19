@@ -298,12 +298,31 @@ State notes:
   Lane C, ba40190 Lane D, c10e4cb Lane E, 429e730 smoke suite,
   f20cff8 provenance r7. Tree clean except .claude/ (untracked by
   design).
-- Next: Wave-0 acceptance: lifecycle re-runs (install-m3.sh collector
-  filelog, install-m4.sh gatekeeper scrape, install-m4-networking.sh
-  TLS), live CI acceptance (seed push with the new gates),
-  smoke-all.sh SUITES integration, then the section-14.3 acceptance
-  checklist sign-off. Watch capacity: 2c/4GB host already has Pending
-  pods (prometheus-server, M3 collectors).
+- 2026-08-18 (WAVE-0 ACCEPTANCE, PART 1): lifecycle applies attempted.
+  Results: smoke-security.sh 41 pass / 0 fail / 8 skip; Gatekeeper
+  C1/C2/C3 verified live at 0 violations; guard hash chains verify
+  live. TWO BLOCKERS surfaced (both pre-existing, neither caused by
+  Wave-0):
+  1. TOFU STATE DRIFT: install-m3.sh fails - helm releases signoz
+     (0.130.1) and otel-collector (live chart 0.159.2 vs pin 0.155.0 -
+     pin drift too) exist but are absent from the kubernetes-backend
+     state ("cannot re-use a name that is still in use"). M4's
+     opencost/prometheus releases likely same. Remediation: a
+     sanctioned import step (new lifecycle script wrapping tofu import
+     - direct import is guard-blocked), then re-run the applies.
+  2. CAPACITY: the VM is 2 vCPU / 3.9 GB with memory requests 99%
+     allocated; 31 pods Pending with "Insufficient memory" (chronic,
+     x161 over 13h): prometheus-server, otel-collector, envoy gateway
+     pod, M3 SigNoz pods. The live Prometheus/collector/HTTPS checks
+     cannot pass until the documented Colima resize (>= 6 CPU / 12 GB,
+     per the security requirements' Wave-1 prerequisite) happens -
+     that resize is a USER step (stopping the VM takes the platform
+     down briefly; not an agent action).
+  Envoy gateway pod Pending also means the .local routes are
+  currently down (smoke-m4-networking 6/6 FAIL for that reason only).
+- Next: state-drift remediation (sanctioned import script + imports +
+  re-apply M3/M4/networking), then live CI acceptance; the remaining
+  live checks then await the user's Colima resize.
 
 ---
 
