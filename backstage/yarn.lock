@@ -3723,18 +3723,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@backstage/plugin-permission-backend-module-allow-all-policy@npm:^0.2.17":
-  version: 0.2.17
-  resolution: "@backstage/plugin-permission-backend-module-allow-all-policy@npm:0.2.17"
-  dependencies:
-    "@backstage/backend-plugin-api": "npm:^1.8.0"
-    "@backstage/plugin-auth-node": "npm:^0.6.14"
-    "@backstage/plugin-permission-common": "npm:^0.9.7"
-    "@backstage/plugin-permission-node": "npm:^0.10.11"
-  checksum: 10c0/7acf5460734731dad68c9525d453b8ceb6bf5e25a266459d787dd527bed1df4929d98862d9fd9886c5c29f1bc9bbdc09e27653ed6b74f7503ab7ece7f824c711
-  languageName: node
-  linkType: hard
-
 "@backstage/plugin-permission-backend@npm:^0.7.10":
   version: 0.7.10
   resolution: "@backstage/plugin-permission-backend@npm:0.7.10"
@@ -15741,10 +15729,11 @@ __metadata:
     "@backstage/plugin-catalog-backend-module-gitea": "npm:^0.1.10"
     "@backstage/plugin-catalog-backend-module-logs": "npm:^0.1.20"
     "@backstage/plugin-catalog-backend-module-scaffolder-entity-model": "npm:^0.2.18"
+    "@backstage/plugin-catalog-common": "npm:^1.1.8"
     "@backstage/plugin-kubernetes-backend": "npm:^0.21.2"
+    "@backstage/plugin-kubernetes-common": "npm:^0.9.10"
     "@backstage/plugin-notifications-backend": "npm:^0.6.3"
     "@backstage/plugin-permission-backend": "npm:^0.7.10"
-    "@backstage/plugin-permission-backend-module-allow-all-policy": "npm:^0.2.17"
     "@backstage/plugin-permission-common": "npm:^0.9.7"
     "@backstage/plugin-permission-node": "npm:^0.10.11"
     "@backstage/plugin-proxy-backend": "npm:^0.6.11"

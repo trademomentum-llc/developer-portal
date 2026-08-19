@@ -45,9 +45,9 @@ backend.add(import('@backstage/plugin-catalog-backend-module-logs'));
 // permission plugin
 backend.add(import('@backstage/plugin-permission-backend'));
 // See https://backstage.io/docs/permissions/getting-started for how to create your own permission policy
-backend.add(
-  import('@backstage/plugin-permission-backend-module-allow-all-policy'),
-);
+// Wave 0 (SEC-PLANE-WAVE0-TECH-001 section 8): the RBAC policy module replaces
+// the permissive default policy.
+backend.add(import('./modules/permissionsPolicy'));
 
 // search plugin
 backend.add(import('@backstage/plugin-search-backend'));

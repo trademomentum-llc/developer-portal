@@ -15,6 +15,7 @@ import { ObservabilityLinksCard } from '../openchoreo-cards/ObservabilityLinksCa
 import { CostCard } from '../openchoreo-cards/CostCard';
 import { PolicyCard } from '../openchoreo-cards/PolicyCard';
 import { PlatformCard } from '../openchoreo-cards/PlatformCard';
+import { SecurityCard } from '../openchoreo-cards/SecurityCard';
 
 const componentFilter = 'kind:component';
 
@@ -108,6 +109,24 @@ const platformContent = EntityContentBlueprint.make({
   },
 });
 
+const securityContent = EntityContentBlueprint.make({
+  name: 'security',
+  params: {
+    path: '/security',
+    title: 'Security',
+    group: 'security',
+    icon: <SecurityIcon />,
+    filter: componentFilter,
+    loader: async () => (
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
+          <SecurityCard />
+        </Grid>
+      </Grid>
+    ),
+  },
+});
+
 export const openchoreoEntityPageModule = createFrontendModule({
   pluginId: 'catalog',
   extensions: [
@@ -116,5 +135,6 @@ export const openchoreoEntityPageModule = createFrontendModule({
     costContent,
     policyContent,
     platformContent,
+    securityContent,
   ],
 });

@@ -121,8 +121,26 @@ catalog:
 
 kubernetes:
   # see https://backstage.io/docs/features/kubernetes/configuration for kubernetes configuration options
+  # Wave 0 (SEC-PLANE-WAVE0-TECH-001 section 5): the cluster is reached through
+  # the host-side `kubectl proxy` on :8001, managed by scripts/start-backstage.sh
+  # (localKubectlProxy; no in-cluster ServiceAccount token is introduced).
+  serviceLocator:
+    type: 'multiTenant'
+  clusterLocatorMethods:
+    - type: 'config'
+      clusters:
+        - name: k3d-openchoreo-local
+          url: http://localhost:8001
+          authProvider: localKubectlProxy
 
 # see https://backstage.io/docs/permissions/getting-started for more on the permission framework
 permission:
   # Permissions are enabled in production; local development disables them via
   # app-config.local.yaml so the guest provider flow stays simple.
+  enabled: true
+  policy:
+    # Admin role membership (SEC-PLANE-WAVE0-TECH-001 section 8): each entry
+    # resolves to user:default/<login> as issued by the Gitea sign-in resolver.
+    # Quoted flow list so the ${...:-default} substitution always yields a
+    # string array for getOptionalStringArray; env override takes one login.
+    adminUsers: ["${BACKSTAGE_ADMIN_USERS:-gitea_admin}"]

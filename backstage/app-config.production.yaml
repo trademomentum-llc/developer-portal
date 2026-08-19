@@ -38,3 +38,9 @@ auth:
 
 permission:
   enabled: true
+  policy:
+    # Admin role membership (SEC-PLANE-WAVE0-TECH-001 section 8). The deployer
+    # signs in through the Gitea OAuth flow, which issues
+    # user:default/<login> claims (giteaAuth.ts); the deployer login is
+    # gitea_admin. Override with BACKSTAGE_ADMIN_USERS (a single login).
+    adminUsers: ["${BACKSTAGE_ADMIN_USERS:-gitea_admin}"]
