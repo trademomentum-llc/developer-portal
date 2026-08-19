@@ -107,6 +107,70 @@ ensure_opencost_port() {
 
 ensure_opencost_port 29003
 
+# SigNoz frontend forward for entity-page trace links (AGENTS.md port table,
+# local 3301). Cluster evidence: svc/signoz in namespace signoz exposes the
+# frontend on port 8080 (M4 networking requirements map 3301 -> signoz:8080).
+# Reaped by scripts/stop-backstage.sh.
+ensure_signoz_port() {
+    local local_port="$1"
+    local pid_file="$RUNTIME_DIR/signoz-portforward-${local_port}.pid"
+    if curl -s -o /dev/null -w '%{http_code}' "http://localhost:${local_port}/" | grep -q '^200$'; then
+        return 0
+    fi
+    if [ -f "$pid_file" ]; then
+        kill "$(cat "$pid_file")" 2>/dev/null || true
+        rm -f "$pid_file"
+    fi
+    pkill -f "kubectl.*port-forward.*svc/signoz.*:${local_port}" 2>/dev/null || true
+    nohup kubectl --context k3d-openchoreo -n signoz port-forward "svc/signoz" "${local_port}:8080" \
+        > "/tmp/signoz-portforward-${local_port}.log" 2>&1 &
+    echo $! > "$pid_file"
+    for i in $(seq 1 30); do
+        if curl -s -o /dev/null -w '%{http_code}' "http://localhost:${local_port}/" | grep -q '^200$'; then
+            return 0
+        fi
+        sleep 1
+    done
+    echo "SigNoz port-forward on ${local_port} did not become ready" >&2
+    return 1
+}
+
+ensure_signoz_port 3301
+
+# OpenChoreo control-plane API forward for the cards' api-base links
+# (OpenChoreoOverviewCard/DeploymentCard default http://localhost:9090;
+# README.md and docs/index.md document it). Cluster evidence:
+# svc/openchoreo-api in namespace openchoreo-control-plane exposes 8080.
+# Reaped by scripts/stop-backstage.sh.
+ensure_openchoreo_api_port() {
+    local local_port="$1"
+    local pid_file="$RUNTIME_DIR/openchoreo-api-portforward-${local_port}.pid"
+    # Probe /health: the API 404s on / (verified live), and a
+    # service-specific endpoint avoids false-passing on unrelated
+    # processes holding the port.
+    if curl -s -o /dev/null -w '%{http_code}' "http://localhost:${local_port}/health" | grep -q '^200$'; then
+        return 0
+    fi
+    if [ -f "$pid_file" ]; then
+        kill "$(cat "$pid_file")" 2>/dev/null || true
+        rm -f "$pid_file"
+    fi
+    pkill -f "kubectl.*port-forward.*svc/openchoreo-api.*:${local_port}" 2>/dev/null || true
+    nohup kubectl --context k3d-openchoreo -n openchoreo-control-plane port-forward "svc/openchoreo-api" "${local_port}:8080" \
+        > "/tmp/openchoreo-api-portforward-${local_port}.log" 2>&1 &
+    echo $! > "$pid_file"
+    for i in $(seq 1 30); do
+        if curl -s -o /dev/null -w '%{http_code}' "http://localhost:${local_port}/health" | grep -q '^200$'; then
+            return 0
+        fi
+        sleep 1
+    done
+    echo "OpenChoreo API port-forward on ${local_port} did not become ready" >&2
+    return 1
+}
+
+ensure_openchoreo_api_port 9090
+
 cd "$BACKSTAGE_DIR"
 
 # Ensure local dev overrides exist; the tracked example supplies guest auth,

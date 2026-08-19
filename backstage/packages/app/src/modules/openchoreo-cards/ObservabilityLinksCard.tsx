@@ -18,7 +18,9 @@ export const ObservabilityLinksCard = () => {
   const controlNs = annotations['openchoreo.dev/control-plane-namespace'] || 'default';
   const runtimeNs = annotations['openchoreo.dev/runtime-namespace-template'] || predictRuntimeNamespace(controlNs, projectForNs, env);
 
-  const signozBase = 'http://localhost:8080'; // Configurable via app-config in future
+  // Dev-host SigNoz via the managed port-forward (start-backstage.sh, 3301 -> svc/signoz:8080);
+  // team/ingress alternative: https://signoz.local via the Envoy gateway.
+  const signozBase = 'http://localhost:3301'; // Configurable via app-config in future
 
   return (
     <InfoCard title="Observability (Multi-Angle)" variant="gridItem">

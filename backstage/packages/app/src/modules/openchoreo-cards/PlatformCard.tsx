@@ -27,7 +27,8 @@ export const PlatformCard = () => {
           <Link to="http://localhost:3333/openchoreo/platform-config">
             Flux-watched platform-config repo
           </Link>
-          <Link to="http://localhost:8080/services">
+          {/* Dev SigNoz via managed :3301 forward; ingress alternative: https://signoz.local */}
+          <Link to="http://localhost:3301/services">
             SigNoz platform health
           </Link>
           <Typography variant="caption" style={{ marginTop: 8, opacity: 0.7 }}>

@@ -28,6 +28,9 @@ export const DeploymentCard = () => {
 
   const openchoreoBase = annotations['openchoreo.dev/api-base'] || 'http://localhost:9090';
 
+  // GitOps source of truth: the local Gitea platform-config repo (same idiom as CostCard).
+  const giteaBase = 'http://localhost:3333';
+
   return (
     <InfoCard title="Deployment & Reconciliation" variant="gridItem">
       <Box>
@@ -55,10 +58,13 @@ export const DeploymentCard = () => {
           <Link to={`${openchoreoBase}/namespaces/${predictedNs}`}>
             Data-plane resources (predicted NS)
           </Link>
-          <Link to={`/iac/environments/${env}/kustomization.yaml`}>
+          {/* Repo layout is environments/{dev,staging}; the env annotation ("development")
+              does not map onto those dir names, so link the environments/ root. */}
+          <Link to={`${giteaBase}/openchoreo/platform-config/src/branch/main/environments`}>
             Flux Kustomization (platform-config)
           </Link>
-          <Link to={`http://localhost:8080/dashboards?namespace=${predictedNs}`}>
+          {/* Dev SigNoz via managed :3301 forward; ingress alternative: https://signoz.local */}
+          <Link to={`http://localhost:3301/dashboards?namespace=${predictedNs}`}>
             Pods / Workloads in SigNoz (filtered)
           </Link>
         </Box>
