@@ -124,7 +124,7 @@ kubernetes:
   # Wave 0 (SEC-PLANE-WAVE0-TECH-001 section 5): the cluster is reached through
   # the host-side `kubectl proxy` on :8001, managed by scripts/start-backstage.sh
   # (localKubectlProxy; no in-cluster ServiceAccount token is introduced).
-  serviceLocator:
+  serviceLocatorMethod:
     type: 'multiTenant'
   clusterLocatorMethods:
     - type: 'config'
