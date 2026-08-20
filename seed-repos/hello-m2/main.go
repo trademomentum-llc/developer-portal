@@ -23,7 +23,7 @@ import (
 var tracer trace.Tracer
 
 // acceptanceMarker records the Wave-0 security-gate live CI acceptance trigger.
-const acceptanceMarker = "wave0-security-gates-acceptance-2026-08-20"
+const acceptanceMarker = "wave0-security-gates-acceptance-2026-08-20-r2"
 
 // predictRuntimeNamespace mirrors the deterministic OpenChoreo data-plane
 // namespace rule used by tools/namespace-predictor and the cluster.
