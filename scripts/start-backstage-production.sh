@@ -79,7 +79,7 @@ cd "${ROOT_DIR}/backstage"
 
 if [ ! -d "packages/app/dist" ] || [ ! -d "packages/backend/dist" ]; then
     echo "Building Backstage production bundles..."
-    yarn build
+    yarn build:all
 fi
 
 LOG_FILE="${RUNTIME_DIR}/backstage-production.log"

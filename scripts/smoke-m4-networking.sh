@@ -56,17 +56,20 @@ kubectl --context "${CONTEXT}" -n "${ENVOY_NS}" port-forward "svc/${SERVICE_NAME
 PF_HTTPS_PID=$!
 trap 'kill "${PF_PID}" "${PF_HTTPS_PID}" 2>/dev/null || true' EXIT
 
-# Wait for the HTTPS port-forward to accept TLS connections. No -f here: an
-# unknown Host header yields 404, which still proves the listener is up.
+# Wait for the HTTPS port-forward to accept TLS connections. Envoy builds one
+# SNI-strict filter chain per hostname and has no catch-all, so every probe
+# must send a real listener hostname via --resolve; an SNI of "localhost"
+# matches no filter chain and Envoy RSTs the connection, which also kills the
+# kubectl port-forward tunnel.
 for i in $(seq 1 30); do
-    if curl -ksS -o /dev/null "https://localhost:${LOCAL_PORT_HTTPS}/" 2>/dev/null; then
+    if curl -ksS -o /dev/null --resolve "${HOSTS[0]}:${LOCAL_PORT_HTTPS}:127.0.0.1" "https://${HOSTS[0]}:${LOCAL_PORT_HTTPS}/" 2>/dev/null; then
         break
     fi
     sleep 1
 done
 
 for host in "${HOSTS[@]}"; do
-    status=$(curl -sk -o /dev/null -w "%{http_code}" -H "Host: ${host}" "https://localhost:${LOCAL_PORT_HTTPS}/" 2>/dev/null || true)
+    status=$(curl -sk -o /dev/null -w "%{http_code}" --resolve "${host}:${LOCAL_PORT_HTTPS}:127.0.0.1" "https://${host}:${LOCAL_PORT_HTTPS}/" 2>/dev/null || true)
     if [ "${status}" = "200" ] || [ "${status}" = "302" ]; then
         echo "PASS: https://${host} -> ${status}"
     else
