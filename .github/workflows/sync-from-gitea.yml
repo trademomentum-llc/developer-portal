@@ -28,6 +28,10 @@ permissions:
 
 jobs:
   sync:
+    # GitHub-only job: Gitea also reads .github/workflows, but on Gitea
+    # secrets.GITHUB_TOKEN is a Gitea-scoped token that cannot write to
+    # github.com, so gitea-side runs are waste. Skip them at the source.
+    if: github.server_url == 'https://github.com'
     runs-on: ubuntu-latest
     steps:
       - name: Mirror branches and tags from Gitea
