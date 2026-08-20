@@ -77,7 +77,7 @@ export APP_CONFIG_backend_cors_origin="http://localhost:3002"
 
 cd "${ROOT_DIR}/backstage"
 
-if [ ! -d "packages/app/dist" ] || [ ! -d "packages/backend/dist" ]; then
+if [ ! -f "packages/app/dist/index.html" ] || [ ! -d "packages/backend/dist" ]; then
     echo "Building Backstage production bundles..."
     yarn build:all
 fi
