@@ -43,12 +43,15 @@ jobs:
           cd gitea.git
 
           # Point origin at GitHub and push all fetched refs.
-          # --mirror updates matching refs; branches deleted on Gitea are
-          # pruned on GitHub so the mirror stays exact.
+          # Explicit branch/tag refspecs with --prune (NOT --mirror):
+          # gitea.com exposes refs/pull/* and GitHub rejects those as
+          # hidden refs, which made every --mirror push fail wholesale.
+          # --prune keeps branches/tags exact: refs deleted on Gitea are
+          # pruned on GitHub.
           git remote set-url origin "${DST}"
 
           before="$(git ls-remote origin HEAD | awk '{print $1}')"
-          git push --mirror origin
+          git push origin --prune '+refs/heads/*:refs/heads/*' '+refs/tags/*:refs/tags/*'
           after="$(git ls-remote origin HEAD | awk '{print $1}')"
 
           echo "GitHub HEAD before: ${before:-none}"
