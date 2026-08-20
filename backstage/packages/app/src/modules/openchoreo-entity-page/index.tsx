@@ -6,6 +6,7 @@ import AssessmentIcon from '@material-ui/icons/Assessment';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import SecurityIcon from '@material-ui/icons/Security';
 import SettingsIcon from '@material-ui/icons/Settings';
+import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 
 // Reuse the existing OpenChoreo card components in deliberate tab layouts.
 // The Overview tab already renders all five cards via EntityCardBlueprint;
@@ -16,6 +17,7 @@ import { CostCard } from '../openchoreo-cards/CostCard';
 import { PolicyCard } from '../openchoreo-cards/PolicyCard';
 import { PlatformCard } from '../openchoreo-cards/PlatformCard';
 import { SecurityCard } from '../openchoreo-cards/SecurityCard';
+import { CiRunsCard } from '../openchoreo-cards/CiRunsCard';
 
 const componentFilter = 'kind:component';
 
@@ -127,6 +129,24 @@ const securityContent = EntityContentBlueprint.make({
   },
 });
 
+const engagementContent = EntityContentBlueprint.make({
+  name: 'engagement',
+  params: {
+    path: '/engagement',
+    title: 'Engagement',
+    group: 'engagement',
+    icon: <PlayCircleOutlineIcon />,
+    filter: componentFilter,
+    loader: async () => (
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
+          <CiRunsCard />
+        </Grid>
+      </Grid>
+    ),
+  },
+});
+
 export const openchoreoEntityPageModule = createFrontendModule({
   pluginId: 'catalog',
   extensions: [
@@ -136,5 +156,6 @@ export const openchoreoEntityPageModule = createFrontendModule({
     policyContent,
     platformContent,
     securityContent,
+    engagementContent,
   ],
 });
