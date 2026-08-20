@@ -119,3 +119,38 @@ the work, not reconstructed after it.
 
 **End of seed block.** Every entry appended below this line must be
 contemporaneous -- written during the work, per the rules in the header.
+
+## 2026-08-20 -- Wave-0 acceptance on the resized cluster
+
+- Author/context: goal continuation session; user completed the Colima
+  resize (6 CPU / 12 GiB), unblocking the queued Wave-0 acceptance.
+- Tried: re-run install-m3.sh, run the full smoke umbrella, push
+  hello-m2 through the new Trivy/OSV security gates live, and land the
+  in-flight Engagement-plane slice (CiRunsCard + tab).
+- Failed: the first live gate runs (#39/#40) exposed a vacuous-pass
+  wiring bug -- dind sibling containers made `-v "$PWD:/src"` an empty
+  mount, so Trivy fs "passed" scanning nothing; a stale local-Gitea
+  developer-portal mirror then 127'd the artifact-commit step; and a
+  partial packages/app/dist (no index.html) had both Backstage backends
+  404ing /, silently failing the auth and production smokes. The
+  linkify-it 5.0.2 downgrade, first judged spurious on tsc evidence,
+  proved REQUIRED once build:all actually ran. And after run #46 went
+  green, the rollout itself was blocked: all three cluster-plane agents
+  had been silently disconnected since 06-30 (websocket bad handshake)
+  because the Cluster*Plane CRs pin the install-time agent clientCA and
+  the self-signed agent certs renewed on 06-26.
+- Learned: static review and tsc do not cover runner topology or
+  bundler type paths -- only live execution does (third time this
+  project: serviceLocatorMethod, the dind mounts, linkify-it). Time-boxed
+  platform lesson: self-signed agent certs pinned into CRs are a renewal
+  time bomb (next expiry 2026-09-24); re-pinned all three CRs, agents
+  reconnected, pod rolled to :59b8c8d. Fixed: --volumes-from
+  "$(hostname)" mounts (6964ca9), mirror synced (dbd79de), dist rebuilt
+  + index.html guard (ea29c84), smoke umbrella ALL SUITES PASSED (AUTH,
+  M2, M3, M4, SECURITY, BACKSTAGE-PRODUCTION), smoke-security 46/0/3
+  (FR-03 flipped PASS), Engagement slice committed (e82f2bc),
+  provenance cert r9.
+- Links: seed-repos/hello-m2/.gitea/workflows/ci.yaml,
+  backstage/packages/app/src/modules/openchoreo-cards/CiRunsCard.tsx,
+  scripts/start-backstage-production.sh, provenance/PROVENANCE-RECOGNITION-CERTIFICATE.md.
+

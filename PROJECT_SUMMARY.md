@@ -4,7 +4,7 @@
 > state. For "what to do next" see TODO.md. For "where we stopped and what
 > changed mid-session" see SESSION_HANDOFF.md.
 
-**Snapshot date:** 2026-06-30 (M3 Production Multi-Angle Visibility live milestone: SigNoz + standalone OTEL collector installed on k3d-openchoreo; namespace predictor corrected to match OpenChoreo's `GenerateK8sNameWithLengthLimit` algorithm; hello-m2 OTEL instrumentation hardened and deployed via the Gitea Actions/Flux/CD loop; first end-to-end trace ingested into SigNoz/ClickHouse; M3 script suite validated offline with 10/10 checks and against the live cluster.)
+**Snapshot date:** 2026-08-20 (Wave-0 security plane accepted on the resized 6c/12GiB Colima cluster: smoke-all reports ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4, SECURITY, BACKSTAGE-PRODUCTION); hello-m2 CI run #46 green through the digest-pinned Trivy/OSV gates with security artifacts committed to platform-config and the pod rolled to :59b8c8d; Engagement-plane slice landed -- CiRunsCard + entity tab; record-immutability chain live with signed commits and checkpoint tag checkpoint-2026-08. Earlier milestone state: M1 substrate, M2 IaC+CD loop, M3 observability, M4 cost visibility and networking all deployed and smoke-validated; see SESSION_HANDOFF.md section 0a for the 2026-08-20 slice and TODO.md for debt.)
 
 ---
 

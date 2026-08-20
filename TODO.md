@@ -85,6 +85,23 @@ acceptance (lifecycle re-runs + live CI + smoke-all integration).
   repair note: kine DB node-IP patch after the Colima restart
   (backup at ~/.rational-reserve/backups/). NEXT USER STEP: Colima
   resize to >= 6 CPU / 12 GB, then the M3 re-run + live CI acceptance.
+- 2026-08-20 acceptance -- DONE: user resized Colima (6c/12GiB);
+  install-m3.sh re-run SUCCESS; smoke-all GREEN incl. security suite
+  (45/0/4); live CI gates proven (runs #39-#41 exposed and fixed the
+  dind --volumes-from mount bug, 6964ca9; stale local-Gitea mirror
+  synced through dbd79de); Engagement slice (CiRunsCard + tab) landed
+  e82f2bc; linkify-it re-pinned 5.0.2 for build:all (ea29c84, cert r9);
+  partial dist / 404 regression fixed (both backends rebuilt and 200).
+  Run #46 (59b8c8d) GREEN end-to-end: artifacts committed, Flux applied,
+  pod rolled to :59b8c8d. Rollout was blocked by a platform fault: all
+  three cluster-plane agents disconnected since 06-30 because the
+  Cluster*Plane CRs pin the install-time agent cert as clientCA and the
+  self-signed certs renewed 06-26 -- re-pinned to current certs (renews
+  break it again; next expiry 2026-09-24 -- needs an upstream fix).
+  New reliability debt: Trivy DB re-downloaded 4x per run (add a named
+  cache volume); seed Dockerfile alpine:3.20 EOL per Trivy; dev server
+  :3001 does not proxy /api to :7008 (pre-existing, all proxy cards
+  affected).
 
 ## 2026-08-18 Active goal: five-plane collaborative portal
 

@@ -4,8 +4,98 @@
 > what is now committed that was not before, what is still outstanding, and
 > exactly what to do first.
 
-**Last updated:** 2026-08-18
-**Reason for handoff:** Attribution/provenance package landed (see section 0). M3 Production Multi-Angle Visibility and M4 cost visibility remain live; `./scripts/smoke-all.sh` previously reported `ALL SMOKE SUITES PASSED (M2, M3, M4)`.
+**Last updated:** 2026-08-20
+**Reason for handoff:** Wave-0 security acceptance COMPLETE on the resized
+cluster; Engagement-plane slice landed; full smoke umbrella green again.
+
+---
+
+## 0a. 2026-08-20 addendum -- resized-cluster acceptance (this session)
+
+The user performed the Colima resize (now 6 CPU / 12 GiB) and started the
+cluster. Executed per the queued plan:
+
+- `install-m3.sh` re-run: SUCCESS (the pre-resize CPU-blocked helm wait
+  cleared). Cluster fully healthy; the stuck signoz-otel-collector init
+  pod recovered after recreation.
+- Full smoke umbrella GREEN: `ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4,
+  SECURITY, BACKSTAGE-PRODUCTION)`; smoke-security 45 pass / 0 fail /
+  4 skip (FR-03 artifact read was still SKIP at that point).
+- Live CI security-gate acceptance (hello-m2): two wiring bugs found and
+  fixed by going live --
+  (1) act-runner dind sibling-container mount bug: `-v "$PWD:/src"`
+  resolved in the daemon namespace, yielding a silently EMPTY scan root
+  (Trivy fs vacuous pass num=0, OSV exit 128). Fixed in the seed workflow
+  with `--volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}"` (commit
+  6964ca9; Gitea hello-m2 d85a68c). Gates unchanged (same digests,
+  severities, exit codes).
+  (2) stale local-Gitea developer-portal mirror (615006d, 2026-06-30)
+  lacked scripts/ci/commit-security-artifacts.sh (exit 127). Fixed by
+  pushing main to the local mirror (now dbd79de+; the mirror is NOT a
+  configured remote -- pushed via explicit URL with basic auth per
+  scripts/push-seed-content.sh conventions).
+  Run #41 proved all four gates EXECUTED and PASSED against real content
+  (Trivy fs+image, OSV; exit 0, zero HIGH/CRITICAL). The decisive
+  end-to-end run #46 (59b8c8d) then went GREEN: security artifacts
+  committed to platform-config (security-artifacts/hello-m2/development/
+  {49.json,latest.json}), component commit 41f9c2e3 pinned :59b8c8d,
+  Flux applied, OpenChoreo created ComponentRelease hello-m2-86b96b6c5
+  and rolled the pod to :59b8c8d (1/1 Running). smoke-security now
+  46/0/3 (FR-03 artifact read flipped from SKIP to PASS).
+  Reliability debt recorded: Trivy re-downloads its 108 MiB DB 4x per
+  run (a named cache volume would fix it); osv-scanner --output is
+  deprecated (still accepted); seed Dockerfile base alpine:3.20 is EOL
+  per Trivy (bump follow-up).
+- Engagement-plane slice LANDED: CiRunsCard (Gitea Actions runs via the
+  authenticated gitea-actions proxy, honest labeled not-wired states) +
+  Engagement tab on Component entity pages; committed e82f2bc (signed).
+  Playwright-verified: tab present, card renders, all pre-existing tabs
+  intact. Environmental notes: the :3001 dev server does not proxy /api
+  to :7008 (pre-existing, affects all proxy cards; live data needs the
+  production same-origin deployment or a dev-proxy change), and
+  ~/.rational-reserve/m1-gitea-token had been wiped -- restored with a
+  fresh admin token (chmod 600) so start-backstage.sh's contract works.
+- linkify-it: the uncommitted 6.1.0 -> 5.0.2 downgrade turned out to be
+  REQUIRED, not spurious: yarn build:all fails against linkify-it v6
+  types (markdown-it 14.2.0 declarations); tsc did not cover the bundler
+  path. Re-applied, yarn.lock regenerated, audit clean; provenance row
+  97 updated, certificate re-issued r9 (PRC-developer-portal-2026-08-20-r9).
+  Lesson: build:all is the real gate for resolution pins.
+- Silent regression found and fixed: packages/app/dist was a PARTIAL
+  bundle (8 public-asset files, no index.html), so both backends 404'd
+  / -- smoke-auth and smoke-backstage-production had been failing
+  unnoticed (the dir-exists check in start-backstage-production.sh
+  skipped the build; it also used the nonexistent `yarn build` -- now
+  `yarn build:all` and an index.html check, dbd79de + ea29c84). Both
+  backends rebuilt, restarted, and serve 200.
+- Commits this session (all signed, %G?=G): e82f2bc (Engagement slice),
+  6964ca9 (dind mount fix), dbd79de (script repairs: SNI-strict probes
+  in smoke-m4-networking -- Envoy has no catch-all filter chain, an SNI
+  of localhost RSTs and kills the tunnel; 6/6 PASS after), 815f9c0
+  (marker r2), ea29c84 (linkify-it + dist check), f6febe0 (provenance
+  r9). NONE pushed to origin/github; local Gitea mirror synced through
+  dbd79de only (mirror now behind by the later commits).
+- Side effect to know: pushing main to the local Gitea mirror triggered
+  a CodeQL run there (Gitea Actions also reads .github/workflows) which
+  occupied the single act-runner for a while.
+- Platform repair (rollout blocker, fixed): all three cluster-plane
+  agents (data/observability/workflow) had been disconnected since
+  2026-06-30 13:48 -- `websocket: bad handshake`. Root cause: the
+  ClusterDataPlane/ClusterObservabilityPlane/ClusterWorkflowPlane CRs pin
+  `spec.clusterAgent.clientCA.value` to the install-time agent cert,
+  but the agents' self-signed certs (CN=default, 90-day) were re-issued
+  by cert-manager on 2026-06-26, so the pinned CA went stale (and the
+  pinned instance expired 2026-07-10). Re-pinned all three CRs to the
+  current certs from each plane's cluster-agent-tls Secret; agents
+  reconnected immediately and the queued release rolled out. TECH DEBT:
+  the pins go stale again at the next renewal (current certs expire
+  2026-09-24); needs an upstream-style fix (real CA or installer hook).
+
+**Next session candidates:** Wave-1 security items (Falco + Falcosidekick
+-> SigNoz, Trivy Operator, MISP slim) now that capacity exists -- gated on
+the roadmap's remaining user decisions; Trivy DB cache volume in the seed
+workflow; alpine base bump; Engagement-card live data via the production
+deployment or a dev /api proxy; continue five-plane roadmap Phase 1.
 
 ---
 
