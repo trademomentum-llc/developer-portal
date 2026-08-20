@@ -1,19 +1,18 @@
 # Provenance Recognition Certificate
 
-**Certificate ID:** PRC-developer-portal-2026-08-19-r8
+**Certificate ID:** PRC-developer-portal-2026-08-20-r9
 
-**Supersedes:** PRC-developer-portal-2026-08-18-r7 (scaffolder
-publish-to-Gitea re-issue: @backstage/plugin-scaffolder-backend-module-gitea
-added as a direct backend dependency (publish:gitea action);
-@backstage/plugin-scaffolder-backend-module-github marked REMOVED
-2026-08-19 -- dead dependency, declared but never registered, replaced by
-the Gitea module; its row is retained with the marker per the listing's
-removal convention. Component total 198, up from 197). Chain history:
+**Supersedes:** PRC-developer-portal-2026-08-19-r8 (linkify-it
+re-issue: the group 5 #97 resolution override moved from 6.1.0 to
+5.0.2 on 2026-08-20 -- markdown-it 14.2.0 type declarations break
+`yarn build:all` against the v6 line; 5.0.2 satisfies markdown-it's
+^5.0.1 range and `yarn npm audit` is clean. Component total unchanged
+at 198; no entries added or removed). Chain history:
 r1-r4 were issued and superseded before the provenance package's first
 commit and exist in no retained history; r5 entered git history at commit
 d85e568, r6 at 82783ee, and r7 at f20cff8; the retention-in-git-history
 rule in the Revocation and update rule section has been in force since
-r5, so r5, r6, r7, and this r8 are all retained.
+r5, so r5, r6, r7, r8, and this r9 are all retained.
 
 ---
 
@@ -94,12 +93,12 @@ is `provenance/PROVENANCE.md`; this table is a summary, not a duplicate.
 ## Integrity
 
 SHA-256 digests computed with `shasum -a 256` at generation time
-(2026-08-19):
+(2026-08-20):
 
 - `THIRD-PARTY-LICENSES.md`:
-  `d453454931970da2d909c7e0f417cc1e5b2ebed9c448e805af1b118a7c79821e`
+  `e76b0a1d13e5587fd9077fa493f947bc2a89aed917a7191277c15456c4245b1b`
 - `provenance/PROVENANCE.md`:
-  `49dc4334fdcd7e81cc4a8dfd2eb3ef1133bb840e122a1c31439fb785f0782169`
+  `10d8bf4a233bf3db7c10129d286b82f2dd6cba171095861591b458e42157ace5`
 
 Any change to either file invalidates the corresponding digest and
 requires this certificate to be regenerated. Verify with:
@@ -112,7 +111,7 @@ and compare against the values above.
 
 ## Attestation
 
-- **Date of issuance:** 2026-08-19
+- **Date of issuance:** 2026-08-20
 - **Issuer attestation:** Issued by the maintainers of developer-portal
   (Sovereign portfolio) on the date above, from the verified dependency
   inventory of the repository at that date.

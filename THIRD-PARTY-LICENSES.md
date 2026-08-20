@@ -660,7 +660,7 @@ LICENSE headers (verified 2026-08-18).
 | minimatch | 9.0.9 (single installed copy and single pin at package.json:89; the dead descriptor-scoped pins were removed in the 2026-08-18 remediation) | ISC | Isaac Z. Schlueter |
 | immutable | 4.3.9 | MIT | Lee Byron and contributors |
 | tar | 7.5.22 | BlueOak-1.0.0 | Isaac Z. Schlueter |
-| linkify-it | 6.1.0 | MIT | Vitaly Puzrin (2015) |
+| linkify-it | 5.0.2 (re-pinned from 6.1.0 on 2026-08-20; markdown-it 14.2.0 types require the ^5.0.1 line for yarn build:all) | MIT | Vitaly Puzrin (2015) |
 | fast-xml-builder | 1.3.0 | MIT | Natural Intelligence (2026); author Amit Gupta |
 | brace-expansion | 5.0.9 | MIT | Julian Gruber; TypeScript port Isaac Z. Schlueter |
 | fast-uri | 4.1.2 | BSD-3-Clause | Vincent Le Goff |
