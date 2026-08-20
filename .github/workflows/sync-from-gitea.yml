@@ -47,8 +47,10 @@ jobs:
           # gitea.com exposes refs/pull/* and GitHub rejects those as
           # hidden refs, which made every --mirror push fail wholesale.
           # --prune keeps branches/tags exact: refs deleted on Gitea are
-          # pruned on GitHub.
+          # pruned on GitHub. The clone --mirror config flag must be
+          # unset first: git refuses to combine it with refspecs.
           git remote set-url origin "${DST}"
+          git config --unset remote.origin.mirror || true
 
           before="$(git ls-remote origin HEAD | awk '{print $1}')"
           git push origin --prune '+refs/heads/*:refs/heads/*' '+refs/tags/*:refs/tags/*'
