@@ -30,6 +30,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Generate lockfile for the scanner
+        # The skeleton ships no lockfile. Materialize one BEFORE Trivy/OSV so
+        # neither scanner walks an empty tree. npm on a zero-dep package.json
+        # still writes a lockfile whose packages map is only the root entry.
+        run: |
+          docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            node@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 \
+            npm install --package-lock-only --ignore-scripts --no-audit --silent
+          test -s "${GITHUB_WORKSPACE}/package-lock.json"
       - name: Trivy filesystem scan (gate)
         run: |
           docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
@@ -37,19 +46,41 @@ jobs:
             aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
             fs --scanners vuln --severity HIGH,CRITICAL --exit-code 1 \
             "${GITHUB_WORKSPACE}"
-      - name: Generate lockfile for the scanner
-        # The skeleton ships no lockfile; osv-scanner exits 128 when it finds
-        # no package sources. Materialize one (zero-dep projects produce an
-        # empty tree, which scans clean).
-        run: |
-          docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
-            node@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 \
-            npm install --package-lock-only --ignore-scripts --no-audit --silent
       - name: OSV dependency scan (gate)
+        # osv-scanner v2.5.1 exits 128 when it finds zero packages (including
+        # a valid empty lockfile). Accept 128 only after package.json and the
+        # lockfile both confirm zero dependencies; a missing tree, a failed
+        # lockfile, or undeclared deps still fail closed.
         run: |
+          COUNTS="$(docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            node@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 \
+            node -e 'const fs=require("fs"); const p=JSON.parse(fs.readFileSync("package.json","utf8")); const d=Object.assign({}, p.dependencies||{}, p.devDependencies||{}, p.optionalDependencies||{}); const lock=JSON.parse(fs.readFileSync("package-lock.json","utf8")); const n=Object.keys(lock.packages||{}).filter(function(k){return k!=="";}).length; process.stdout.write(String(Object.keys(d).length)+"\n"+String(n)+"\n");')"
+          DECLARED="$(printf '%s\n' "${COUNTS}" | sed -n '1p')"
+          LOCKED="$(printf '%s\n' "${COUNTS}" | sed -n '2p')"
+          echo "osv inputs: declared=${DECLARED} locked=${LOCKED}"
+          if [ -z "${DECLARED}" ] || [ -z "${LOCKED}" ]; then
+            echo "failed to read package.json / package-lock.json for the OSV gate"
+            exit 1
+          fi
+          if [ "${DECLARED}" != "0" ] && [ "${LOCKED}" = "0" ]; then
+            echo "package.json declares dependencies but the lockfile has none"
+            exit 1
+          fi
+          set +e
           docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
             ghcr.io/google/osv-scanner@sha256:8108ae94eadea5a02c9bec6e646909d5b790b44bd62d7f5b7f0b1d6d0ffc7734 \
             scan source -r --format json "${GITHUB_WORKSPACE}"
+          rc=$?
+          set -e
+          if [ "${rc}" -eq 0 ]; then
+            exit 0
+          fi
+          if [ "${rc}" -eq 128 ] && [ "${DECLARED}" = "0" ] && [ "${LOCKED}" = "0" ]; then
+            echo "osv-scanner exit 128 on a verified empty dependency tree; treating as clean"
+            exit 0
+          fi
+          echo "osv-scanner failed with exit ${rc} (declared=${DECLARED} locked=${LOCKED})"
+          exit "${rc}"
 
   build:
     runs-on: ubuntu-latest

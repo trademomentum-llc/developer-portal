@@ -469,6 +469,55 @@ else
 fi
 
 # =============================================================================
+# Scaffolder-inherited project CI (FR-38/OQ-31)
+# =============================================================================
+# New projects get test + security stages from the portal template. The
+# live e2e (scaffold-e2e-20260821 run 1) showed two wiring bugs: Trivy ran
+# before the lockfile existed (num=0), and osv-scanner v2.5.1 exits 128 on
+# a valid empty lockfile. These checks pin the repaired contract.
+info "Scaffolder template CI inheritance (FR-38/OQ-31)"
+
+SCAFFOLD_WF="${REPO_ROOT}/backstage/examples/template/content/.gitea/workflows/ci.yaml"
+if [ ! -f "${SCAFFOLD_WF}" ]; then
+    fail "backstage/examples/template/content/.gitea/workflows/ci.yaml missing"
+else
+    if grep -qF "name: Unit tests (node --test)" "${SCAFFOLD_WF}" \
+        && grep -qF "name: Generate lockfile for the scanner" "${SCAFFOLD_WF}" \
+        && grep -qF "name: Trivy filesystem scan (gate)" "${SCAFFOLD_WF}" \
+        && grep -qF "name: OSV dependency scan (gate)" "${SCAFFOLD_WF}"; then
+        pass "scaffolder template CI has test + lockfile + Trivy + OSV stages"
+    else
+        fail "scaffolder template CI is missing a required inherited stage"
+    fi
+
+    gen_line="$(grep -n "name: Generate lockfile for the scanner" "${SCAFFOLD_WF}" | head -1 | cut -d: -f1)"
+    trivy_line="$(grep -n "name: Trivy filesystem scan (gate)" "${SCAFFOLD_WF}" | head -1 | cut -d: -f1)"
+    osv_line="$(grep -n "name: OSV dependency scan (gate)" "${SCAFFOLD_WF}" | head -1 | cut -d: -f1)"
+    if [ -n "${gen_line}" ] && [ -n "${trivy_line}" ] && [ -n "${osv_line}" ] \
+        && [ "${gen_line}" -lt "${trivy_line}" ] && [ "${trivy_line}" -lt "${osv_line}" ]; then
+        pass "scaffolder template CI generates the lockfile before Trivy and OSV"
+    else
+        fail "scaffolder template CI step order is lockfile -> Trivy -> OSV (got gen=${gen_line} trivy=${trivy_line} osv=${osv_line})"
+    fi
+
+    if grep -qF "aquasec/trivy@${TRIVY_DIGEST}" "${SCAFFOLD_WF}" \
+        && grep -qF "ghcr.io/google/osv-scanner@${OSV_DIGEST}" "${SCAFFOLD_WF}"; then
+        pass "scaffolder template CI references the pinned Trivy and OSV-Scanner digests"
+    else
+        fail "scaffolder template CI is missing a spec-pinned scanner digest"
+    fi
+
+    if grep -qF 'rc=$?' "${SCAFFOLD_WF}" \
+        && grep -qF '[ "${rc}" -eq 128 ]' "${SCAFFOLD_WF}" \
+        && grep -qF '[ "${DECLARED}" = "0" ]' "${SCAFFOLD_WF}" \
+        && grep -qF '[ "${LOCKED}" = "0" ]' "${SCAFFOLD_WF}"; then
+        pass "scaffolder template CI accepts OSV 128 only on a verified empty tree"
+    else
+        fail "scaffolder template CI is missing fail-closed OSV empty-tree handling"
+    fi
+fi
+
+# =============================================================================
 # Summary
 # =============================================================================
 echo

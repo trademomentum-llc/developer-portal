@@ -116,6 +116,17 @@ acceptance (lifecycle re-runs + live CI + smoke-all integration).
   (refs/pull rejection + mirror-flag conflict, 5ec7c5a/6b682a4) and
   guarded GitHub-only (8fea437); stale chore/main-forward-2026-08-19
   branch deleted everywhere.
+  CORRECTION same day: the OQ-12 half of db25615 was wrong -- the
+  roadmap's 'dead example-nodejs-template' note predates the 08-19
+  publish:gitea slice that made examples/template the LIVE project-
+  creation path; deleting it zeroed the catalog's Template entities.
+  Restored + re-registered (ee46a96). The github-module half of OQ-12
+  stays done.
+- 2026-08-21 Phase 2 -- LIVE-PROVEN, not yet published to origin:
+  self-CI (FR-17/OQ-27) run 278 GREEN at e4495ee; scaffolder test-stage
+  inheritance (FR-38/OQ-31) live-proven on scaffold-e2e-20260821 run 2
+  after OSV empty-tree 128 was handled fail-closed. Promotion stays
+  manual (OQ-14). Remaining: push the unpushed series to gitea.com.
 
 ## 2026-08-18 Active goal: five-plane collaborative portal
 

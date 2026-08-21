@@ -5,9 +5,61 @@
 > exactly what to do first.
 
 **Last updated:** 2026-08-21
-**Reason for handoff:** Wave-0 security acceptance COMPLETE on the resized
-cluster; Engagement-plane slice landed; full smoke umbrella green again.
-2026-08-21: operational debt sweep + Phase 1 closure (below).
+**Reason for handoff:** Phase 2 self-CI and scaffolder test-stage
+inheritance proven live on the local Gitea runner. Wave-0 remains green.
+Kimi debug session session_d1ce6d50 died mid-acceptance (OAuth ENOTFOUND
+auth.kimi.com); recovered and closed below.
+
+---
+
+## 0c. 2026-08-21 addendum -- Phase 2 self-CI + scaffold inheritance
+
+Kimi session `session_d1ce6d50-42e4-42a2-83d8-bdae8671ed37` (exported as
+`kimi-debug-session_-20260821-193754`) ended at turn 14 on
+`getaddrinfo ENOTFOUND auth.kimi.com` while waiting on self-CI 278 and
+scaffold v4. Recovered from the export, not from the connection drop.
+
+- Self-CI run 278 (`e4495ee`) completed **success**: go-tests,
+  policy-tests, security-gates. Runs 276/277 failed only on
+  `TestAudit_PrevHashFailOpen` under the rootful act-runner; that skip
+  was already on main.
+- Scaffolder inheritance (OQ-31/FR-38) was **not** green. Scaffold
+  `openchoreo/scaffold-e2e-20260821` run 1: test success, security-gates
+  failure, build skipped. Exact OSV line:
+  `Scanned .../package-lock.json file and found 0 packages` then
+  `exitcode '128'`. Trivy had already walked the tree **before** the
+  lockfile existed (`Number of language-specific files num=0`). This is
+  a wiring bug, not a CVE -- osv-scanner v2.5.1 exits 128 on a valid
+  empty lockfile, and the template comment that "an empty tree scans
+  clean" was false.
+- Fix in `backstage/examples/template/content/.gitea/workflows/ci.yaml`:
+  generate the lockfile first, then Trivy, then OSV. Accept exit 128
+  only when package.json and the lockfile both confirm zero
+  dependencies; missing tree or undeclared deps still fail closed.
+  smoke-security gained a FR-38 lane pinning that contract.
+- Proof: scaffold-e2e run 2 (`a59c7fe`) test + security-gates + build
+  all success. Log: `osv inputs: declared=0 locked=0` then
+  `osv-scanner exit 128 on a verified empty dependency tree; treating as
+  clean`. smoke-security **53 pass / 0 fail / 1 skip**.
+- Residual: Trivy still reports `num=0` on a zero-dep npm lockfile
+  (nothing to scan). Adding a real dependency will populate the lockfile
+  and Trivy will see it. Do not weaken the HIGH/CRITICAL exit-code gate.
+- Publication: origin/github still behind local HEAD (the Phase 2
+  commits plus this fix). Push to the local Gitea mirror
+  (`localhost:3333/openchoreo/developer-portal`) so self-CI picks up the
+  smoke-security change. Do not treat origin as current.
+
+Approved but not started (agent-6, user "yes"): bind Backstage
+`app.listen`/`backend.listen` to 127.0.0.1, add a wildcard-listener
+smoke-security lane, record `k3d --api-port 127.0.0.1:6550` on the
+fresh-cluster rebuild path. Work with the Colima SSH tightening; do not
+disable it.
+
+**Next candidates:** publish the unpushed Phase 2 series to gitea.com
+(and let GitHub sync), then Wave-1 security installs (Falco, Trivy
+Operator, MISP slim -- each needs a recorded stack approval per OQ-20).
+User open items unchanged: gitea.com branch protection, .env.local
+Vercel token rotation.
 
 ---
 
@@ -73,10 +125,8 @@ cluster; Engagement-plane slice landed; full smoke umbrella green again.
   project, not developer-portal scope. The deployment stays scaled to 0.
   Report in session transcript 2026-08-21.
 
-**Next candidates:** Phase 2 closure (self-CI OQ-27, test-stage
-inheritance OQ-31/FR-38, promotion stays manual per OQ-14), then
-Wave-1 security installs (Falco, Trivy Operator, MISP slim -- each
-needs a recorded stack approval per OQ-20). User open items unchanged:
+**Next candidates (superseded by 0c):** Phase 2 is live-proven; publish
+the unpushed series, then Wave-1. User open items unchanged:
 gitea.com branch protection, .env.local Vercel token rotation.
 
 Late-session incident (2026-08-21 ~05:30 and 06:53 local): the Colima
