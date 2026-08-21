@@ -37,6 +37,11 @@ cluster; Engagement-plane slice landed; full smoke umbrella green again.
   verifier caught it as designed; log preserved as
   verify-guard.jsonl.race-2026-08-20 and a fresh chain started. Debt:
   guard writers need cross-harness file locking.
+  UPDATE same day: landed (d4c2f80) -- auditlock.go in all six guards,
+  exclusive flock on a persistent <log>.lock sidecar covering
+  read-tail-hash -> append (+ rotation for verify-guard); races now
+  structurally impossible; smoke-security 49/0/1 with fresh locked
+  chains verifying.
 - CI debt fixed (e7f42f1): all four Trivy steps mount
   -v trivy-cache:/root/.cache/trivy on the dind daemon (was 4x108 MiB
   re-downloads per run); hello-m2 runtime base bumped alpine:3.20 ->
