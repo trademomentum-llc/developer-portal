@@ -281,21 +281,30 @@ else
     fail "Certificates in envoy-gateway not Ready within 120s"
 fi
 
-# D4: FR-10 config files exist and parse.
-for f in .github/dependabot.yml .github/workflows/code-scanning.yml; do
-    if [ ! -f "${REPO_ROOT}/${f}" ]; then
-        fail "${f} missing"
-        continue
-    fi
-    yaml_ok "${REPO_ROOT}/${f}" && rc=0 || rc=$?
+# D4: FR-10 config files exist and parse. dependabot.yml is required;
+# code-scanning.yml must NOT exist: GitHub-side CodeQL is provided by the
+# org "GitHub recommended" security configuration (default setup), which
+# rejects SARIF from an in-repo advanced workflow -- the two cannot
+# coexist, so the file was removed 2026-08-21 (see spec section 10
+# amendment). The dynamic CodeQL workflow is green on every push.
+f="${REPO_ROOT}/.github/dependabot.yml"
+if [ ! -f "${f}" ]; then
+    fail ".github/dependabot.yml missing"
+else
+    yaml_ok "${f}" && rc=0 || rc=$?
     if [ "${rc}" -eq 0 ]; then
-        pass "${f} exists and is valid YAML"
+        pass ".github/dependabot.yml exists and is valid YAML"
     elif [ "${rc}" -eq 2 ]; then
-        skip "${f} YAML validity (no yq or python3+yaml on this host)"
+        skip ".github/dependabot.yml YAML validity (no yq or python3+yaml on this host)"
     else
-        fail "${f} does not parse as YAML"
+        fail ".github/dependabot.yml does not parse as YAML"
     fi
-done
+fi
+if [ -f "${REPO_ROOT}/.github/workflows/code-scanning.yml" ]; then
+    fail "code-scanning.yml present -- conflicts with the org default CodeQL setup (remove it; see spec section 10 amendment)"
+else
+    pass "no in-repo advanced CodeQL workflow (org default setup owns GitHub-side scanning)"
+fi
 
 # D5: dependabot.yml covers every go.mod root (enumeration per spec 10.2;
 # a missing root fails the suite, spec 14.1 negative test).

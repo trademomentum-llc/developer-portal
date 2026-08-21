@@ -853,6 +853,21 @@ None new (cert-manager is already deployed; Secrets and Gateway listeners are co
 
 ## 10. FR-10 -- dependabot and code scanning as config-as-code
 
+> **Amendment 2026-08-21 (supersedes the code-scanning workflow portion of
+> this section):** the GitHub organization (trademomentum-llc) runs a "GitHub
+> recommended" code-security configuration with CodeQL **default setup**
+> enabled. GitHub rejects SARIF uploads from an in-repo advanced workflow
+> while default setup is active ("CodeQL analyses from advanced
+> configurations cannot be processed when the default setup is enabled"),
+> so `.github/workflows/code-scanning.yml` was REMOVED on 2026-08-21.
+> GitHub-side CodeQL is owned by the org default setup (dynamic workflow
+> `CodeQL`, verified green on every push, e.g. run 32495906251 on 706a3b0);
+> dependabot.yml is unaffected. The smoke suite now asserts the file's
+> absence. Also corrected on evidence: the 10.2 claim "Gitea Actions never
+> executes .github/workflows" is wrong for this Gitea version -- the local
+> forge DID execute code-scanning.yml on the act-runner (2026-08-20), which
+> is also why the removed workflow was observable there.
+
 ### 10.1 Goal
 
 Scanner posture for the GitHub mirror is version-controlled in this repo.

@@ -1,19 +1,19 @@
 # Provenance Recognition Certificate
 
-**Certificate ID:** PRC-developer-portal-2026-08-21-r10
+**Certificate ID:** PRC-developer-portal-2026-08-21-r11
 
-**Supersedes:** PRC-developer-portal-2026-08-20-r9 (alpine re-issue:
-the hello-m2 runtime base moved from EOL alpine:3.20 to alpine:3.24 on
-2026-08-21 -- Trivy flagged 3.20 as unsupported by its distribution,
-making scan detection unreliable. Group 2 entry 5 re-enumerated against
-a pulled image: Alpine 3.24.1, 16 packages with apk-verified licenses.
-Component total unchanged at 198; no entries added or removed). Chain
-history: r1-r4 were issued and superseded before the provenance
-package's first commit and exist in no retained history; r5 entered git
-history at commit d85e568, r6 at 82783ee, and r7 at f20cff8; the
-retention-in-git-history rule in the Revocation and update rule section
-has been in force since r5, so r5 through r9 and this r10 are all
-retained.
+**Supersedes:** PRC-developer-portal-2026-08-21-r10 (codeql-action
+re-issue: group 6 entry 9 marked REMOVED 2026-08-21 -- the GitHub org's
+"GitHub recommended" code-security configuration enables CodeQL default
+setup, which rejects SARIF from an in-repo advanced workflow;
+code-scanning.yml removed, GitHub-side scanning owned by the org default
+setup. Component total unchanged at 198; the row is retained with the
+marker per the listing's removal convention). Chain history: r1-r4 were
+issued and superseded before the provenance package's first commit and
+exist in no retained history; r5 entered git history at commit d85e568,
+r6 at 82783ee, and r7 at f20cff8; the retention-in-git-history rule in
+the Revocation and update rule section has been in force since r5, so
+r5 through r10 and this r11 are all retained.
 
 ---
 
@@ -42,9 +42,11 @@ components listed in `provenance/PROVENANCE.md`, grouped as follows:
 | 8. Documentation Tooling | 2 |
 | **Total** | **198** |
 
-The total includes one row retained with a REMOVED 2026-08-19 marker
-(@backstage/plugin-scaffolder-backend-module-github, group 5 #68): a
-removal is recorded, not erased, per the listing's convention.
+The total includes two rows retained with REMOVED markers
+(@backstage/plugin-scaffolder-backend-module-github, group 5 #68,
+REMOVED 2026-08-19; github/codeql-action, group 6 #9, REMOVED
+2026-08-21 -- org default CodeQL setup owns GitHub-side scanning):
+a removal is recorded, not erased, per the listing's convention.
 
 In addition, 3 UNVERIFIED items and honest gaps are recorded in the
 UNVERIFIED subsection of the listing (original U-numbers retained: U7,
@@ -87,19 +89,19 @@ is `provenance/PROVENANCE.md`; this table is a summary, not a duplicate.
 | 3. IaC Providers | 5 | MPL-2.0 | github.com/hashicorp/terraform-provider-kubernetes; github.com/alekc/terraform-provider-kubectl |
 | 4. Go Tooling and Modules | 22 | BSD-3-Clause, Apache-2.0, MIT, LGPL-2.1, MIT AND Apache-2.0 (x/net v0.56.0, x/sys v0.46.0, x/text v0.39.0 as of 2026-08-18; govulncheck firmed to v1.7.0, host-installed via go install) | go.dev; github.com/go-yaml/yaml; github.com/open-telemetry/opentelemetry-go |
 | 5. Backstage and Node.js | 128 | Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, ISC, BlueOak-1.0.0, (MPL-2.0 OR Apache-2.0); 47 resolution override pins (@octokit/* pins confirmed load-bearing via @backstage/integration); vendored Yarn 4.18.0 with npmMinimalAgeGate "7d"; plugin-scaffolder-backend-module-gitea added 2026-08-19 (publish:gitea), plugin-scaffolder-backend-module-github marked REMOVED the same day | github.com/backstage/backstage; github.com/facebook/react; github.com/yarnpkg/berry |
-| 6. CI/CD Actions and Images | 9 | MIT, MPL-2.0, BSD-3-Clause, GPL-2.0-only, Apache-2.0, MPL-2.0 AND MIT, MIT AND BSD-2-Clause AND GPL-2.0-or-later, Zlib; actions SHA-pinned 2026-08-18 (checkout v4.4.0, setup-go v5.6.0, setup-opentofu v1.0.8, codeql-action v4.37.7 mirror-scope); Trivy 0.74.0 and OSV-Scanner v2.5.1 digest-pinned (registry-manifest verified); base images floating-tag snapshots | github.com/actions/checkout; hub.docker.com/_/golang; hub.docker.com/_/alpine; hub.docker.com/_/node |
+| 6. CI/CD Actions and Images | 9 | MIT, MPL-2.0, BSD-3-Clause, GPL-2.0-only, Apache-2.0, MPL-2.0 AND MIT, MIT AND BSD-2-Clause AND GPL-2.0-or-later, Zlib; actions SHA-pinned 2026-08-18 (checkout v4.4.0, setup-go v5.6.0, setup-opentofu v1.0.8); codeql-action marked REMOVED 2026-08-21 (org default CodeQL setup owns GitHub-side scanning); Trivy 0.74.0 and OSV-Scanner v2.5.1 digest-pinned (registry-manifest verified); base images floating-tag snapshots | github.com/actions/checkout; hub.docker.com/_/golang; hub.docker.com/_/alpine; hub.docker.com/_/node |
 | 7. Schemas and Specifications | 1 | Apache-2.0 (vendored schema byte-identical to score-spec/spec commit 3ecb17d430c2bbf46d2dfc161fabc7d432d6d1f5) | github.com/score-spec/spec |
 | 8. Documentation Tooling | 2 | BSD-2-Clause, Apache-2.0 | github.com/mkdocs/mkdocs; github.com/backstage/mkdocs-techdocs-core |
 
 ## Integrity
 
 SHA-256 digests computed with `shasum -a 256` at generation time
-(2026-08-21):
+(2026-08-21, r11):
 
 - `THIRD-PARTY-LICENSES.md`:
   `c90537ef44604b8a3dfa2568a6c1231e02bb9ab6c4abdd4bd1e0eb4e22b8c79a`
 - `provenance/PROVENANCE.md`:
-  `ac807f5192e32b0bea0d9e155c07e3f228d251d84fd6aafd4c582b658b548b74`
+  `65f6c68a42746ee98107f16bebee531978fad5084be7b7a46f969dab8b8f2018`
 
 Any change to either file invalidates the corresponding digest and
 requires this certificate to be regenerated. Verify with:
