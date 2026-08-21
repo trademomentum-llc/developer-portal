@@ -164,6 +164,12 @@ macOS + Backstage + builds squeeze the rest; the repeated VM stops
 correlate with host pressure. Consider 10 GiB for the VM (violates the
 recorded Wave-1 >=12 GB prerequisite) or closing heavy apps during
 platform work. USER decision.
+DECISION (2026-08-21, user + measurement): keep 12 GiB. The VM measures
+9120/11934 MiB used with the full platform up (324 free) and CPU
+requests at 95% of 6 cores -- 10 GiB would not fit the current stack,
+let alone Wave-1. Policy for the Mac era: no heavy host-side builds
+concurrent with pipeline runs. Wave-1 sizing waits for the Asus NUC
+move (96 GB, removes the ceiling entirely).
 
 ---
 
