@@ -13,6 +13,9 @@ app:
 
 backend:
   baseUrl: ${BACKEND_BASE_URL}
+  listen:
+    # Loopback only. Port is overridden to 7009 by start-backstage-production.sh.
+    host: 127.0.0.1
   auth:
     keys:
       - secret: ${BACKEND_SECRET}

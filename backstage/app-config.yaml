@@ -2,6 +2,8 @@ app:
   title: Developer Portal
   baseUrl: http://localhost:3001
   listen:
+    # Loopback only: a missing host binds *:port and exposes the UI on the LAN.
+    host: 127.0.0.1
     port: 3001
 
   # Enable all packages by default, this will discover packages from packages/app/package.json
@@ -25,9 +27,9 @@ backend:
   #     - secret: ${BACKEND_SECRET}
   baseUrl: http://localhost:7008
   listen:
+    # Loopback only: a missing host binds *:port and exposes the API on the LAN.
+    host: 127.0.0.1
     port: 7008
-    # Uncomment the following host directive to bind to specific interfaces
-    # host: 127.0.0.1
   csp:
     connect-src: ["'self'", 'http:', 'https:']
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference

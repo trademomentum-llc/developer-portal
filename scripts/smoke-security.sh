@@ -518,6 +518,68 @@ else
 fi
 
 # =============================================================================
+# Loopback-only host listeners (LAN exposure)
+# =============================================================================
+# Backstage, Gitea port-forwards, and the other host-side portal surfaces must
+# not bind 0.0.0.0 / * / [::]. Wildcard binds were observed on :7008/:7009
+# during the 2026-08-21 Colima SSH tightening review.
+info "Host listener scope (loopback only)"
+
+while IFS='|' read -r kind msg; do
+    case "${kind}" in
+        pass) pass "${msg}" ;;
+        fail) fail "${msg}" ;;
+        skip) skip "${msg}" ;;
+    esac
+done < <(python3 <<'PY'
+import re
+import subprocess
+
+ports = (3001, 7008, 7009, 3333, 3002, 29003, 3301, 9090)
+
+try:
+    out = subprocess.check_output(
+        ["lsof", "-nP", "-iTCP", "-sTCP:LISTEN"],
+        text=True,
+        errors="replace",
+    )
+except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+    print(f"skip|lsof not available ({exc})")
+    raise SystemExit(0)
+
+wildcard_re = re.compile(r"^(?:\*|0\.0\.0\.0|\[::\])$")
+loopback_re = re.compile(r"^(?:127\.0\.0\.1|\[::1\])$")
+name_re = re.compile(r"TCP\s+(\S+):(\d+)\s+\(LISTEN\)")
+
+by_port = {p: [] for p in ports}
+for line in out.splitlines():
+    m = name_re.search(line)
+    if not m:
+        continue
+    addr, port_s = m.group(1), m.group(2)
+    port = int(port_s)
+    if port in by_port:
+        by_port[port].append(addr)
+
+for port in ports:
+    addrs = by_port[port]
+    if not addrs:
+        print(f"skip|port {port} has no host listener")
+        continue
+    wild = [a for a in addrs if wildcard_re.match(a)]
+    if wild:
+        print(f"fail|port {port} has a wildcard listener ({', '.join(wild)})")
+        continue
+    bad = [a for a in addrs if not loopback_re.match(a)]
+    if bad:
+        print(f"fail|port {port} listens on non-loopback address ({', '.join(bad)})")
+        continue
+    uniq = ", ".join(sorted(set(addrs)))
+    print(f"pass|port {port} is loopback-only ({uniq})")
+PY
+)
+
+# =============================================================================
 # Summary
 # =============================================================================
 echo

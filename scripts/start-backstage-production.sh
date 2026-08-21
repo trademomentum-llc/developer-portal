@@ -71,6 +71,7 @@ export GITEA_HOSTNAME="localhost:3333"
 export APP_BASE_URL="http://localhost:3002"
 export BACKEND_BASE_URL="http://localhost:7009"
 export APP_CONFIG_backend_listen_port="7009"
+export APP_CONFIG_backend_listen_host="127.0.0.1"
 
 # Keep CORS permissive for local production validation.
 export APP_CONFIG_backend_cors_origin="http://localhost:3002"

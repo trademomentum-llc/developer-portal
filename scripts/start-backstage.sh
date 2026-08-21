@@ -7,7 +7,7 @@ set -euo pipefail
 # checkout lives under ~/Projects/Sovereign/.
 BACKSTAGE_DIR="/Users/nnos/Projects/Sovereign/developer-portal/backstage"
 RUNTIME_DIR="${HOME}/.rational-reserve"
-APP_HOST="${BACKSTAGE_APP_HOST:-localhost}"
+APP_HOST="${BACKSTAGE_APP_HOST:-127.0.0.1}"
 APP_PORT="${BACKSTAGE_APP_PORT:-3001}"
 BACKEND_PORT="${BACKSTAGE_BACKEND_PORT:-7008}"
 APP_BASE_URL="${BACKSTAGE_APP_BASE_URL:-http://${APP_HOST}:${APP_PORT}}"
@@ -193,7 +193,9 @@ export GITEA_ADMIN_TOKEN
 export HOST="$APP_HOST"
 export PORT="$APP_PORT"
 export APP_CONFIG_app_baseUrl="$APP_BASE_URL"
+export APP_CONFIG_app_listen_host="$APP_HOST"
 export APP_CONFIG_backend_baseUrl="$BACKEND_BASE_URL"
+export APP_CONFIG_backend_listen_host="127.0.0.1"
 export APP_CONFIG_backend_listen_port="$BACKEND_PORT"
 # Only pin CORS to a custom app host; otherwise the app-config.yaml list
 # (localhost + 127.0.0.1) is used so both URLs work.

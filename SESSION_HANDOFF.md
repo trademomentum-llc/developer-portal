@@ -49,11 +49,16 @@ scaffold v4. Recovered from the export, not from the connection drop.
   (`localhost:3333/openchoreo/developer-portal`) so self-CI picks up the
   smoke-security change. Do not treat origin as current.
 
-Approved but not started (agent-6, user "yes"): bind Backstage
-`app.listen`/`backend.listen` to 127.0.0.1, add a wildcard-listener
-smoke-security lane, record `k3d --api-port 127.0.0.1:6550` on the
-fresh-cluster rebuild path. Work with the Colima SSH tightening; do not
-disable it.
+Loopback bind slice LANDED: `app.listen`/`backend.listen` host
+`127.0.0.1` in app-config.yaml and app-config.production.yaml;
+start-backstage.sh defaults HOST to 127.0.0.1; rspack `/api` proxy
+targets `http://127.0.0.1:7008`. Live listeners after restart:
+3001/7008/7009 all `127.0.0.1` (were `*` on 7008/7009). smoke-security
+gained a host-listener lane (portal-owned ports must be loopback;
+wildcard fails). M4 networking tech spec rebuild path now requires
+`k3d --api-port 127.0.0.1:6550`. Colima SSH tightening is unchanged
+(worked with, not around). smoke-auth and smoke-backstage-production
+green against the rebound sockets.
 
 **Next candidates:** publish the unpushed Phase 2 series to gitea.com
 (and let GitHub sync), then Wave-1 security installs (Falco, Trivy
