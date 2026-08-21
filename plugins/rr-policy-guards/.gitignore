@@ -1,3 +1,12 @@
 bin/
 *.test
 *.out
+
+# Binaries accidentally built inside a tool dir (canonical outputs live in bin/)
+tools/bash-guard/bash-guard
+tools/brew-guard/brew-guard
+tools/commit-guard/rr-commit-guard
+tools/emoji-guard/emoji-guard
+tools/tofu-guard/tofu-guard
+tools/verify-guard/verify-guard
+tools/audit-chain/audit-chain
