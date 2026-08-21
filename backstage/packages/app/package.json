@@ -14,6 +14,13 @@
     "test": "backstage-cli package test",
     "lint": "backstage-cli package lint"
   },
+  "proxy": [
+    {
+      "context": ["/api"],
+      "target": "http://localhost:7008",
+      "changeOrigin": true
+    }
+  ],
   "dependencies": {
     "@backstage/cli": "^0.36.0",
     "@backstage/core-components": "^0.18.8",
