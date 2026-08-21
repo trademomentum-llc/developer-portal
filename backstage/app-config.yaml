@@ -111,10 +111,6 @@ catalog:
     - type: file
       target: ../../../catalog-info.yaml
     - type: file
-      target: ../../examples/template/template.yaml
-      rules:
-        - allow: [Template]
-    - type: file
       target: ../../examples/org.yaml
       rules:
         - allow: [User, Group]

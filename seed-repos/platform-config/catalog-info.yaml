@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: platform-config
+  description: GitOps deploy repo -- rendered OpenChoreo Components per environment (dev/staging), cost and security scan artifacts. Written by CI, applied by Flux.
+  annotations:
+    gitea.io/project: openchoreo/platform-config
+  links:
+    - url: http://localhost:3333/openchoreo/platform-config
+      title: Gitea repo
+      icon: web
+spec:
+  type: gitops-config
+  owner: openchoreo
+  system: developer-portal
