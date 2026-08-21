@@ -154,3 +154,32 @@ contemporaneous -- written during the work, per the rules in the header.
   backstage/packages/app/src/modules/openchoreo-cards/CiRunsCard.tsx,
   scripts/start-backstage-production.sh, provenance/PROVENANCE-RECOGNITION-CERTIFICATE.md.
 
+## 2026-08-21 -- Ops debt sweep, publication repair, Phase 1 closure
+
+- Author/context: user-directed continuation; close out operational debt
+  and finish earlier roadmap phases before starting new ones.
+- Tried: fix the plane-agent cert renewal time bomb, CI reliability debt
+  (Trivy DB cache, EOL alpine base), the dev /api proxy gap, the broken
+  Gitea->GitHub publication path, and Phase 1 leftovers (catalog
+  entities for the GitOps repos, dead template hygiene).
+- Failed: two hello-m2 runs (#48, #49) died on infrastructure flakes
+  (cluster-wide sandbox churn killed the runner's dind; then a TLS
+  handshake timeout pulling the runner image) before #50 went green;
+  the verify-guard audit chain tripped on a two-writer race with a
+  concurrent Codex-harness guard install (caught exactly as designed);
+  the sync workflow needed two rounds (refs/pull rejection, then the
+  clone's mirror flag refusing refspecs); the user's Vercel-as-CI idea
+  for the cert issue was a category error -- the pinning is in-cluster
+  mTLS, invisible to any external CI; and the Colima VM itself stopped
+  twice mid-session, churning every pod (openbao needed a reseed,
+  m2i-6's inmem weakness again) and producing a second guard-log race.
+- Learned: adjacency is not causality for infrastructure (Vercel cannot
+  fix in-cluster cert pinning); float-and-pin fragility is the recurring
+  theme of the week (agent clientCA pins, floating base tags, lockfile
+  overrides) -- deterministic re-pin scripts + smoke drift checks are
+  the cheap mitigation. Phase 1 exit criteria now all met; smoke-security
+  47/0/3 including the new clientCA freshness lane.
+- Links: scripts/repin-plane-agent-ca.sh, .github/workflows/sync-from-gitea.yml,
+  seed-repos/platform-config/catalog-info.yaml, seed-repos/platform-addons/catalog-info.yaml,
+  backstage/packages/app/package.json, iac/templates/ci.yaml,
+  provenance/PROVENANCE-RECOGNITION-CERTIFICATE.md (r10).

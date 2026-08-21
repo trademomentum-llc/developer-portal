@@ -102,6 +102,20 @@ acceptance (lifecycle re-runs + live CI + smoke-all integration).
   cache volume); seed Dockerfile alpine:3.20 EOL per Trivy; dev server
   :3001 does not proxy /api to :7008 (pre-existing, all proxy cards
   affected).
+- 2026-08-21 ops debt sweep -- DONE: cert re-pin tool + smoke drift
+  check (c035211; verify-guard.jsonl two-writer race with a concurrent
+  Codex harness recorded, log archived as .race-2026-08-20, fresh chain
+  started; structural fix = cross-harness file locking in guard
+  writers); Trivy named cache volume on all four steps + runtime base
+  alpine:3.24 + template re-synced to the live seed byte-for-byte
+  (e7f42f1, closes OQ-18/FR-33); dev /api proxy fixed and live-verified
+  (f0d10f6); Phase 1 leftovers closed (db25615: platform-config/
+  platform-addons catalog entities, dead example template removed,
+  OQ-11/OQ-12); provenance cert r10 (d0fddbc). Publication: origin +
+  github + local mirror all synced; Gitea->GitHub sync workflow repaired
+  (refs/pull rejection + mirror-flag conflict, 5ec7c5a/6b682a4) and
+  guarded GitHub-only (8fea437); stale chore/main-forward-2026-08-19
+  branch deleted everywhere.
 
 ## 2026-08-18 Active goal: five-plane collaborative portal
 

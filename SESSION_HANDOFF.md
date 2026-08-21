@@ -4,9 +4,86 @@
 > what is now committed that was not before, what is still outstanding, and
 > exactly what to do first.
 
-**Last updated:** 2026-08-20
+**Last updated:** 2026-08-21
 **Reason for handoff:** Wave-0 security acceptance COMPLETE on the resized
 cluster; Engagement-plane slice landed; full smoke umbrella green again.
+2026-08-21: operational debt sweep + Phase 1 closure (below).
+
+---
+
+## 0b. 2026-08-21 addendum -- ops debt + Phase 1 closure (this session)
+
+- Publication state: origin (gitea.com) AND github both current at HEAD;
+  the Gitea->GitHub sync was repaired (see below) and a GitHub-side cron
+  keeps them mirrored every 5 min. Local Gitea mirror (localhost:3333
+  openchoreo/developer-portal; NOT a configured remote, pushed via
+  explicit URL) also synced -- CI clones read from it.
+- Sync-from-Gitea fixed (.github/workflows/sync-from-gitea.yml): every
+  scheduled run had been failing because clone --mirror from gitea.com
+  fetches refs/pull/* and GitHub rejects hidden refs (5ec7c5a switched
+  to explicit refs/heads+refs/tags refspecs with --prune; 6b682a4 unset
+  the clone's remote.origin.mirror flag, which git refuses to combine
+  with refspecs). Dispatch verified green (23s). 8fea437 added a
+  GitHub-only job guard (gitea.com shared runners were wastefully
+  executing it with a Gitea-scoped token). Stale branch
+  chore/main-forward-2026-08-19 deleted on origin/github/local.
+- Cluster-plane agent certs: re-pin tooling landed (c035211) --
+  scripts/repin-plane-agent-ca.sh (idempotent, --check mode) plus a
+  smoke-security lane that fails on drift. Next renewal ~2026-09-24;
+  structural fix (real CA / installer-side pinning) remains upstream
+  debt. Guard audit-log note: verify-guard.jsonl hit a two-writer race
+  with a concurrent Codex-harness guard install (four interleaved
+  entries chained from one tail hash, 2026-08-20T10:46:48Z); the chain
+  verifier caught it as designed; log preserved as
+  verify-guard.jsonl.race-2026-08-20 and a fresh chain started. Debt:
+  guard writers need cross-harness file locking.
+- CI debt fixed (e7f42f1): all four Trivy steps mount
+  -v trivy-cache:/root/.cache/trivy on the dind daemon (was 4x108 MiB
+  re-downloads per run); hello-m2 runtime base bumped alpine:3.20 ->
+  3.24 (EOL; both Dockerfile stages now ride Alpine 3.24.1);
+  iac/templates/ci.yaml re-synced byte-for-byte to the live seed
+  workflow (OQ-18/FR-33 closed -- it still had the vacuous-pass $PWD
+  mounts and --environment dev).
+- Dev proxy fixed (f0d10f6): rspack dev server on :3001 now proxies
+  /api to :7008 (proxy array in packages/app/package.json -- array form
+  mandatory) and discovery.endpoints allowlists the proxied prefix so
+  the Backstage token attaches. Engagement/Security/Cost cards render
+  LIVE data in dev now (Playwright-verified, /tmp/bs-03-engagement-tab.png).
+  Port note for the record: Gitea owns :3000; the portal uses
+  3001/7008/7009 by design.
+- Phase 1 leftovers closed (db25615): platform-config and
+  platform-addons are catalog entities (Resource/gitops-config,
+  auto-imported from their Gitea repos); dead examples/template/ removed
+  with its catalog registration (OQ-12; github scaffolder module was
+  already gone). Phase 1 exit criteria: all met.
+- Provenance r10 (d0fddbc): alpine row re-enumerated from a pulled
+  3.24.1 image (16 packages, apk-verified licenses); cert
+  PRC-developer-portal-2026-08-21-r10.
+- NeuroDiOS investigated (read-only): the neurodios-rag deployment
+  (namespace neurodios-llm) references placeholder image
+  ghcr.io/yourorg/neurodios-llm:latest that never existed; the sources
+  at ~/Projects/Sovereign/System/NeuroDiOS/llm/ are a corpse (gitignored,
+  never committed, .pyc bytecode only). Full remediation = reconstruct
+  sources + Dockerfile + build to local registry; that is a sibling-repo
+  project, not developer-portal scope. The deployment stays scaled to 0.
+  Report in session transcript 2026-08-21.
+
+**Next candidates:** Phase 2 closure (self-CI OQ-27, test-stage
+inheritance OQ-31/FR-38, promotion stays manual per OQ-14), then
+Wave-1 security installs (Falco, Trivy Operator, MISP slim -- each
+needs a recorded stack approval per OQ-20). User open items unchanged:
+gitea.com branch protection, .env.local Vercel token rotation.
+
+Late-session incident (2026-08-21 ~05:30 and 06:53 local): the Colima
+VM STOPPED twice (host-level, not cluster-internal) causing two
+cluster-wide churn storms (SandboxChanged / Unknown pods / dangling
+port-forwards). All pods self-recovered on restart except openbao-0
+(deleted to force recreation) and the kine node-IP bug did NOT recur
+(172.20.0.2 stable after the 08-19 repair). OpenBao dev inmem lost its
+secrets again (m2i-6) -- reseeded via scripts/seed-openbao-m2-paths.sh,
+smoke-m2 green. The churn also produced a SECOND guard-log write race
+(bash-guard + the fresh verify-guard chain; archived as
+*.race-2026-08-21); the flock fix for the guard writers is in flight.
 
 ---
 
