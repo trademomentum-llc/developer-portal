@@ -352,7 +352,7 @@ Gitea integration):
 | 2 | actions/setup-go | pinned SHA 40f1582b2485089dde7abd97c1529aa768e1baff (v5.6.0; pinned 2026-08-18, previously the mutable @v5 tag); installs Go 1.26 | https://github.com/actions/setup-go | MIT | GitHub, Inc. and contributors (2018) | fetched at install time (CI action) | iac/templates/ci.yaml:16-18; seed-repos/hello-m2/.gitea/workflows/ci.yaml:16-18 |
 | 3 | opentofu/setup-opentofu | pinned SHA 9d84900f3238fab8cd84ce47d658d25dd008be2f (v1.0.8; pinned 2026-08-18, previously the mutable @v1 tag); installs OpenTofu 1.9.0 | https://github.com/opentofu/setup-opentofu | MPL-2.0 | OpenTofu Authors (LICENSE records Copyright (c) 2020 HashiCorp, Inc., inherited from forked hashicorp/setup-terraform) | fetched at install time (CI action) | iac/templates/ci.yaml:31; seed-repos/hello-m2/.gitea/workflows/ci.yaml:31 |
 | 4 | golang (Docker Official Image) | tag 1.26-alpine (no digest) | https://hub.docker.com/_/golang | BSD-3-Clause (Go toolchain) | The Go Authors / Google LLC | runtime image (CI build stage) | seed-repos/hello-m2/Dockerfile:1 |
-| 5 | alpine (Docker Official Image) | tag 3.20 (no digest; floating tag, snapshot 2026-08-18) | https://hub.docker.com/_/alpine | Multi-license aggregate; Alpine 3.20.10, 14 packages enumerated 2026-08-18 (sha256-verified blobs): GPL-2.0-only (alpine-baselayout 3.6.5-r0, alpine-baselayout-data 3.6.5-r0, apk-tools 2.14.4-r1, busybox 1.36.1-r31, busybox-binsh 1.36.1-r31, scanelf 1.3.7-r2, ssl_client 1.36.1-r31), MIT (alpine-keys 2.4-r1, musl 1.2.5-r3), MPL-2.0 AND MIT (ca-certificates-bundle 20260413-r0), Apache-2.0 (libcrypto3 3.3.7-r0, libssl3 3.3.7-r0), MIT AND BSD-2-Clause AND GPL-2.0-or-later (musl-utils 1.2.5-r3), Zlib (zlib 1.3.2-r0) | Alpine Linux development team | runtime image (hello-m2 runtime stage) | seed-repos/hello-m2/Dockerfile:6 |
+| 5 | alpine (Docker Official Image) | tag 3.24 (no digest; floating tag, snapshot 2026-08-21) | https://hub.docker.com/_/alpine | Multi-license aggregate; Alpine 3.24.1, 16 packages enumerated 2026-08-21 by pulling the image and reading apk metadata (apk info --license): GPL-2.0-only (alpine-baselayout 3.7.2-r1, alpine-baselayout-data 3.7.2-r1, apk-tools 3.0.6-r0, busybox 1.37.0-r31, busybox-binsh 1.37.0-r31, libapk 3.0.6-r0, scanelf 1.3.9-r1, ssl_client 1.37.0-r31), MIT (alpine-keys 2.6-r0, alpine-release 3.24.1-r0, musl 1.2.6-r2), MPL-2.0 AND MIT (ca-certificates-bundle 20260611-r0), Apache-2.0 (libcrypto3 3.5.7-r0, libssl3 3.5.7-r0), MIT AND BSD-2-Clause AND GPL-2.0-or-later (musl-utils 1.2.6-r2), Zlib (zlib 1.3.2-r0) | Alpine Linux development team | runtime image (hello-m2 runtime stage; bumped from EOL 3.20 on 2026-08-21) | seed-repos/hello-m2/Dockerfile:6 |
 | 6 | node (Docker Official Image) | tag 24-trixie-slim (no digest; floating tag, snapshot 2026-08-18) | https://hub.docker.com/_/node + https://github.com/nodejs/docker-node | MIT (image build files and Node.js runtime; runtime bundles third-party libraries under their own licenses incl. Apache-2.0, Unicode-3.0, BSD variants); Debian trixie-slim base layer: debootstrap minbase from Debian main only (all packages DFSG-free per the Debian Social Contract), per-package list not enumerated (PARTIAL) | Joyent, Inc. and Node.js contributors; Debian Project (base layer, not enumerated) | runtime image (Backstage backend image base; pulled at docker build time via yarn build-image; upstream Dockerfile FROM debian:trixie-slim, NODE_VERSION=24.19.0) | backstage/packages/backend/Dockerfile:15; backstage/packages/backend/package.json:16 |
 | 7 | Trivy | image aquasec/trivy:0.74.0@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 (digest verified against the registry manifest for tag 0.74.0, 2026-08-18) | https://github.com/aquasecurity/trivy | Apache-2.0 | Aqua Security (upstream org; stock Apache-2.0 LICENSE, no filled copyright line) | runtime image (CI scanning gates: filesystem and image scans with SARIF artifacts); digest-pinned following the March 2026 Trivy supply-chain compromise (CVE-2026-33634) | seed-repos/hello-m2/.gitea/workflows/ci.yaml:29-45,92-107; iac/templates/ci.yaml:29-45,77-92 |
 | 8 | OSV-Scanner | image ghcr.io/google/osv-scanner:v2.5.1@sha256:8108ae94eadea5a02c9bec6e646909d5b790b44bd62d7f5b7f0b1d6d0ffc7734 (digest verified against the registry manifest for tag v2.5.1, 2026-08-18) | https://github.com/google/osv-scanner | Apache-2.0 | Google | runtime image (CI dependency scan gate; suppression file seed-repos/hello-m2/osv-scanner.toml) | seed-repos/hello-m2/.gitea/workflows/ci.yaml:44; iac/templates/ci.yaml:44; seed-repos/hello-m2/osv-scanner.toml |
@@ -365,15 +365,14 @@ are digest-pinned as of 2026-08-18 (see the entries above).
 Actions. jq, curl, docker, and git in CI steps are runner-image-provided
 binaries with no repo-level pin.
 
-Base-layer detail (snapshot 2026-08-18): the Alpine layer of
-golang:1.26-alpine is a DIFFERENT, newer base than alpine:3.20 -- as of
-2026-08-18 golang:1.26-alpine is Alpine 3.24.1-based (16 packages,
-including apk-tools 3.0.6/libapk, busybox 1.37.0, musl 1.2.6-r2,
-libcrypto3/libssl3 3.5.7 Apache-2.0, ca-certificates-bundle 20260611
-MPL-2.0 AND MIT, zlib Zlib). alpine:3.20, golang:1.26-alpine, and
-node:24-trixie-slim are floating tags; the enumerations here are a
-snapshot of 2026-08-18 and drift as tags move -- digest pinning would
-close this.
+Base-layer detail (snapshot 2026-08-21): since the 2026-08-21 bump, both
+Dockerfile stages ride the same Alpine line -- golang:1.26-alpine is
+Alpine 3.24.1-based and the runtime stage is alpine:3.24 (3.24.1, 16
+packages, enumerated in entry 5; supersedes the 2026-08-18 note that the
+two stages were on different Alpine lines). alpine:3.24,
+golang:1.26-alpine, and node:24-trixie-slim are floating tags; the
+enumerations here are a snapshot and drift as tags move -- digest
+pinning would close this.
 
 ## 7. Schemas and Specifications (1 entry)
 
@@ -424,9 +423,10 @@ Intelligence (2026), author Amit Gupta, upstream
 github.com/NaturalIntelligence/fast-xml-builder); the vendored Score
 schema is byte-identical to score-spec/spec commit
 3ecb17d430c2bbf46d2dfc161fabc7d432d6d1f5 (score-v1b1.json at the
-repository root); alpine:3.20 is fully enumerated (14 packages, Alpine
-3.20.10); the golang:1.26-alpine layer is a different, newer Alpine
-3.24.1-based image; the descriptor-scoped minimatch pins at
+repository root); alpine:3.24 is fully enumerated (16 packages, Alpine
+3.24.1; supersedes the 2026-08-18 alpine:3.20 enumeration after the
+EOL-driven runtime bump); golang:1.26-alpine rides the same Alpine
+3.24.1 line; the descriptor-scoped minimatch pins at
 backstage/package.json:67-70 are dead config shadowed by the bare pin at
 :93 (exactly one installed copy and one yarn.lock resolution exist); all
 113 installed @backstage/* packages confirmed to ship no LICENSE file;

@@ -752,28 +752,31 @@ their own licenses.
 - **License:** BSD-3-Clause (Go toolchain)
 - **Copyright:** The Go Authors / Google LLC
 - **Usage:** Tag `1.26-alpine` (no digest), build stage of
-  seed-repos/hello-m2/Dockerfile:1. Its Alpine layer is a different, newer
-  base than alpine:3.20: as of 2026-08-18 golang:1.26-alpine is Alpine
+  seed-repos/hello-m2/Dockerfile:1. Its Alpine layer is Alpine
   3.24.1-based (16 packages, including apk-tools 3.0.6/libapk, busybox
   1.37.0, musl 1.2.6-r2, libcrypto3/libssl3 3.5.7 Apache-2.0,
-  ca-certificates-bundle 20260611 MPL-2.0 AND MIT, zlib Zlib).
+  ca-certificates-bundle 20260611 MPL-2.0 AND MIT, zlib Zlib) -- the same
+  Alpine line as the runtime stage since the 2026-08-21 bump.
 
 ### alpine (Docker Official Image)
 
 - **Source:** https://hub.docker.com/_/alpine
-- **License:** Multi-license aggregate. alpine:3.20 is currently Alpine
-  3.20.10 (image created 2026-04-16), 14 packages enumerated 2026-08-18
-  (Docker Hub registry API, sha256-verified blobs): alpine-baselayout
-  3.6.5-r0 GPL-2.0-only; alpine-baselayout-data 3.6.5-r0 GPL-2.0-only;
-  alpine-keys 2.4-r1 MIT; apk-tools 2.14.4-r1 GPL-2.0-only; busybox
-  1.36.1-r31 GPL-2.0-only; busybox-binsh 1.36.1-r31 GPL-2.0-only;
-  ca-certificates-bundle 20260413-r0 MPL-2.0 AND MIT; libcrypto3 3.3.7-r0
-  Apache-2.0; libssl3 3.3.7-r0 Apache-2.0; musl 1.2.5-r3 MIT; musl-utils
-  1.2.5-r3 MIT AND BSD-2-Clause AND GPL-2.0-or-later; scanelf 1.3.7-r2
-  GPL-2.0-only; ssl_client 1.36.1-r31 GPL-2.0-only; zlib 1.3.2-r0 Zlib.
+- **License:** Multi-license aggregate. alpine:3.24 is currently Alpine
+  3.24.1, 16 packages enumerated 2026-08-21 by pulling the image and
+  reading apk metadata (`apk info --license`): alpine-baselayout
+  3.7.2-r1 GPL-2.0-only; alpine-baselayout-data 3.7.2-r1 GPL-2.0-only;
+  alpine-keys 2.6-r0 MIT; alpine-release 3.24.1-r0 MIT; apk-tools
+  3.0.6-r0 GPL-2.0-only; busybox 1.37.0-r31 GPL-2.0-only; busybox-binsh
+  1.37.0-r31 GPL-2.0-only; ca-certificates-bundle 20260611-r0 MPL-2.0
+  AND MIT; libapk 3.0.6-r0 GPL-2.0-only; libcrypto3 3.5.7-r0
+  Apache-2.0; libssl3 3.5.7-r0 Apache-2.0; musl 1.2.6-r2 MIT; musl-utils
+  1.2.6-r2 MIT AND BSD-2-Clause AND GPL-2.0-or-later; scanelf 1.3.9-r1
+  GPL-2.0-only; ssl_client 1.37.0-r31 GPL-2.0-only; zlib 1.3.2-r0 Zlib.
+  (Supersedes the 2026-08-18 enumeration of alpine:3.20 / 3.20.10, 14
+  packages; 3.20 is EOL per Trivy and the runtime stage moved to 3.24.)
 - **Copyright:** Alpine Linux development team
-- **Usage:** Tag `3.20` (no digest), runtime stage of
-  seed-repos/hello-m2/Dockerfile:6.
+- **Usage:** Tag `3.24` (no digest), runtime stage of
+  seed-repos/hello-m2/Dockerfile:6 (bumped from 3.20 on 2026-08-21).
 
 ### node (Docker Official Image)
 

@@ -1,18 +1,19 @@
 # Provenance Recognition Certificate
 
-**Certificate ID:** PRC-developer-portal-2026-08-20-r9
+**Certificate ID:** PRC-developer-portal-2026-08-21-r10
 
-**Supersedes:** PRC-developer-portal-2026-08-19-r8 (linkify-it
-re-issue: the group 5 #97 resolution override moved from 6.1.0 to
-5.0.2 on 2026-08-20 -- markdown-it 14.2.0 type declarations break
-`yarn build:all` against the v6 line; 5.0.2 satisfies markdown-it's
-^5.0.1 range and `yarn npm audit` is clean. Component total unchanged
-at 198; no entries added or removed). Chain history:
-r1-r4 were issued and superseded before the provenance package's first
-commit and exist in no retained history; r5 entered git history at commit
-d85e568, r6 at 82783ee, and r7 at f20cff8; the retention-in-git-history
-rule in the Revocation and update rule section has been in force since
-r5, so r5, r6, r7, r8, and this r9 are all retained.
+**Supersedes:** PRC-developer-portal-2026-08-20-r9 (alpine re-issue:
+the hello-m2 runtime base moved from EOL alpine:3.20 to alpine:3.24 on
+2026-08-21 -- Trivy flagged 3.20 as unsupported by its distribution,
+making scan detection unreliable. Group 2 entry 5 re-enumerated against
+a pulled image: Alpine 3.24.1, 16 packages with apk-verified licenses.
+Component total unchanged at 198; no entries added or removed). Chain
+history: r1-r4 were issued and superseded before the provenance
+package's first commit and exist in no retained history; r5 entered git
+history at commit d85e568, r6 at 82783ee, and r7 at f20cff8; the
+retention-in-git-history rule in the Revocation and update rule section
+has been in force since r5, so r5 through r9 and this r10 are all
+retained.
 
 ---
 
@@ -93,12 +94,12 @@ is `provenance/PROVENANCE.md`; this table is a summary, not a duplicate.
 ## Integrity
 
 SHA-256 digests computed with `shasum -a 256` at generation time
-(2026-08-20):
+(2026-08-21):
 
 - `THIRD-PARTY-LICENSES.md`:
-  `e76b0a1d13e5587fd9077fa493f947bc2a89aed917a7191277c15456c4245b1b`
+  `c90537ef44604b8a3dfa2568a6c1231e02bb9ab6c4abdd4bd1e0eb4e22b8c79a`
 - `provenance/PROVENANCE.md`:
-  `10d8bf4a233bf3db7c10129d286b82f2dd6cba171095861591b458e42157ace5`
+  `ac807f5192e32b0bea0d9e155c07e3f228d251d84fd6aafd4c582b658b548b74`
 
 Any change to either file invalidates the corresponding digest and
 requires this certificate to be regenerated. Verify with:
@@ -111,7 +112,7 @@ and compare against the values above.
 
 ## Attestation
 
-- **Date of issuance:** 2026-08-20
+- **Date of issuance:** 2026-08-21
 - **Issuer attestation:** Issued by the maintainers of developer-portal
   (Sovereign portfolio) on the date above, from the verified dependency
   inventory of the repository at that date.
