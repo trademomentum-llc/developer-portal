@@ -1,3 +1,6 @@
+# Canonical CI template -- byte copy of seed-repos/hello-m2/.gitea/workflows/ci.yaml.
+# Keep in sync with the live seed (OQ-18/FR-33): the seed is the tested truth.
+
 name: M2 CI
 
 on:
@@ -26,23 +29,32 @@ jobs:
       - name: Validate Score schema
         run: score2openchoreo --validate-only --input score.yaml
 
+      # act-runner note: jobs run as sibling containers on a dind daemon, so
+      # "$PWD" does not exist in the daemon namespace and bind-mounting it
+      # yields a silently empty /src. --volumes-from the job container exposes
+      # this workspace (and the docker socket) at its real path instead.
       - name: Trivy filesystem scan (gate)
         run: |
-          docker run --rm -v "$PWD:/src" aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
+          docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            -v trivy-cache:/root/.cache/trivy \
+            aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
             fs --severity HIGH,CRITICAL --exit-code 1 \
-            --format json -o /src/trivy-fs.json /src
+            --format json -o "${GITHUB_WORKSPACE}/trivy-fs.json" "${GITHUB_WORKSPACE}"
 
       - name: Trivy filesystem report (SARIF artifact)
         if: always()
         run: |
-          docker run --rm -v "$PWD:/src" aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
+          docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            -v trivy-cache:/root/.cache/trivy \
+            aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
             fs --severity HIGH,CRITICAL --exit-code 0 \
-            --format sarif -o /src/trivy-fs.sarif /src
+            --format sarif -o "${GITHUB_WORKSPACE}/trivy-fs.sarif" "${GITHUB_WORKSPACE}"
 
       - name: OSV dependency scan (gate)
         run: |
-          docker run --rm -v "$PWD:/src" ghcr.io/google/osv-scanner@sha256:8108ae94eadea5a02c9bec6e646909d5b790b44bd62d7f5b7f0b1d6d0ffc7734 \
-            scan source -r /src --format json --output /src/osv.json
+          docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            ghcr.io/google/osv-scanner@sha256:8108ae94eadea5a02c9bec6e646909d5b790b44bd62d7f5b7f0b1d6d0ffc7734 \
+            scan source -r "${GITHUB_WORKSPACE}" --format json --output "${GITHUB_WORKSPACE}/osv.json"
 
       - name: Set up OpenTofu
         if: github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'iac/')
@@ -56,6 +68,21 @@ jobs:
           cd /tmp/dp/iac
           tofu init
           tofu plan -out=plan.out
+
+      - name: Install Infracost
+        if: (github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'iac/')) || github.event_name == 'push'
+        run: |
+          ARCH=$(uname -m)
+          case "$ARCH" in
+            x86_64) INFRACOST_ARCH=amd64 ;;
+            aarch64|arm64) INFRACOST_ARCH=arm64 ;;
+            *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+          esac
+          curl -fsSL "https://github.com/infracost/infracost/releases/latest/download/infracost-linux-${INFRACOST_ARCH}.tar.gz" -o /tmp/infracost.tar.gz
+          tar -xzf /tmp/infracost.tar.gz -C /tmp
+          mv "/tmp/infracost-linux-${INFRACOST_ARCH}" /usr/local/bin/infracost
+          chmod +x /usr/local/bin/infracost
+          infracost --version
 
       - name: Infracost breakdown
         if: github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'iac/')
@@ -76,40 +103,81 @@ jobs:
 
       - name: Trivy image scan (gate)
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD:/src" \
+          docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            -v trivy-cache:/root/.cache/trivy \
             aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
-            image --severity HIGH,CRITICAL --exit-code 1 --ignorefile /src/.trivyignore \
-            --format json -o /src/trivy-image.json \
+            image --severity HIGH,CRITICAL --exit-code 1 --ignorefile "${GITHUB_WORKSPACE}/.trivyignore" \
+            --format json -o "${GITHUB_WORKSPACE}/trivy-image.json" \
             registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7}
 
       - name: Trivy image report (SARIF artifact)
         if: always()
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD:/src" \
+          docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            -v trivy-cache:/root/.cache/trivy \
             aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
-            image --severity HIGH,CRITICAL --exit-code 0 --ignorefile /src/.trivyignore \
-            --format sarif -o /src/trivy-image.sarif \
+            image --severity HIGH,CRITICAL --exit-code 0 --ignorefile "${GITHUB_WORKSPACE}/.trivyignore" \
+            --format sarif -o "${GITHUB_WORKSPACE}/trivy-image.sarif" \
             registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7}
 
       - name: Push image
         if: github.event_name == 'push'
         run: docker push registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7}
 
+      - name: Compute OpenChoreo runtime namespace
+        if: github.event_name == 'push'
+        run: |
+          EXPECTED_NS=$(go run /tmp/dp/tools/namespace-predictor/main.go default default development)
+          echo "EXPECTED_NS=${EXPECTED_NS}" >> $GITHUB_ENV
+
       - name: Render OpenChoreo resources
         if: github.event_name == 'push'
         run: |
           score2openchoreo \
             --input score.yaml \
-            --environment dev \
+            --environment development \
             --image registry.local-registry.svc.cluster.local:5000/hello-m2:${GITHUB_SHA::7} \
+            --extra-env OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-opentelemetry-collector.otel-system.svc.cluster.local:4318 \
+            --extra-env OPENCHOREO_PROJECT=default \
+            --extra-env OPENCHOREO_COMPONENT=hello-m2 \
+            --extra-env OPENCHOREO_ENVIRONMENT=development \
+            --extra-env OPENCHOREO_RUNTIME_NAMESPACE=${EXPECTED_NS} \
+            --extra-env GIT_SHA=${GITHUB_SHA::7} \
             > /tmp/component.yaml
 
-      - name: Commit to platform-config
+      - name: Generate post-deploy cost artifact
         if: github.event_name == 'push'
-        run: /tmp/dp/scripts/ci/commit-to-platform-config.sh dev hello-m2 /tmp/component.yaml
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+        run: |
+          if [[ -n "${INFRACOST_API_KEY:-}" ]]; then
+            infracost breakdown --path /tmp/dp/iac --format json --out-file /tmp/infracost.json
+            MONTHLY=$(jq -r '.totalMonthlyCost // 0' /tmp/infracost.json)
+            BASE=$(jq -r '.pastTotalMonthlyCost // 0' /tmp/infracost.json)
+            DELTA=$(awk -v a="$MONTHLY" -v b="$BASE" 'BEGIN{print a-b}')
+            SOURCE="infracost"
+          else
+            echo "INFRACOST_API_KEY not set; generating local zero-estimate reference artifact"
+            MONTHLY=0
+            BASE=0
+            DELTA=0
+            SOURCE="infracost-unavailable-local-reference"
+          fi
+          jq -n \
+            --arg component "hello-m2" \
+            --arg environment "development" \
+            --arg git_sha "${GITHUB_SHA::7}" \
+            --arg monthly_cost "$MONTHLY" \
+            --arg monthly_delta "$DELTA" \
+            --arg source "$SOURCE" \
+            --arg generated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{component:$component, environment:$environment, source:$source, estimate_type:"post-deploy-reference", currency:"USD", monthly_cost:($monthly_cost|tonumber), monthly_delta:($monthly_delta|tonumber), git_sha:$git_sha, generated_at:$generated_at}' \
+            > /tmp/cost-artifact.json
+      - name: Commit cost artifact to platform-config
+        if: github.event_name == 'push'
+        run: /tmp/dp/scripts/ci/commit-cost-artifact.sh development hello-m2 /tmp/cost-artifact.json
         env:
           GITEA_TOKEN: ${{ secrets.PLATFORM_CONFIG_TOKEN }}
-
       - name: Assemble security scan artifact
         if: github.event_name == 'push'
         run: |
@@ -138,5 +206,10 @@ jobs:
       - name: Commit security artifact to platform-config
         if: github.event_name == 'push'
         run: /tmp/dp/scripts/ci/commit-security-artifacts.sh development hello-m2 /tmp/security-artifact.json "${GITHUB_RUN_ID}"
+        env:
+          GITEA_TOKEN: ${{ secrets.PLATFORM_CONFIG_TOKEN }}
+      - name: Commit to platform-config
+        if: github.event_name == 'push'
+        run: /tmp/dp/scripts/ci/commit-to-platform-config.sh dev hello-m2 /tmp/component.yaml
         env:
           GITEA_TOKEN: ${{ secrets.PLATFORM_CONFIG_TOKEN }}

@@ -33,6 +33,7 @@ jobs:
       - name: Trivy filesystem scan (gate)
         run: |
           docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            -v trivy-cache:/root/.cache/trivy \
             aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
             fs --severity HIGH,CRITICAL --exit-code 1 \
             --format json -o "${GITHUB_WORKSPACE}/trivy-fs.json" "${GITHUB_WORKSPACE}"
@@ -41,6 +42,7 @@ jobs:
         if: always()
         run: |
           docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            -v trivy-cache:/root/.cache/trivy \
             aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
             fs --severity HIGH,CRITICAL --exit-code 0 \
             --format sarif -o "${GITHUB_WORKSPACE}/trivy-fs.sarif" "${GITHUB_WORKSPACE}"
@@ -99,6 +101,7 @@ jobs:
       - name: Trivy image scan (gate)
         run: |
           docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            -v trivy-cache:/root/.cache/trivy \
             aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
             image --severity HIGH,CRITICAL --exit-code 1 --ignorefile "${GITHUB_WORKSPACE}/.trivyignore" \
             --format json -o "${GITHUB_WORKSPACE}/trivy-image.json" \
@@ -108,6 +111,7 @@ jobs:
         if: always()
         run: |
           docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            -v trivy-cache:/root/.cache/trivy \
             aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
             image --severity HIGH,CRITICAL --exit-code 0 --ignorefile "${GITHUB_WORKSPACE}/.trivyignore" \
             --format sarif -o "${GITHUB_WORKSPACE}/trivy-image.sarif" \
