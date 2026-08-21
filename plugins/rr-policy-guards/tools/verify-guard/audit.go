@@ -146,26 +146,32 @@ func writeAudit(line AuditLine) error {
 	if err != nil {
 		return fmt.Errorf("audit path: %w", err)
 	}
-	// Chain to the current last line before rotation runs: with or without
-	// rotation, that line remains the predecessor of the one written below.
-	line.PrevHash = prevHashForPath(path)
-	data, err := json.Marshal(line)
-	if err != nil {
-		return fmt.Errorf("audit marshal: %w", err)
-	}
-	data = append(data, '\n')
-	if err := rotateAuditLog(path, auditMaxBytes("RR_VERIFY_GUARD_AUDIT_MAX_BYTES"), auditBackupCount, int64(len(data))); err != nil {
-		return fmt.Errorf("audit rotate: %w", err)
-	}
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
-	if err != nil {
-		return fmt.Errorf("audit open: %w", err)
-	}
-	defer f.Close()
-	if _, err := f.Write(data); err != nil {
-		return fmt.Errorf("audit write: %w", err)
-	}
-	return nil
+	// Chain-tail read, rotation, and append are one critical section: they
+	// must hold the inter-process lock end to end, or concurrent guards
+	// chain from the same tail (or rotate under each other) and break the
+	// chain (see auditlock.go).
+	return withAuditLock(path, func() error {
+		// Chain to the current last line before rotation runs: with or without
+		// rotation, that line remains the predecessor of the one written below.
+		line.PrevHash = prevHashForPath(path)
+		data, err := json.Marshal(line)
+		if err != nil {
+			return fmt.Errorf("audit marshal: %w", err)
+		}
+		data = append(data, '\n')
+		if err := rotateAuditLog(path, auditMaxBytes("RR_VERIFY_GUARD_AUDIT_MAX_BYTES"), auditBackupCount, int64(len(data))); err != nil {
+			return fmt.Errorf("audit rotate: %w", err)
+		}
+		f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+		if err != nil {
+			return fmt.Errorf("audit open: %w", err)
+		}
+		defer f.Close()
+		if _, err := f.Write(data); err != nil {
+			return fmt.Errorf("audit write: %w", err)
+		}
+		return nil
+	})
 }
 
 func auditMaxBytes(envName string) int64 {

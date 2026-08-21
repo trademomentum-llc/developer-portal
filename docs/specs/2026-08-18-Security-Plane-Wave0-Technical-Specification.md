@@ -975,6 +975,8 @@ One new field per line: `"prev_hash":"<64 lowercase hex>"` = SHA-256 of the raw 
 
 Identical shape in all six append paths: before marshaling, read the last raw line of the current log (see helper), set `prev_hash`, marshal, append. Fail-open is preserved absolutely (TECH-001 9.2): any tail-read error yields a line with 64 zeros and NEVER blocks or alters the enforcement decision -- a broken link is a verification finding, not a policy failure.
 
+**Inter-process serialization (added 2026-08-21).** The tail-read -> append sequence is a read-modify-write cycle and raced when several agent harnesses (Claude Code, Codex, Kimi) ran the same guard concurrently: two writers chained from the same tail, or both wrote a genesis line into a fresh log, and the verifier correctly reported BROKEN. All six append paths now run the entire critical section (tail read, verify-guard rotation, append) under an exclusive advisory `flock(2)` on a sidecar lock file `<log>.lock` (created once, mode 0600, never deleted; a sidecar rather than the log itself because verify-guard rotation renames the log and the lock must pin a stable inode). Each guard carries an identical `auditlock.go` (`withAuditLock(path, fn)`), consistent with the no-shared-module build contract. The log format is byte-unchanged. Failure policy matches the audit path's existing contract: if the lock cannot be taken, the append is skipped (error returned for strict callers) rather than performed unlocked -- a lost line is recoverable, a broken chain is not; policy enforcement still never blocks on audit I/O.
+
 Shared helper shape (each guard gets its own copy, stdlib only, consistent with the guards' no-shared-module build contract):
 
 ```
@@ -993,6 +995,7 @@ Reasoning over a per-guard `verify` subcommand: the chain is deliberately schema
 ### 11.6 Tests (per TECH-001 10.4)
 
 - Per guard (`audit_test.go` beside each `audit.go`): `TestAudit_PrevHashChain` -- two appends; line 2's `prev_hash` equals SHA-256 of line 1's raw bytes + `\n`; genesis line carries 64 zeros; tail-read failure path writes zeros and still appends (fail-open pinned).
+- Per guard (`auditlock_test.go`, added 2026-08-21): `TestAudit_ConcurrentWriters` (16 goroutines x 25 appends), `TestAudit_ConcurrentProcesses` (8 re-executed test-binary processes x 10 appends), and `TestWithAuditLock_Serializes` (lost-update counter under the lock) all produce logs whose chains re-verify; verify-guard adds `TestAudit_ConcurrentWritersRotation` (rotation forced by a tiny size budget, chain walked across segments).
 - Verifier (`main_test.go` in audit-chain): passes a well-formed multi-line log; a hand-edited middle line is detected AT the edited line number; a log whose final line is removed verifies clean internally (11.7's limit, pinned by test so it is never mistaken for a bug); rotated-segment walk for a synthetic verify-guard log set.
 - Non-regression: each guard's existing test suite passes unchanged (`go test ./...` per guard).
 

@@ -107,18 +107,23 @@ func appendAuditStrict(r AuditRecord) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o600)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	r.PrevHash = prevHashForPath(path)
-	line, err := json.Marshal(r)
-	if err != nil {
-		return err
-	}
-	if _, err := f.Write(append(line, '\n')); err != nil {
-		return err
-	}
-	return nil
+	// The tail read and the append are one critical section: they must run
+	// under the inter-process lock or concurrent guards break the chain
+	// (see auditlock.go).
+	return withAuditLock(path, func() error {
+		f, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o600)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		r.PrevHash = prevHashForPath(path)
+		line, err := json.Marshal(r)
+		if err != nil {
+			return err
+		}
+		if _, err := f.Write(append(line, '\n')); err != nil {
+			return err
+		}
+		return nil
+	})
 }
