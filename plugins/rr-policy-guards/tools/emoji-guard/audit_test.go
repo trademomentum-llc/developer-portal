@@ -56,6 +56,9 @@ func TestAudit_PrevHashChain(t *testing.T) {
 }
 
 func TestAudit_PrevHashFailOpen(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("root bypasses the chmod-based read denial this test simulates")
+	}
 	path := filepath.Join(t.TempDir(), "audit.jsonl")
 	t.Setenv("RR_EMOJI_GUARD_AUDIT_LOG", path)
 

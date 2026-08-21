@@ -91,6 +91,9 @@ func TestAudit_PrevHashChain(t *testing.T) {
 }
 
 func TestAudit_PrevHashFailOpen(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("root bypasses the chmod-based read denial this test simulates")
+	}
 	dir := t.TempDir()
 	path := filepath.Join(dir, "tofu-guard.jsonl")
 	t.Setenv("RR_TOFU_GUARD_AUDIT_LOG", path)
