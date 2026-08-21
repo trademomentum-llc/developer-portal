@@ -441,6 +441,25 @@ if [ -x "${AUDIT_CHAIN_BIN}" ]; then
 fi
 
 # =============================================================================
+# Plane agent clientCA freshness (operational guard; 2026-08-20 incident)
+# =============================================================================
+# The Cluster*Plane CRs pin each agent's self-signed cert as clientCA; every
+# cert-manager renewal silently breaks the gateway channel (websocket bad
+# handshake, observed 2026-06-30..08-20). Fail loudly on drift so a stale pin
+# is caught before it takes the planes down again.
+info "Plane agent clientCA freshness"
+
+if kubectl --context k3d-openchoreo get clusterdataplane default >/dev/null 2>&1; then
+    if "${REPO_ROOT}/scripts/repin-plane-agent-ca.sh" --check >/dev/null 2>&1; then
+        pass "all plane agent clientCA pins match live certs"
+    else
+        fail "plane agent clientCA drift (repair: scripts/repin-plane-agent-ca.sh)"
+    fi
+else
+    skip "cluster not reachable; clientCA freshness not checked"
+fi
+
+# =============================================================================
 # Summary
 # =============================================================================
 echo
