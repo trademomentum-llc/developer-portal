@@ -1,0 +1,84 @@
+# developer-portal self-CI (FR-17 / OQ-27): the forge runs the platform's
+# own suites on every push, so team execution without an agent session is
+# covered. Runs ONLY on the local Gitea mirror (owner openchoreo); gitea.com
+# shared runners skip it (they cannot reach the cluster and should not burn
+# shared minutes).
+#
+# Hard-won runner facts (2026-08-20/21): job containers are siblings on the
+# dind daemon -- use --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}"
+# for any dockerized tool (never -v "$PWD:/src", which mounts an empty dir).
+# Trivy steps share the named trivy-cache volume so the 108 MiB DB is
+# downloaded once per daemon lifetime, not once per step.
+
+name: platform self-CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  go-tests:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'openchoreo'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version: "1.26"
+      - name: go test all modules
+        run: |
+          set -e
+          for m in \
+            plugins/rr-policy-guards/tools/emoji-guard \
+            plugins/rr-policy-guards/tools/bash-guard \
+            plugins/rr-policy-guards/tools/brew-guard \
+            plugins/rr-policy-guards/tools/tofu-guard \
+            plugins/rr-policy-guards/tools/commit-guard \
+            plugins/rr-policy-guards/tools/verify-guard \
+            plugins/rr-policy-guards/tools/audit-chain \
+            tools/score2openchoreo; do
+            echo "== ${m}"
+            (cd "${m}" && go test ./...)
+          done
+      # tools/namespace-predictor is a single-file tool (no go.mod by
+      # design); its canonical-vector contract is covered by smoke-m3.sh.
+
+  policy-tests:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'openchoreo'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: OPA Rego tests (v0 syntax, Gatekeeper-compatible)
+        run: |
+          docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            openpolicyagent/opa@sha256:60b6af32b58377718546ac7d4634eecbfe50ec36f7d3ca3f8ebf515f9826c2ac \
+            test --v0-compatible policies/*.rego
+      - name: Shell syntax sweep
+        run: |
+          set -e
+          find scripts -name '*.sh' -print0 | xargs -0 -n1 bash -n
+          echo "all scripts parse"
+
+  security-gates:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'openchoreo'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Trivy filesystem scan (gate)
+        # vuln-only: gitleaks/semgrep remain the local verify-guard's job;
+        # the 3 accepted react-router moderates are below HIGH (SECURITY.md).
+        run: |
+          docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            -v trivy-cache:/root/.cache/trivy \
+            aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 \
+            fs --scanners vuln --severity HIGH,CRITICAL --exit-code 1 \
+            "${GITHUB_WORKSPACE}"
+      - name: OSV dependency scan (gate, Go roots)
+        # Scoped to the Go trees: backstage/yarn.lock's JS gate is yarn audit
+        # in the local verify-guard (npmMinimalAgeGate); the 3 accepted
+        # react-router moderates would otherwise fail this gate.
+        run: |
+          docker run --rm --volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}" \
+            ghcr.io/google/osv-scanner@sha256:8108ae94eadea5a02c9bec6e646909d5b790b44bd62d7f5b7f0b1d6d0ffc7734 \
+            scan source -r --format json "${GITHUB_WORKSPACE}/tools" "${GITHUB_WORKSPACE}/plugins" "${GITHUB_WORKSPACE}/seed-repos"
