@@ -90,6 +90,26 @@ smoke-m2 green. The churn also produced a SECOND guard-log write race
 (bash-guard + the fresh verify-guard chain; archived as
 *.race-2026-08-21); the flock fix for the guard writers is in flight.
 
+THIRD stop (2026-08-21 ~11:40 local) and the node-IP lottery: the VM
+died again mid-session; on each restart docker deals server-0/serverlb/
+tools different 172.20.0.x addresses (restart-policy race at daemon
+boot), and the kine Node record then mismatches ("failed to find
+interface with specified node ip"). Recovered by patching the latest
+/registry/minions row to the live IP (twice: .2->.3, then .3->.2 after
+the next lottery flip). Lessons now baked into
+scripts/repair-k3d-node-ip.sh (repeatable tool): state.db is WAL-mode
+-- copy the TRIO (state.db/-wal/-shm) or it reads as malformed; plain
+docker start reuses a stopped container's endpoint IP, so start
+server-0 ALONE first to claim the lowest free address, sample, patch,
+start. Separately: Colima's host-side port forwarder wedged (guest
+listens on 6550, host never forwards) -- workaround in use:
+ssh -F ~/.colima/_lima/colima/ssh.config -L 6550:127.0.0.1:6550 -N lima-colima
+STRUCTURAL WARNING: the host has 16 GiB RAM total and the VM takes 12 --
+macOS + Backstage + builds squeeze the rest; the repeated VM stops
+correlate with host pressure. Consider 10 GiB for the VM (violates the
+recorded Wave-1 >=12 GB prerequisite) or closing heavy apps during
+platform work. USER decision.
+
 ---
 
 ## 0a. 2026-08-20 addendum -- resized-cluster acceptance (this session)
