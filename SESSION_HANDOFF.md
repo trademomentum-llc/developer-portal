@@ -67,6 +67,15 @@ chain:
   correct -- cosmetic on kube-proxy, flagged for next full restart.
 - Final: ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4, SECURITY,
   BACKSTAGE-PRODUCTION), smoke-security 60/0/2.
+- self-CI epilogue: run 285 failed at checkout -- CoreDNS answered
+  NXDOMAIN for ALL cluster names (it had started with an unsynced
+  Kubernetes API during the flap and never resynced; 18 restarts).
+  Fixed by recreating the CoreDNS pod; SRV records resolve again. Run
+  286's go-tests container died mid-run with no node-level event. Run
+  287 (`516f85b`), in a quiet window: go-tests + policy-tests +
+  security-gates ALL SUCCESS. Note for future CI watchers: this Gitea
+  version's tasks endpoint reports job status as success/failure, not
+  completed/conclusion.
 - New convention in AGENTS.md: serialized heavy operations (no
   concurrent CI + smoke + boots); kill stale dev-server processes before
   restarts.
