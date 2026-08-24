@@ -4,6 +4,16 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "${ROOT_DIR}/scripts/lib/smoke-json.sh"
+smoke_json_parse_args "$@"
+smoke_json_begin all
+
+# FR-34: child suites append their own records to the same JSONL file;
+# this suite adds one aggregate record over the suite results.
+if [ -n "${SMOKE_JSON_OUT}" ]; then
+    export SMOKE_JSON_OUT
+fi
+
 SUITES=(auth m2 m3 m4 security)
 FAILED=()
 
@@ -12,9 +22,11 @@ for suite in "${SUITES[@]}"; do
     echo "=== Running smoke-${suite}.sh ==="
     if "$script"; then
         echo "=== smoke-${suite}.sh PASSED ==="
+        smoke_json_count pass
     else
         echo "=== smoke-${suite}.sh FAILED ===" >&2
         FAILED+=("$suite")
+        smoke_json_count fail
     fi
     echo
 done
@@ -24,9 +36,11 @@ script="${ROOT_DIR}/scripts/smoke-backstage-production.sh"
 echo "=== Running smoke-backstage-production.sh ==="
 if "$script"; then
     echo "=== smoke-backstage-production.sh PASSED ==="
+    smoke_json_count pass
 else
     echo "=== smoke-backstage-production.sh FAILED ===" >&2
     FAILED+=("backstage-production")
+    smoke_json_count fail
 fi
 echo
 

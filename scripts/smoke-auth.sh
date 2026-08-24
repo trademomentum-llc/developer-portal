@@ -14,6 +14,10 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+source "${ROOT_DIR}/scripts/lib/smoke-json.sh"
+smoke_json_parse_args "$@"
+smoke_json_begin auth
+
 BACKSTAGE_BACKEND="${BACKSTAGE_BACKEND:-http://localhost:7008}"
 GITEA_URL="${GITEA_URL:-http://localhost:3333}"
 
@@ -23,8 +27,8 @@ RED="\033[31m"
 RESET="\033[0m"
 
 log() { echo -e "$*"; }
-pass() { echo -e "${GREEN} PASS${RESET} $*"; }
-fail() { echo -e "${RED} FAIL${RESET} $*"; exit 1; }
+pass() { echo -e "${GREEN} PASS${RESET} $*"; smoke_json_count pass; }
+fail() { echo -e "${RED} FAIL${RESET} $*"; smoke_json_count fail; exit 1; }
 info() { echo -e "${BOLD}INFO${RESET} $*"; }
 
 info "Validating Backstage Gitea auth provider"

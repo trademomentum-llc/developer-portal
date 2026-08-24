@@ -190,6 +190,14 @@ else
     GITEA_ADMIN_TOKEN="${GITEA_ADMIN_TOKEN:-dummy}"
 fi
 export GITEA_ADMIN_TOKEN
+# FR-09: SigNoz API key for the /api/proxy/signoz backend proxy header.
+# Seeded by scripts/install-m3.sh; empty means the cards render not-wired.
+if [ -f "$RUNTIME_DIR/signoz-api-key" ]; then
+    SIGNOZ_API_KEY=$(cat "$RUNTIME_DIR/signoz-api-key")
+else
+    SIGNOZ_API_KEY="${SIGNOZ_API_KEY:-}"
+fi
+export SIGNOZ_API_KEY
 export HOST="$APP_HOST"
 export PORT="$APP_PORT"
 export APP_CONFIG_app_baseUrl="$APP_BASE_URL"

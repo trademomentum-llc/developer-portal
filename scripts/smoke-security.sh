@@ -9,14 +9,18 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONTEXT="${KUBECTL_CONTEXT:-k3d-openchoreo}"
 
+source "${REPO_ROOT}/scripts/lib/smoke-json.sh"
+smoke_json_parse_args "$@"
+smoke_json_begin security
+
 PASSED=0
 FAILED=0
 SKIPPED=0
 
 info() { echo "[smoke-security] $*"; }
-pass() { echo "PASS: $*"; PASSED=$((PASSED + 1)); }
-fail() { echo "FAIL: $*" >&2; FAILED=$((FAILED + 1)); }
-skip() { echo "SKIP: $*"; SKIPPED=$((SKIPPED + 1)); }
+pass() { echo "PASS: $*"; PASSED=$((PASSED + 1)); smoke_json_count pass; }
+fail() { echo "FAIL: $*" >&2; FAILED=$((FAILED + 1)); smoke_json_count fail; }
+skip() { echo "SKIP: $*"; SKIPPED=$((SKIPPED + 1)); smoke_json_count skip; }
 
 # yaml_ok <file>: 0 = parses, 1 = invalid, 2 = no YAML parser available.
 yaml_ok() {

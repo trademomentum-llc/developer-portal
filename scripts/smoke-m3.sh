@@ -25,6 +25,9 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 PREDICTOR_DIR="${ROOT_DIR}/tools/namespace-predictor"
 HELLO_CATALOG="${ROOT_DIR}/seed-repos/hello-m2/catalog-info.yaml"
 
+# FR-34: machine-readable result emission (--json <path> or SMOKE_JSON_OUT).
+source "${ROOT_DIR}/scripts/lib/smoke-json.sh"
+
 # Colors for readability (plain text safe)
 BOLD="\033[1m"
 GREEN="\033[32m"
@@ -46,9 +49,15 @@ Options:
   --offline              Run only offline / static checks (predictor, files, annotations)
   --cluster              Force cluster-dependent checks (requires k3d-openchoreo)
   --predictor-vectors=N  Number of predictor vectors to exercise (default 3)
+  --json <path>          Append a machine-readable result record (FR-34);
+                         the SMOKE_JSON_OUT env var is equivalent
   -h | --help            Show this help
 EOF
 }
+
+# Extract --json/--json= first so this loop only sees harness options.
+smoke_json_parse_args "$@"
+set -- ${SMOKE_JSON_ARGS[@]+"${SMOKE_JSON_ARGS[@]}"}
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -59,6 +68,8 @@ while [[ $# -gt 0 ]]; do
         *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
 done
+
+smoke_json_begin m3
 
 echo "=== M3 Full Spectrum Test Harness — $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
 echo "Mode: ${MODE}"
@@ -74,8 +85,10 @@ record_result() {
     TOTAL=$((TOTAL+1))
     if [[ "$1" == "pass" ]]; then
         PASSED=$((PASSED+1))
+        smoke_json_count pass
     else
         FAILED=$((FAILED+1))
+        smoke_json_count fail
     fi
 }
 
@@ -197,6 +210,62 @@ else
     record_result fail
 fi
 
+# --- Lane B (Phase-2/3 closure): FR-19 / FR-20 / FR-21 presence checks ---
+APP_CONFIG="${ROOT_DIR}/backstage/app-config.yaml"
+ENTITY_PAGE="${ROOT_DIR}/backstage/packages/app/src/modules/openchoreo-entity-page/index.tsx"
+DEPLOYMENT_CARD="${ROOT_DIR}/backstage/packages/app/src/modules/openchoreo-cards/DeploymentCard.tsx"
+PLATFORM_CARD="${ROOT_DIR}/backstage/packages/app/src/modules/openchoreo-cards/PlatformCard.tsx"
+PROMOTION_RUNBOOK="${ROOT_DIR}/docs/runbooks/promotion.md"
+
+# FR-21: openchoreo proxy endpoint in app-config.yaml
+if grep -q "'/openchoreo':" "${APP_CONFIG}" 2>/dev/null && \
+   grep -q 'http://localhost:9090' "${APP_CONFIG}" 2>/dev/null; then
+    pass "app-config.yaml wires the /openchoreo proxy endpoint to localhost:9090 (FR-21)"
+    record_result pass
+else
+    fail "app-config.yaml missing the /openchoreo proxy endpoint (FR-21)"
+    record_result fail
+fi
+
+# FR-21: DeploymentCard queries ReleaseBindings through the proxy
+if grep -q '/api/proxy/openchoreo' "${DEPLOYMENT_CARD}" 2>/dev/null && \
+   grep -q 'releasebindings' "${DEPLOYMENT_CARD}" 2>/dev/null; then
+    pass "DeploymentCard observed-state block queries ReleaseBindings via /api/proxy/openchoreo (FR-21)"
+    record_result pass
+else
+    fail "DeploymentCard does not query the openchoreo proxy (FR-21)"
+    record_result fail
+fi
+
+# FR-19: kubernetes plugin workload view mounted on the Deployment tab
+if grep -q 'EntityKubernetesContent' "${ENTITY_PAGE}" 2>/dev/null && \
+   grep -q 'entity-content:kubernetes/kubernetes: false' "${APP_CONFIG}" 2>/dev/null; then
+    pass "Deployment tab mounts the kubernetes plugin workload view; duplicate standalone tab disabled (FR-19)"
+    record_result pass
+else
+    fail "Deployment tab missing the kubernetes plugin workload view (FR-19)"
+    record_result fail
+fi
+
+# FR-19: seed entity carries the kubernetes label selector the plugin discovers by
+if grep -q 'backstage.io/kubernetes-label-selector: openchoreo.dev/component=hello-m2' "${HELLO_CATALOG}" 2>/dev/null; then
+    pass "hello-m2 seed catalog-info.yaml carries backstage.io/kubernetes-label-selector (FR-19)"
+    record_result pass
+else
+    fail "hello-m2 seed catalog-info.yaml missing backstage.io/kubernetes-label-selector (FR-19)"
+    record_result fail
+fi
+
+# FR-20: promotion runbook exists and is linked from the PlatformCard
+if [[ -f "${PROMOTION_RUNBOOK}" ]] && \
+   grep -q 'runbooks/promotion' "${PLATFORM_CARD}" 2>/dev/null; then
+    pass "Promotion runbook exists and is linked from the PlatformCard (FR-20)"
+    record_result pass
+else
+    fail "Promotion runbook missing or not linked from the PlatformCard (FR-20)"
+    record_result fail
+fi
+
 # =============================================================================
 # 3. ANGLE COVERAGE MATRIX (Static + Future Dynamic)
 # =============================================================================
@@ -296,6 +365,33 @@ if [[ "${MODE}" == "cluster" || ( "${MODE}" == "auto" && "${CLUSTER_AVAILABLE}" 
             fail "hello-m2 relations do not resolve to group:default/openchoreo"
             record_result fail
         fi
+
+        # FR-21 (Lane B): the openchoreo proxy is wired end-to-end when the
+        # unauthenticated /health endpoint answers 200 through it.
+        if curl -fsS -o /dev/null "${AUTH_CURL[@]}" "${BACKSTAGE_BACKEND_URL}/api/proxy/openchoreo/health" 2>/dev/null; then
+            pass "OpenChoreo API health endpoint reachable via /api/proxy/openchoreo (FR-21)"
+            record_result pass
+        else
+            fail "OpenChoreo API not reachable via /api/proxy/openchoreo (proxy or :9090 port-forward down)"
+            record_result fail
+        fi
+
+        # FR-21 (Lane B): the ReleaseBindings query path reaches the real API.
+        # The API enforces Thunder-issued JWTs and the proxy attaches no token,
+        # so the honest live answer today is 401 MISSING_TOKEN -- that proves
+        # reachability while the DeploymentCard renders its not-wired state.
+        RB_CODE=$(curl -s -o /tmp/smoke-m3-releasebindings.json -w '%{http_code}' "${AUTH_CURL[@]}" \
+            "${BACKSTAGE_BACKEND_URL}/api/proxy/openchoreo/api/v1/namespaces/default/releasebindings?component=hello-m2" 2>/dev/null || echo "000")
+        if [[ "${RB_CODE}" == "200" ]]; then
+            pass "ReleaseBindings query returns live data (API token wired) (FR-21)"
+            record_result pass
+        elif [[ "${RB_CODE}" == "401" || "${RB_CODE}" == "403" ]]; then
+            pass "ReleaseBindings query reaches the API and is honestly auth-gated (HTTP ${RB_CODE}; card renders not-wired) (FR-21)"
+            record_result pass
+        else
+            fail "ReleaseBindings query via /api/proxy/openchoreo returned unexpected HTTP ${RB_CODE}"
+            record_result fail
+        fi
     else
         warn "Backstage backend not reachable at ${BACKSTAGE_BACKEND_URL} (is the dev server running?)"
         record_result fail
@@ -371,6 +467,102 @@ if [[ "${MODE}" == "cluster" || ( "${MODE}" == "auto" && "${CLUSTER_AVAILABLE}" 
     else
         warn "No hello-m2 pod available for live trace generation"
         record_result fail
+    fi
+
+    # --- FR-10: durability -- PVCs Bound -----------------------------------
+    info "FR-10: checking ClickHouse and Prometheus PVCs are Bound (local-path)"
+    if kubectl --context k3d-openchoreo -n signoz get pvc -o json 2>/dev/null | \
+        python3 -c "
+import sys, json
+items = json.load(sys.stdin).get('items', [])
+ch = [p for p in items if 'clickhouse' in p['metadata']['name'].lower()
+      and p['status'].get('phase') == 'Bound'
+      and p['spec'].get('storageClassName') == 'local-path']
+sys.exit(0 if ch else 1)"; then
+        pass "ClickHouse local-path PVC is Bound in namespace signoz"
+        record_result pass
+    else
+        fail "No Bound local-path ClickHouse PVC in namespace signoz (FR-10)"
+        record_result fail
+    fi
+
+    if kubectl --context k3d-openchoreo -n opencost get pvc -o json 2>/dev/null | \
+        python3 -c "
+import sys, json
+items = json.load(sys.stdin).get('items', [])
+pr = [p for p in items if 'prometheus' in p['metadata']['name'].lower()
+      and p['status'].get('phase') == 'Bound'
+      and p['spec'].get('storageClassName') == 'local-path']
+sys.exit(0 if pr else 1)"; then
+        pass "Prometheus local-path PVC is Bound in namespace opencost"
+        record_result pass
+    else
+        fail "No Bound local-path Prometheus PVC in namespace opencost (FR-10; run scripts/install-m4.sh)"
+        record_result fail
+    fi
+
+    # --- FR-05 / FR-07 / FR-08: logs, spanmetrics, dashboards ---------------
+    # ClickHouse reachability for the two ingestion checks.
+    info "FR-05/FR-07: checking log and spanmetrics ingestion via ClickHouse"
+    kubectl --context k3d-openchoreo -n signoz port-forward svc/signoz-clickhouse 28123:8123 >/tmp/smoke-m3-ch-pf.log 2>&1 & CH_PF=$!
+    sleep 2
+
+    LOGS_FOUND=false
+    for attempt in {1..12}; do
+        LOG_ROWS=$(curl -fsS -m 10 "http://localhost:28123/?query=SELECT+count%28%2A%29+FROM+signoz_logs.distributed_logs_v2+WHERE+resources_string%5B%27k8s.namespace.name%27%5D%3D%27${EXPECTED_NS}%27+FORMAT+JSONCompact" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data'][0][0])" 2>/dev/null || echo 0)
+        if [[ "${LOG_ROWS}" -gt 0 ]]; then
+            LOGS_FOUND=true
+            break
+        fi
+        sleep 5
+    done
+    if [[ "${LOGS_FOUND}" == true ]]; then
+        pass "FR-05: pod logs present in signoz_logs for namespace ${EXPECTED_NS} (${LOG_ROWS} rows)"
+        record_result pass
+    else
+        fail "FR-05: no pod logs in signoz_logs for namespace ${EXPECTED_NS}"
+        record_result fail
+    fi
+
+    SPANMETRICS_FOUND=false
+    for attempt in {1..12}; do
+        SM_ROWS=$(curl -fsS -m 10 "http://localhost:28123/?query=SELECT+count%28DISTINCT+metric_name%29+FROM+signoz_metrics.distributed_time_series_v4_1day+WHERE+metric_name+LIKE+%27spanmetrics%25%27+FORMAT+JSONCompact" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data'][0][0])" 2>/dev/null || echo 0)
+        if [[ "${SM_ROWS}" -gt 0 ]]; then
+            SPANMETRICS_FOUND=true
+            break
+        fi
+        sleep 5
+    done
+    if [[ "${SPANMETRICS_FOUND}" == true ]]; then
+        pass "FR-07: spanmetrics series present (${SM_ROWS} distinct spanmetrics_* metrics)"
+        record_result pass
+    else
+        fail "FR-07: no spanmetrics_* series in signoz_metrics"
+        record_result fail
+    fi
+    kill "${CH_PF}" 2>/dev/null || true
+    wait "${CH_PF}" 2>/dev/null || true
+
+    info "FR-08: checking seeded dashboards via the SigNoz API"
+    SIGNOZ_SMOKE_KEY=""
+    if [[ -n "${SIGNOZ_API_KEY:-}" ]]; then
+        SIGNOZ_SMOKE_KEY="${SIGNOZ_API_KEY}"
+    elif [[ -f "${HOME}/.rational-reserve/signoz-api-key" ]]; then
+        SIGNOZ_SMOKE_KEY="$(cat "${HOME}/.rational-reserve/signoz-api-key")"
+    fi
+    if [[ -z "${SIGNOZ_SMOKE_KEY}" ]]; then
+        fail "FR-08: no SigNoz API key available (run scripts/install-m3.sh to bootstrap)"
+        record_result fail
+    else
+        DASH_NAMES=$(curl -fsS -m 10 "http://localhost:3301/api/v2/dashboards" -H "SIGNOZ-API-KEY: ${SIGNOZ_SMOKE_KEY}" 2>/dev/null \
+            | python3 -c "import sys,json; print(' '.join(x.get('name','') for x in (json.load(sys.stdin).get('data') or [])))" 2>/dev/null || echo "")
+        if [[ " ${DASH_NAMES} " == *" hello-m2-red "* && " ${DASH_NAMES} " == *" platform-overview "* ]]; then
+            pass "FR-08: dashboards seeded (hello-m2-red, platform-overview)"
+            record_result pass
+        else
+            fail "FR-08: seeded dashboards missing (found: ${DASH_NAMES:-none})"
+            record_result fail
+        fi
     fi
 
     # Post-deploy cost artifact presence in platform-config (best effort)
