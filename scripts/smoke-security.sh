@@ -187,8 +187,11 @@ else
 fi
 
 # FR-07: collector values carry the filelog receiver, pipeline entry, and hostPath mount.
+# The logs pipeline receivers list may include additional receivers (e.g.
+# filelog/k8s-pods); membership of filelog/gatekeeper-audit is what matters,
+# not exact list equality.
 if grep -q "filelog/gatekeeper-audit" "${REPO_ROOT}/observability/otel/collector-values.local.yaml" \
-  && grep -q "receivers: \[otlp, filelog/gatekeeper-audit\]" "${REPO_ROOT}/observability/otel/collector-values.local.yaml" \
+  && grep "receivers: \[otlp" "${REPO_ROOT}/observability/otel/collector-values.local.yaml" | grep -q "filelog/gatekeeper-audit" \
   && grep -q "path: /var/log/pods" "${REPO_ROOT}/observability/otel/collector-values.local.yaml"; then
     pass "OTEL collector filelog gatekeeper-audit receiver present"
 else
