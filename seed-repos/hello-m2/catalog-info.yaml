@@ -13,6 +13,12 @@ metadata:
     # openchoreo/internal/dataplane/kubernetes/name.go.
     # Deterministic predictor: tools/namespace-predictor/main.go
     openchoreo.dev/runtime-namespace-template: dp-default-default-development-*
+    # FR-19: Backstage kubernetes plugin discovery. Dataplane pods carry the
+    # label openchoreo.dev/component=<name> (set by OpenChoreo), so the label
+    # selector below lets the plugin's workload view (mounted as a section on
+    # the entity's Deployment tab) list this component's live objects through
+    # the localKubectlProxy cluster locator.
+    backstage.io/kubernetes-label-selector: openchoreo.dev/component=hello-m2
   links:
     - url: http://localhost:3333/openchoreo/hello-m2
       title: Gitea repo
