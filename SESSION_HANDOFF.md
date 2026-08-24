@@ -3,12 +3,171 @@
 > Read this file FIRST in the next session. It tells you where we stopped,
 > what is now committed that was not before, what is still outstanding, and
 > exactly what to do first.
+>
+> STANDING DIRECTIVE (user, 2026-08-22): after any major state change --
+> milestone acceptance, cluster event, publication, dependency/provenance
+> change, or another tool intervening in this repo -- take a dated snapshot
+> addendum at the top of this file BEFORE ending the session. Do not leave
+> state capture to the next session.
+>
+> SNAPSHOT EVIDENCE RULE (2026-08-23): every claim in a snapshot addendum
+> must carry its own verification evidence -- the command run and the
+> measured result (e.g. `git ls-remote origin main` -> sha). Anything not
+> measured at snapshot time is marked UNVERIFIED. The reader must be able
+> to trust the snapshot without re-deriving it. Freshness of this file is
+> enforced by scripts/check-handoff-fidelity.sh.
 
-**Last updated:** 2026-08-21
-**Reason for handoff:** Phase 2 self-CI and scaffolder test-stage
-inheritance proven live on the local Gitea runner. Wave-0 remains green.
-Kimi debug session session_d1ce6d50 died mid-acceptance (OAuth ENOTFOUND
-auth.kimi.com); recovered and closed below.
+**Last updated:** 2026-08-24
+**Reason for handoff:** USER RULING: phase-gate discipline. Completion was
+conveyed while gates stood open; no advancement until the verified gap
+register (top of TODO.md) is closed. Register created, stash preserved as
+patch, rule codified in AGENTS.md Conventions.
+
+---
+
+## 0g. 2026-08-24 addendum -- user ruling: phase-gate discipline + gap register
+
+The user ruled that phases were approved on the understanding that all
+prior work was complete as conveyed, and that open gates from earlier
+phases are a development no-no for a system expected to govern other
+architecture. The ruling stands as recorded. The pattern is on the repo's
+own record (OSV vacuous pass pre-`3f27f0c`; silent catalog death
+pre-`48960a5`; unnoticed smoke failures pre-`dbd79de`).
+
+Actions taken this session (evidence):
+
+- Verified gap register written to the top of TODO.md (G1-G9, each with
+  measured status or UNVERIFIED). Sources: `git status` (42 modified +
+  20 untracked), `git stash show --stat` (68 files, 925+/514-),
+  docker stats + server-0 logs (0f), cert expiry date math.
+- Stash `wip-non-security-20260730` preserved NON-DESTRUCTIVELY as
+  `~/.rational-reserve/backups/wip-non-security-20260730.patch`
+  (3,357 lines; stash itself still present, `git stash list` verified).
+- AGENTS.md Conventions: phase-gate discipline rule added.
+- Found during audit: `scripts/residual_ranking.py` (248 lines,
+  carrier-derived hybrid+isolation-forest code, created 2026-08-24
+  09:27, not by this session) sitting untracked in scripts/ -- carrier
+  materialization into the repo without a triad; disposition is a user
+  decision (register item G9).
+
+Pending user decisions: commit triage of the 61-entry dirty tree (G1),
+residual_ranking.py disposition (G9), cluster repair approach (G3).
+
+---
+
+## 0f. 2026-08-23 addendum (late) -- cluster degraded: resource saturation
+
+Measured live ~17:35 local while answering a state query:
+
+- `docker stats --no-stream`: k3d-openchoreo-server-0 CPU 1241% (6-core
+  VM, ~2x oversubscribed), MEM 10.25/11.65 GiB. serverlb idle.
+- server-0 logs: kine Slow SQL warnings, list queries 14-29.5 s;
+  `apiserver was unable to write a JSON response: http: Handler timeout`;
+  Network Policy Controller heartbeat missed.
+- Symptom: API answers curl (401 in 10.6 s) but kubectl discovery times
+  out reading the body; `get nodes`/`get pods -A` fail. Colima itself is
+  running; containers up (server-0 23 h, serverlb 27 h); the 6550 SSH
+  workaround tunnel is alive and NOT the cause this time.
+- Pattern match: the documented host-pressure failure (16 GiB host /
+  12 GiB VM; "no heavy host-side builds concurrent with pipeline runs").
+  No repair attempted -- remediation options are the user's call (close
+  heavy host apps; rolling restart of server-0; node-IP repair tool is
+  ready if the restart triggers the lottery).
+- Repo state unchanged and green: `./scripts/check-handoff-fidelity.sh`
+  all lanes PASS (handoff 2026-08-23 vs HEAD 2026-08-21; gitea-com,
+  github, origin all at `5b0c23e`); 61 dirty entries; 1 stash; 1 extra
+  worktree.
+
+---
+
+## 0e. 2026-08-23 addendum -- carrier take-froms scope 0-2 LANDED
+
+User approved scope 0-2 of the carrier-assessment recommendations (the
+analytical carrier itself was audited and found to be deterministic
+re-encoding, not independent analysis; only its quality-gate sentence,
+forward-inverse discipline, and handoff-fidelity idea were taken).
+
+- Phase 0 (docs): SNAPSHOT EVIDENCE RULE added to this file's header
+  (above); AGENTS.md gained the "External analytical artifacts are
+  ingest-only" convention and the evidence-rule wording on the standing
+  directive.
+- Phase 1 (code): `scripts/check-handoff-fidelity.sh` -- three lanes:
+  freshness (Last updated >= HEAD committer date), remote-sync (each
+  remote's main vs HEAD; unreachable = SKIP/UNVERIFIED, never fail),
+  hygiene (extra worktrees + stash, informational). TDD per superpowers:
+  test written first, watched fail (exit 127, script missing), then
+  implemented. Evidence: `./scripts/tests/test-check-handoff-fidelity.sh`
+  -> ALL HANDOFF-FIDELITY TESTS PASSED, 6/6 (A-F; B and C are the
+  inverse-proof lanes: stale handoff FAILS, remote-behind FAILS).
+  Live evidence: `./scripts/check-handoff-fidelity.sh` -> all lanes
+  green; gitea-com/github/origin all at `5b0c23e`; hygiene reports 1
+  extra worktree + 1 stash.
+- Phase 2 (convention): "Inverse-proof testing" added to AGENTS.md
+  Conventions -- every new gate ships with a negative test proving it
+  fails when its condition is absent; a check never observed to fail is
+  treated as unverified.
+- AGENTS.md Commands gained a "Session handoff fidelity" block.
+- Deferred (needs spec triad, Phase 3): friction analytics over guard
+  audit chains as an rr-audit-chain extension.
+
+Working tree note: the 58-entry dirty set from 0d is still uncommitted;
+these new files (checker + test) and doc edits add to it. Commit triage
+of the whole set is the user's call.
+
+**Next candidates (unchanged):** Wave-1 security installs gated on OQ-20
+stack approvals. User open items: gitea.com branch protection, .env.local
+Vercel token rotation.
+
+---
+
+## 0d. 2026-08-22 addendum -- state snapshot + snapshot directive
+
+Snapshot taken at user request after a cross-tool event: Codex ran a
+sanitization pass because various worktrees were dirty -- worktrees that
+fall under Kimi (this harness's) governance. The user's framing is
+informational, not an assignment of blame for how they got that way;
+recorded here so the next session knows it happened while Kimi was not
+around. UPDATE (user, same session): the sanitization is USER-DIRECTED --
+the user has been explicit with Codex that the objective is to clean those
+worktree states. Treat further Codex cleanup of Kimi-governed worktrees as
+sanctioned, and re-verify `git worktree list` / stash state before relying
+on anything recorded here.
+
+Verified state at snapshot time (measured live this session):
+
+- git: HEAD `5b0c23e` on main. origin (gitea.com) AND github both
+  fetch-verified AT HEAD (`git ls-remote`) -- the Phase 2 / loopback /
+  spec series that 0c flagged as unpushed has since been published.
+  Local Gitea mirror (`localhost:3333`) not re-verified this session.
+- Worktrees: two -- the main checkout plus a detached smoke worktree
+  `/private/tmp/developer-portal-smoke-5b0c23e` (at `5b0c23e`). One stash
+  carried: `stash@{0}: wip-non-security-20260730`.
+- Working tree: dirty, 58 entries (41 tracked modifications, 17
+  untracked) -- openchoreo-cards, entity-page, smoke scripts, iac/
+  observability values, plus untracked runbooks, dashboards, e2e tests,
+  and new cards (AlertsCard, TestResultsCard). Run `git status` for the
+  current list; do not assume it matches 0c-era descriptions.
+- Cluster: `k3d-openchoreo` UP (server-0 Ready, v1.32.9+k3s1, age 133d).
+- The `kimi-debug-session_-20260821-193754` export (dir + zip) is gone
+  from the working tree. Transcript digests this session: the Grok
+  session (01a025d6) only READ it -- the Kimi session died on OAuth
+  `ENOTFOUND auth.kimi.com`, not a repo bug; the underlying OSV exit-128
+  wiring bug was fixed in `3f27f0c`, loopback bind in `4f0dfa5`. No Codex
+  or Grok session performed export sanitization; the removal happened
+  outside both tools' recorded sessions.
+- Ingested `~/Downloads/KIMI_DEVELOPER_PORTAL_STANDALONE_ANALYTICAL_CARRIER_20260821.html`
+  (4.5 MB standalone analytical handoff built from the dead Kimi session's
+  export; 30 datasets / 6,326 rows / 6 SHA-256 receipts). It asserts no
+  repo mutation -- five review-gated mechanism candidates (handoff
+  fidelity gate, evidence ledger, tool-friction detector, forward-inverse
+  gap resolver, friend-safe boundary). No action taken on them; any
+  conversion into checklists/scripts needs explicit user approval first.
+
+**Next candidates:** Wave-1 security installs (Falco, Trivy Operator,
+MISP slim -- each needs a recorded stack approval per OQ-20). The 0c
+"publish the unpushed series" item is DONE (remotes at HEAD). User open
+items unchanged: gitea.com branch protection, .env.local Vercel token
+rotation.
 
 ---
 
