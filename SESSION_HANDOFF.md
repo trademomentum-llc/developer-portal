@@ -18,9 +18,58 @@
 > enforced by scripts/check-handoff-fidelity.sh.
 
 **Last updated:** 2026-08-24
-**Reason for handoff:** Publication complete -- all remotes + local mirror
-at HEAD `76bb694`; fidelity gate all green. Gap register re-ranked with
-corrected carrier logic on real inputs; priorities in 0i.
+**Reason for handoff:** G11 CLOSED -- ALL SMOKE SUITES PASSED. Publication
+current at HEAD. Gap register re-ranked (0i). Cluster incidents of the day
+and their fixes in 0j.
+
+---
+
+## 0j. 2026-08-24 addendum -- G11 closure (the long version)
+
+G11 closed after five smoke-all attempts; every failure traced to
+environment/tooling, zero code regressions in the pushed series. Evidence
+chain:
+
+- self-CI 283 security-gates fail: runner pod DNS wedge post-restart
+  (kube-dns refused from the act-runner pod; other pods resolved fine).
+  Fixed by recreating the act-runner pod; 284 security-gates green.
+- self-CI 284 go-tests fail: node flapped NotReady ("container runtime is
+  down") at 18:29 UTC under concurrent load (CI Trivy + smoke suites +
+  Backstage boot). Log stops mid-verify-guard. Environmental.
+- Client-side exec/port-forward hangs + websocket 1006: user's failed
+  Homebrew kubectl upgrade (broken intermediate install); resolved when
+  the user re-completed the update (v1.36.3). EXEC_OK verified.
+- M3 proxy lanes 404: stale Saturday processes held 3001/7008/7009 (one
+  serving from the throwaway smoke worktree /private/tmp/...-5b0c23e).
+  Killed; worktree removed; fresh backend serves all routes (200
+  verified). Hygiene lane now reports zero extra worktrees.
+- M3 FR-08 false FAIL: lane parsed SigNoz v2 `data` as a list; the API
+  nests `data.dashboards`. Fixed in smoke-m3.sh and install-m3.sh
+  (idempotency verified: second run found existing, no dupes; update PUT
+  still WARNs -- minor debt). My earlier manual POST created duplicates,
+  deleted; originals date 2026-08-22.
+- M3 FR-05 false FAIL chain: live otel-collector config was 55d stale
+  (no filelog receivers at all; reconciled by install-m3 re-run), then
+  ClickHouse memory deadlock: 1.8 GiB server cap (derived from the 2 Gi
+  container limit) OOM-killed even trivial migrator queries, blocking the
+  very upgrade that would raise it. Broke the loop by patching the CHI
+  directly to 3Gi; install-m3 then applied cleanly (Apply complete) and
+  helm state converges on the same value. Lane query rewritten to the
+  resource-metadata table (full-history map scan OOMs/times out;
+  resource table returns 4 rows for the dp namespace in <1s).
+  Inverse-proven: nonexistent namespace returns 0.
+- OpenBao inmem wiped twice today (G5 recurrence proven again; reseeded,
+  smoke-openbao PASS both times).
+- gitea_admin had must-change-password set (rejected API+git auth);
+  cleared via in-pod gitea CLI. m1-gitea-token is STALE (403);
+  admin-password auth is the working path.
+- Legacy gitea-postgresql Endpoints object empty while EndpointSlice is
+  correct -- cosmetic on kube-proxy, flagged for next full restart.
+- Final: ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4, SECURITY,
+  BACKSTAGE-PRODUCTION), smoke-security 60/0/2.
+- New convention in AGENTS.md: serialized heavy operations (no
+  concurrent CI + smoke + boots); kill stale dev-server processes before
+  restarts.
 
 ---
 

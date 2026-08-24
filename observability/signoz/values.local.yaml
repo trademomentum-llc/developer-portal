@@ -20,7 +20,12 @@ clickhouse:
       memory: 1Gi
     limits:
       cpu: 1
-      memory: 2Gi
+      # 3Gi: ClickHouse derives max_server_memory_usage as ~90% of the
+      # container limit; at 2Gi (1.8 GiB cap) namespace-filtered log scans
+      # against the full logs_v2 history OOM (DB::Exception 241), which made
+      # smoke-m3 FR-05 false-fail on 2026-08-24. Limit only -- requests
+      # unchanged, so no standing cost.
+      memory: 3Gi
   persistence:
     # FR-10 (OQ-06): local-path PVC so ClickHouse restarts stop wiping telemetry.
     enabled: true

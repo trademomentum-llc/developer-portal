@@ -171,9 +171,10 @@ if [[ -n "${SIGNOZ_KEY}" ]]; then
         EXISTING_ID=$(curl -fsS -m 10 "${SIGNOZ_BASE}/api/v2/dashboards" -H "SIGNOZ-API-KEY: ${SIGNOZ_KEY}" 2>/dev/null \
             | DASH_NAME="${DASH_NAME}" python3 -c "
 import sys, json, os
-d = json.load(sys.stdin).get('data') or []
-match = [x for x in d if x.get('name') == os.environ['DASH_NAME']]
-print(match[0]['id'] if match else '')" 2>/dev/null || true)
+d = json.load(sys.stdin).get('data') or {}
+rows = d.get('dashboards') if isinstance(d, dict) else d
+match = [x for x in (rows or []) if x.get('name') == os.environ['DASH_NAME']]
+print((match[0].get('uuid') or match[0].get('id')) if match else '')" 2>/dev/null || true)
         if [[ -n "${EXISTING_ID}" ]]; then
             # Name is immutable; update spec/tags/schemaVersion only.
             python3 -c "

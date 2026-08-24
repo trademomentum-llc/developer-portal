@@ -509,7 +509,12 @@ sys.exit(0 if pr else 1)"; then
 
     LOGS_FOUND=false
     for attempt in {1..12}; do
-        LOG_ROWS=$(curl -fsS -m 10 "http://localhost:28123/?query=SELECT+count%28%2A%29+FROM+signoz_logs.distributed_logs_v2+WHERE+resources_string%5B%27k8s.namespace.name%27%5D%3D%27${EXPECTED_NS}%27+FORMAT+JSONCompact" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data'][0][0])" 2>/dev/null || echo 0)
+        # Query the resource-metadata table, not the full logs table: a
+        # namespace filter on distributed_logs_v2 map/JSON columns scans the
+        # whole history and OOMs or times out on a small ClickHouse
+        # (observed 2026-08-24: DB::Exception 241 / 60s timeouts). One row
+        # per resource fingerprint per bucket makes this lookup cheap.
+        LOG_ROWS=$(curl -fsS -m 15 "http://localhost:28123/?query=SELECT+count%28%2A%29+FROM+signoz_logs.distributed_logs_v2_resource+WHERE+labels+LIKE+%27%25${EXPECTED_NS}%25%27+AND+seen_at_ts_bucket_start+%3E+now%28%29+-+INTERVAL+1+DAY+FORMAT+JSONCompact" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data'][0][0])" 2>/dev/null || echo 0)
         if [[ "${LOG_ROWS}" -gt 0 ]]; then
             LOGS_FOUND=true
             break
@@ -554,8 +559,15 @@ sys.exit(0 if pr else 1)"; then
         fail "FR-08: no SigNoz API key available (run scripts/install-m3.sh to bootstrap)"
         record_result fail
     else
+        # SigNoz v2 API returns data as an object with a dashboards list
+        # (data.dashboards[].name); older shapes returned data as the list
+        # directly. Handle both.
         DASH_NAMES=$(curl -fsS -m 10 "http://localhost:3301/api/v2/dashboards" -H "SIGNOZ-API-KEY: ${SIGNOZ_SMOKE_KEY}" 2>/dev/null \
-            | python3 -c "import sys,json; print(' '.join(x.get('name','') for x in (json.load(sys.stdin).get('data') or [])))" 2>/dev/null || echo "")
+            | python3 -c "
+import sys, json
+d = json.load(sys.stdin).get('data') or {}
+rows = d.get('dashboards') if isinstance(d, dict) else d
+print(' '.join(x.get('name','') for x in (rows or [])))" 2>/dev/null || echo "")
         if [[ " ${DASH_NAMES} " == *" hello-m2-red "* && " ${DASH_NAMES} " == *" platform-overview "* ]]; then
             pass "FR-08: dashboards seeded (hello-m2-red, platform-overview)"
             record_result pass
