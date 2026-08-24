@@ -37,12 +37,11 @@ jobs:
             plugins/rr-policy-guards/tools/commit-guard \
             plugins/rr-policy-guards/tools/verify-guard \
             plugins/rr-policy-guards/tools/audit-chain \
+            tools/namespace-predictor \
             tools/score2openchoreo; do
             echo "== ${m}"
             (cd "${m}" && go test ./...)
           done
-      # tools/namespace-predictor is a single-file tool (no go.mod by
-      # design); its canonical-vector contract is covered by smoke-m3.sh.
 
   policy-tests:
     runs-on: ubuntu-latest
