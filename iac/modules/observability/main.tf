@@ -24,7 +24,10 @@ resource "helm_release" "signoz" {
 
   values = local.signoz_values != "" ? [local.signoz_values] : []
 
-  timeout = 600
+  # Generous wait: the telemetrystore-migrator pre-upgrade hook polls
+  # ClickHouse readiness and runs schema migrations; on a resource-tight
+  # laptop cluster this can exceed the default window during node churn.
+  timeout = 900
 }
 
 resource "helm_release" "otel_collector" {

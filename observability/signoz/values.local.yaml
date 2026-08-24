@@ -22,8 +22,10 @@ clickhouse:
       cpu: 1
       memory: 2Gi
   persistence:
-    enabled: false   # Use emptyDir for local demo speed and simplicity
-    size: 10Gi
+    # FR-10 (OQ-06): local-path PVC so ClickHouse restarts stop wiping telemetry.
+    enabled: true
+    size: 2Gi
+    storageClass: local-path
 
 zookeeper:
   enabled: false     # Single-node ClickHouse for demo
@@ -55,6 +57,9 @@ otelCollector:
       memory: 256Mi
 
 # Reduce sampling and retention for local laptop / CI friendliness
+# FR-10 (OQ-06): retention is CONFIGURABLE here but is NOT a native chart key;
+# scripts/install-m3.sh reconciles these values onto the live instance through
+# the SigNoz TTL API (POST /api/v1/settings/ttl) after the helm upgrade.
 signoz:
   otel:
     sampling:

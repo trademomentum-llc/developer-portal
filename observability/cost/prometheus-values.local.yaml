@@ -1,6 +1,9 @@
 server:
   persistentVolume:
-    enabled: false
+    # FR-10 (OQ-06): local-path PVC so Prometheus restarts stop wiping metrics.
+    enabled: true
+    size: 2Gi
+    storageClass: local-path
   retention: "2d"
   resources:
     requests:
