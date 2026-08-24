@@ -18,9 +18,44 @@
 > enforced by scripts/check-handoff-fidelity.sh.
 
 **Last updated:** 2026-08-24
-**Reason for handoff:** USER RULING: phase-gate discipline. Gap register
-executed: G1 (8 signed commits), G3 (cluster restart + recovery), G9
-(carrier code parked in assessments/) closed same-day. Evidence in 0h.
+**Reason for handoff:** Publication complete -- all remotes + local mirror
+at HEAD `76bb694`; fidelity gate all green. Gap register re-ranked with
+corrected carrier logic on real inputs; priorities in 0i.
+
+---
+
+## 0i. 2026-08-24 addendum -- publication + gap re-ranking (real inputs)
+
+Publication (user-authorized): `git push origin main` and `github main`
+(5b0c23e..76bb694); local mirror `259de88..76bb694`. Two blockers found
+and fixed en route: gitea_admin had must-change-password set (rejected
+API+git auth; cleared via in-pod `gitea admin user must-change-password
+--unset gitea_admin` with `-c /data/gitea/conf/app.ini`), and the legacy
+`gitea-postgresql` Endpoints object is empty while its EndpointSlice is
+correct (cosmetic on k3s/kube-proxy, but flag for the next full restart).
+The m1-gitea-token is STALE (403 all styles); admin-password auth is the
+working path (scripts/push-local.sh convention). Evidence:
+`./scripts/check-handoff-fidelity.sh` -> all lanes PASS, all three
+remotes at `76bb694`. GitHub dependabot now reports 6 advisories (5
+moderate + 1 low) vs the 3 documented moderates -- register G10.
+
+Gap re-ranking (corrected hybrid severity + surface priority, REAL
+register inputs; IsolationForest skipped deliberately -- N=8 is
+statistically meaningless):
+
+| Rank | SP | Item | Basis |
+|---|---|---|---|
+| 1 | 4.05 | G5 OpenBao production backend | recurred 3x (incl. today), 114 days old |
+| 2 | 1.81 | G2 stash disposition | 25 days old, overlaps live files |
+| 3 | 1.62 | G7 user actions | branch protection + token rotation |
+| 4 | 1.54 | G4 cert re-pin | hard deadline 2026-09-24 -- formula cannot see deadlines; judgment override: treat as top-2 |
+| 5 | 1.22 | G8 phase-3 tracker triad | gated by phase-gate discipline |
+| 6 | 1.05 | G6 react-router moderates | accepted risk, blocked upstream |
+| 7 | 0.67 | G11 smoke-all + self-CI rerun | validation debt from today's series; cheap -- run next |
+| 8 | 0.57 | G10 dependabot delta | needs 5-minute review |
+
+Recommended order (formula + deadline/effort judgment): G11 (next, cheap
+validation), G4 (deadline), G5 (structural fix), G2, G7 (user), G10, G8.
 
 ---
 

@@ -25,6 +25,8 @@ unless marked UNVERIFIED.
 | G7 | User actions: gitea.com branch protection (OQ-06); .env.local Vercel OIDC token rotation | OPEN (user-owned) | User |
 | G8 | Phase 3 residual/friction tracker over real event sources (CI runs, smoke results, guard audit chains) | OPEN, gated | Spec triad required per POLICIES.md |
 | G9 | `scripts/residual_ranking.py` (248 lines, carrier-derived, created 2026-08-24 09:27, NOT by Kimi) sits untracked in scripts/ | **DONE** -- relocated to `assessments/residual_ranking.py`, committed `754a72e` as parked external artifact | None |
+| G10 | GitHub dependabot reports 6 advisories (5 moderate + 1 low) vs 3 documented moderates in SECURITY.md | OPEN -- discrepancy UNVERIFIED | Review the delta; update SECURITY.md or remediate |
+| G11 | smoke-all + self-CI rerun after the 2026-08-24 commit series and cluster restart | OPEN -- validation debt | Run `scripts/smoke-all.sh` once cluster settles; watch self-CI on the runner |
 
 ---
 
