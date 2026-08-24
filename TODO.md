@@ -16,15 +16,15 @@ unless marked UNVERIFIED.
 
 | ID | Item | Status verified 2026-08-24 | Closure action |
 |---|---|---|---|
-| G1 | Dirty working tree: 42 modified + 20 untracked | OPEN (`git status`) | Commit triage -- needs user authorization for commits on main |
+| G1 | Dirty working tree: 42 modified + 20 untracked | **DONE** -- 8 signed commits `c08b4ba..a22f33f` (all %G?=G); tree clean except intentional `.claude/`; verify: tsc exit 0, go test OK, bash -n clean, YAML 12/12 | Remaining: push decision (remotes 8 behind; fidelity gate correctly FAILs remote-sync) |
 | G2 | Stash `wip-non-security-20260730`: 68 files, 925+/514-, overlaps live files (hello-m2 main.go +95) | OPEN (`git stash list`) | PRESERVED as patch `~/.rational-reserve/backups/wip-non-security-20260730.patch` (3,357 lines); apply/split/drop still needed |
-| G3 | Cluster k3d-openchoreo degraded: kine Slow SQL 14-29 s, server-0 CPU 1241%, API handler timeouts | OPEN as of 2026-08-23 17:37; UNVERIFIED today (kubectl empty) | Settle / rolling restart server-0 (`repair-k3d-node-ip.sh` on standby) |
-| G4 | Cluster-plane agent cert pins stale at renewal; current certs expire 2026-09-24 | OPEN (date math; cluster down so pins UNVERIFIED) | Re-pin before expiry (`scripts/repin-plane-agent-ca.sh`); upstream fix deferred |
-| G5 | m2i-6 OpenBao dev-mode inmem loses secrets on restart | OPEN (standing) | Production storage backend -- production-readiness item |
+| G3 | Cluster k3d-openchoreo degraded: kine Slow SQL 14-29 s, server-0 CPU 1241%, API handler timeouts | **DONE** -- rolling restart of server-0 (user-approved); node Ready, 72 pods Running / 1 PodInitializing, openbao-0 1/1 after reseed (`seed-openbao-m2-paths.sh` + `smoke-openbao.sh` PASS) | Full smoke-all re-run recommended when settled |
+| G4 | Cluster-plane agent cert pins stale at renewal; current certs expire 2026-09-24 | OPEN (cluster back up; pins re-verifiable now) | Re-pin before expiry (`scripts/repin-plane-agent-ca.sh`); upstream fix deferred |
+| G5 | m2i-6 OpenBao dev-mode inmem loses secrets on restart | OPEN (standing; reseeded again today -- recurrence proven) | Production storage backend -- production-readiness item |
 | G6 | react-router 6.30.4 moderates | ACCEPTED RISK (SECURITY.md) | Upstream Backstage v7 support |
 | G7 | User actions: gitea.com branch protection (OQ-06); .env.local Vercel OIDC token rotation | OPEN (user-owned) | User |
 | G8 | Phase 3 residual/friction tracker over real event sources (CI runs, smoke results, guard audit chains) | OPEN, gated | Spec triad required per POLICIES.md |
-| G9 | `scripts/residual_ranking.py` (248 lines, carrier-derived, created 2026-08-24 09:27, NOT by Kimi) sits untracked in scripts/ | OPEN | Disposition: sanction (needs triad), relocate to assessments/, or remove |
+| G9 | `scripts/residual_ranking.py` (248 lines, carrier-derived, created 2026-08-24 09:27, NOT by Kimi) sits untracked in scripts/ | **DONE** -- relocated to `assessments/residual_ranking.py`, committed `754a72e` as parked external artifact | None |
 
 ---
 

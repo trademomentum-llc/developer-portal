@@ -18,10 +18,40 @@
 > enforced by scripts/check-handoff-fidelity.sh.
 
 **Last updated:** 2026-08-24
-**Reason for handoff:** USER RULING: phase-gate discipline. Completion was
-conveyed while gates stood open; no advancement until the verified gap
-register (top of TODO.md) is closed. Register created, stash preserved as
-patch, rule codified in AGENTS.md Conventions.
+**Reason for handoff:** USER RULING: phase-gate discipline. Gap register
+executed: G1 (8 signed commits), G3 (cluster restart + recovery), G9
+(carrier code parked in assessments/) closed same-day. Evidence in 0h.
+
+---
+
+## 0h. 2026-08-24 addendum -- gap register execution (user-approved closures)
+
+All three user-approved closures executed and verified:
+
+- G1 commit triage: 8 signed commits `c08b4ba..a22f33f` (all %G?=G):
+  governance; assessments relocation; backstage (tsc exit 0); scripts
+  (bash -n clean x21); observability (YAML OK); namespace-predictor
+  (go test 0.300s OK); ci workflows (YAML OK); seed-repos + runbooks.
+  Tree now clean except intentional untracked `.claude/`. First commit
+  initially BLOCKED by rr-commit-guard IN-M-001 (subject > 72 chars);
+  message shortened, no bypass used.
+- G9: `scripts/residual_ranking.py` moved to `assessments/` (`754a72e`),
+  committed as a parked external artifact, not wired to any operational
+  path.
+- G3: `docker restart k3d-openchoreo-server-0` (user-approved). Node
+  Ready within minutes; node-IP lottery did NOT strike; pods recovered
+  to 72 Running / 1 PodInitializing; openbao-0 came back 1/1 after the
+  documented inmem reseed (`seed-openbao-m2-paths.sh` -> "openbao
+  seeded"; `smoke-openbao.sh` -> PASS). G5 recurred exactly as
+  documented -- evidence for prioritizing the production backend.
+- Gate self-proof: `scripts/check-handoff-fidelity.sh` now FAILs
+  remote-sync on all three remotes (they are at `5b0c23e`, HEAD is
+  `a22f33f`) -- the checker's first live catch. Push is a user decision.
+
+Still open: G2 (stash disposition; patch preserved), G4 (cert re-pin by
+2026-09-24), G5 (OpenBao production backend), G6 (accepted risk), G7
+(user-owned), G8 (Phase 3 triad). Recommended next: full `smoke-all`
+re-run once the cluster settles, then push of the 8-commit series.
 
 ---
 
