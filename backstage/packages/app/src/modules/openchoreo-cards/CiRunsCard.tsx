@@ -1,7 +1,7 @@
 import { InfoCard, Link } from '@backstage/core-components';
 import { useApi, fetchApiRef } from '@backstage/core-plugin-api';
 import { useEntity } from '@backstage/plugin-catalog-react';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Button, Typography } from '@material-ui/core';
 import { useEffect, useState } from 'react';
 
 // Shape of one entry in Gitea's
@@ -34,6 +34,12 @@ const MAX_RUNS = 10;
 function runOutcome(run: WorkflowRun): string {
   return run.conclusion ?? run.status ?? 'unknown';
 }
+
+// FR-35: the workflow dispatched by the in-portal action. `ci.yaml` is the
+// M2 pipeline convention (every component repo's main CI workflow; the same
+// workflow id smoke-actions.sh dispatches).
+const DISPATCH_WORKFLOW = 'ci.yaml';
+const DISPATCH_REF = 'main';
 
 /**
  * CiRunsCard
@@ -70,6 +76,14 @@ export const CiRunsCard = () => {
   );
   const [runsError, setRunsError] = useState<string | null>(null);
 
+  // FR-35 dispatch control state. refreshIndex re-triggers the runs fetch
+  // after a successful dispatch so the new run surfaces without a reload.
+  const [dispatchState, setDispatchState] = useState<
+    'idle' | 'dispatching' | 'dispatched' | 'error'
+  >('idle');
+  const [dispatchError, setDispatchError] = useState<string | null>(null);
+  const [refreshIndex, setRefreshIndex] = useState(0);
+
   useEffect(() => {
     let cancelled = false;
     fetch(
@@ -99,7 +113,37 @@ export const CiRunsCard = () => {
     return () => {
       cancelled = true;
     };
-  }, [fetch, component]);
+  }, [fetch, component, refreshIndex]);
+
+  // FR-35: in-portal workflow dispatch. Actuation is the documented OQ-15
+  // exception for forge dispatch: the POST rides the same authenticated
+  // gitea-actions proxy as the reads (the backend attaches the token), and
+  // in production the entity surface sits behind the Wave-0 RBAC policy
+  // (SecurityRbacPolicy), same as every other card on this page.
+  const dispatchWorkflow = () => {
+    setDispatchState('dispatching');
+    setDispatchError(null);
+    fetch(
+      `/api/proxy/gitea-actions/repos/${repoOwner}/${component}/actions/workflows/${DISPATCH_WORKFLOW}/dispatches`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ref: DISPATCH_REF }),
+      },
+    )
+      .then(async res => {
+        if (!res.ok) {
+          throw new Error(`Gitea proxy returned ${res.status}`);
+        }
+        setDispatchState('dispatched');
+        // Give Gitea a moment to register the run before refreshing.
+        setTimeout(() => setRefreshIndex(i => i + 1), 3000);
+      })
+      .catch(err => {
+        setDispatchError(err.message);
+        setDispatchState('error');
+      });
+  };
 
   return (
     <InfoCard title="CI Runs" variant="gridItem">
@@ -157,6 +201,38 @@ export const CiRunsCard = () => {
           )}
         </Box>
 
+        <Box mt={2}>
+          <Typography variant="body2">
+            <strong>Dispatch workflow:</strong>
+          </Typography>
+          <Box mt={1}>
+            <Button
+              size="small"
+              variant="outlined"
+              color="primary"
+              disabled={dispatchState === 'dispatching'}
+              onClick={dispatchWorkflow}
+            >
+              {dispatchState === 'dispatching'
+                ? 'Dispatching...'
+                : `Dispatch ${DISPATCH_WORKFLOW} on ${DISPATCH_REF}`}
+            </Button>
+          </Box>
+          {dispatchState === 'dispatched' ? (
+            <Typography variant="body2" style={{ marginTop: 4 }}>
+              Dispatched {DISPATCH_WORKFLOW} on {DISPATCH_REF} -- the run list
+              refreshes automatically
+            </Typography>
+          ) : null}
+          {dispatchState === 'error' ? (
+            <Typography variant="body2" style={{ marginTop: 4 }}>
+              <span style={{ color: 'orange' }}>
+                Dispatch failed (not wired): {dispatchError}
+              </span>
+            </Typography>
+          ) : null}
+        </Box>
+
         <Box mt={2} display="flex" flexDirection="column" gridGap={4}>
           <Link to={actionsUrl}>All runs in Gitea Actions</Link>
         </Box>
@@ -165,7 +241,9 @@ export const CiRunsCard = () => {
           Live data from the Gitea Actions API (repos/{repoOwner}/{component}
           /actions/runs) through the authenticated gitea-actions proxy. Each
           entry links to the run in the Gitea UI; the run list reflects the
-          repo's full CI history, most recent first.
+          repo's full CI history, most recent first. The dispatch action POSTs
+          workflow_dispatch through the same proxy (backend-attached token);
+          in production this surface is behind the Wave-0 RBAC policy.
         </Typography>
       </Box>
     </InfoCard>

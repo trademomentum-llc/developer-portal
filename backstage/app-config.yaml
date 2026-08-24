@@ -14,6 +14,11 @@ app:
     - page:catalog:
         config:
           path: /
+    # FR-19: the kubernetes plugin's workload view is mounted as a section on
+    # the OpenChoreo Deployment tab (openchoreo-entity-page module); disable
+    # the plugin's auto-discovered standalone entity tab so the workload view
+    # is not rendered twice.
+    - entity-content:kubernetes/kubernetes: false
 
 organization:
   name: Rational Reserve
@@ -74,6 +79,31 @@ proxy:
       changeOrigin: true
       pathRewrite:
         '^/api/proxy/opencost': ''
+    # FR-09 (Lane A): SigNoz query API for the Observability/Alerts cards.
+    # /api/proxy/signoz/v5/query_range -> http://localhost:3301/api/v5/query_range
+    # The API key is injected from SIGNOZ_API_KEY (exported by start-backstage.sh
+    # from ~/.rational-reserve/signoz-api-key). When unset the header is empty,
+    # SigNoz answers 401, and the cards render their honest not-wired state.
+    '/signoz':
+      target: http://localhost:3301
+      changeOrigin: true
+      pathRewrite:
+        '^/api/proxy/signoz': '/api'
+      headers:
+        SIGNOZ-API-KEY: '${SIGNOZ_API_KEY:-}'
+    # FR-21: OpenChoreo control-plane API (port-forward managed by
+    # scripts/start-backstage.sh as openchoreo-api on :9090). The API enforces
+    # Thunder-issued JWT bearer tokens; when OPENCHOREO_API_TOKEN is unset the
+    # header is an empty bearer, the API answers 401, and the DeploymentCard
+    # renders its honest not-wired state (NFR-04). Exporting a valid token
+    # makes the observed-state block live without a config change.
+    '/openchoreo':
+      target: http://localhost:9090
+      changeOrigin: true
+      pathRewrite:
+        '^/api/proxy/openchoreo': ''
+      headers:
+        Authorization: 'Bearer ${OPENCHOREO_API_TOKEN:-}'
 
 # Reference documentation http://backstage.io/docs/features/techdocs/configuration
 # Note: After experimenting with basic setup, use CI/CD to generate docs

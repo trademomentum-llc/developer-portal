@@ -1,0 +1,26 @@
+apiVersion: score.dev/v1b1
+metadata:
+  name: ${{ values.name }}
+  annotations:
+    pipeline.m2/owner: openchoreo
+containers:
+  web:
+    # The CI render step overrides this with the freshly built, SHA-tagged
+    # image; this default only needs to be schema-valid.
+    image: registry.local-registry.svc.cluster.local:5000/${{ values.name }}:latest
+    variables:
+      ENVIRONMENT: "${resources.env.value}"
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
+service:
+  ports:
+    http:
+      port: 3000
+resources:
+  env:
+    type: environment

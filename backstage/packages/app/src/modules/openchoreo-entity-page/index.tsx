@@ -1,5 +1,6 @@
 import { createFrontendModule } from '@backstage/frontend-plugin-api';
 import { EntityContentBlueprint } from '@backstage/plugin-catalog-react/alpha';
+import { EntityKubernetesContent } from '@backstage/plugin-kubernetes';
 import Grid from '@material-ui/core/Grid';
 import CloudIcon from '@material-ui/icons/Cloud';
 import AssessmentIcon from '@material-ui/icons/Assessment';
@@ -13,11 +14,13 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 // this module adds dedicated angle tabs without duplicating content.
 import { DeploymentCard } from '../openchoreo-cards/DeploymentCard';
 import { ObservabilityLinksCard } from '../openchoreo-cards/ObservabilityLinksCard';
+import { AlertsCard } from '../openchoreo-cards/AlertsCard';
 import { CostCard } from '../openchoreo-cards/CostCard';
 import { PolicyCard } from '../openchoreo-cards/PolicyCard';
 import { PlatformCard } from '../openchoreo-cards/PlatformCard';
 import { SecurityCard } from '../openchoreo-cards/SecurityCard';
 import { CiRunsCard } from '../openchoreo-cards/CiRunsCard';
+import { TestResultsCard } from '../openchoreo-cards/TestResultsCard';
 
 const componentFilter = 'kind:component';
 
@@ -33,6 +36,19 @@ const deploymentContent = EntityContentBlueprint.make({
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <DeploymentCard />
+        </Grid>
+        {/* FR-19: Backstage kubernetes plugin workload view, a section below
+            the custom card (the custom card stays primary). Reaches the
+            k3d-openchoreo cluster through the localKubectlProxy locator
+            (kubectl proxy on :8001); discovers workloads via the entity's
+            backstage.io/kubernetes-label-selector annotation
+            (openchoreo.dev/component=<name>). Until that annotation is on the
+            ingested entity the plugin renders its own explicit
+            missing-annotation empty state (NFR-04). The plugin's standalone
+            per-entity tab is disabled in app-config.yaml to avoid a duplicate
+            surface. */}
+        <Grid item xs={12}>
+          <EntityKubernetesContent />
         </Grid>
       </Grid>
     ),
@@ -51,6 +67,9 @@ const observabilityContent = EntityContentBlueprint.make({
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <ObservabilityLinksCard />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <AlertsCard />
         </Grid>
       </Grid>
     ),
@@ -141,6 +160,9 @@ const engagementContent = EntityContentBlueprint.make({
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <CiRunsCard />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <TestResultsCard />
         </Grid>
       </Grid>
     ),

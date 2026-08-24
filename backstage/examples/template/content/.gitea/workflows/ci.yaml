@@ -93,4 +93,66 @@ jobs:
           docker build -t registry.local-registry.svc.cluster.local:5000/${GITHUB_REPOSITORY#*/}:${GITHUB_SHA::7} .
       - name: Push image
         run: docker push registry.local-registry.svc.cluster.local:5000/${GITHUB_REPOSITORY#*/}:${GITHUB_SHA::7}
+
+  # Deploy stage (FR-13): render the Score file into OpenChoreo resources and
+  # commit them into platform-config/environments/dev/, where Flux applies
+  # them and OpenChoreo reconciles the component into the development
+  # data-plane namespace. Mirrors the proven hello-m2 pipeline.
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version: "1.26"
+
+      - name: Clone developer-portal and build score2openchoreo
+        run: |
+          git clone --depth 1 http://gitea-http.gitea.svc.cluster.local:3000/openchoreo/developer-portal.git /tmp/dp
+          cd /tmp/dp/tools/score2openchoreo
+          go build -o /usr/local/bin/score2openchoreo .
+
+      - name: Validate Score schema
+        run: score2openchoreo --validate-only --input score.yaml
+
+      - name: Compute OpenChoreo runtime namespace
+        run: |
+          EXPECTED_NS=$(go run /tmp/dp/tools/namespace-predictor/main.go default default development)
+          echo "EXPECTED_NS=${EXPECTED_NS}" >> $GITHUB_ENV
+
+      - name: Render OpenChoreo resources
+        run: |
+          score2openchoreo \
+            --input score.yaml \
+            --environment development \
+            --image "registry.local-registry.svc.cluster.local:5000/${GITHUB_REPOSITORY#*/}:${GITHUB_SHA::7}" \
+            --extra-env OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-opentelemetry-collector.otel-system.svc.cluster.local:4318 \
+            --extra-env OPENCHOREO_PROJECT=default \
+            --extra-env "OPENCHOREO_COMPONENT=${GITHUB_REPOSITORY#*/}" \
+            --extra-env OPENCHOREO_ENVIRONMENT=development \
+            --extra-env "OPENCHOREO_RUNTIME_NAMESPACE=${EXPECTED_NS}" \
+            --extra-env "GIT_SHA=${GITHUB_SHA::7}" \
+            > /tmp/component.yaml
+
+      # Honest degradation: if the org/repo does not carry
+      # PLATFORM_CONFIG_TOKEN, the rendered Component is still produced but
+      # the platform-config commit is skipped loudly instead of faking a
+      # success. Admins seed the org-level secret once via
+      # scripts/seed-gitea-repos.sh (Gitea >= 1.20 supports org secrets).
+      - name: Commit to platform-config
+        env:
+          PLATFORM_CONFIG_TOKEN: ${{ secrets.PLATFORM_CONFIG_TOKEN }}
+        run: |
+          if [ -z "${PLATFORM_CONFIG_TOKEN}" ]; then
+            echo "PLATFORM_CONFIG_TOKEN is not set for this repository or its org."
+            echo "Skipping the platform-config commit; the rendered Component above is still valid."
+            echo "Admin remediation: run scripts/seed-gitea-repos.sh to seed the org-level secret."
+            exit 0
+          fi
+          GITEA_TOKEN="${PLATFORM_CONFIG_TOKEN}" \
+            /tmp/dp/scripts/ci/commit-to-platform-config.sh dev "${GITHUB_REPOSITORY#*/}" /tmp/component.yaml
 {% endraw %}
