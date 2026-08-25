@@ -24,6 +24,29 @@ and their fixes in 0j.
 
 ---
 
+## 0k. 2026-08-24 addendum (late) -- structural-gap execution
+
+User challenge: the open-gaps ranking had not changed because only
+process/validation gates had been closed. Executed against the top
+structural items:
+
+- G13 DONE: self-CI run 288 (`1337215`) all three jobs success.
+- G10 DISSOLVED: `gh api repos/.../dependabot/alerts` shows exactly 3
+  open advisories (react-router mediums), matching SECURITY.md; the push
+  banner counted non-open alerts.
+- G4 checked: `repin-plane-agent-ca.sh --check` -- all three plane pins
+  match live certs; no drift today; renewal deadline 2026-09-24 stands.
+- G5 STARTED: `docs/specs/2026-08-24-OpenBao-Production-Storage-
+  Requirements.md` (BAO-STORAGE-REQ-001) -- Raft+PVC proposed, options
+  dispositioned, FR-4 inverse-proof lane specified (fails today by
+  construction: secrets do not survive openbao-0 deletion).
+
+Open gates entering 2026-08-25: G5 (triad continues), G4 (deadline),
+G2 (stash disposition -- recommendation: drop, patch preserved), G7
+(user-owned), G8 (gated behind the above).
+
+---
+
 ## 0j. 2026-08-24 addendum -- G11 closure (the long version)
 
 G11 closed after five smoke-all attempts; every failure traced to
