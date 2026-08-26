@@ -152,7 +152,7 @@ per-repo from the module cache at the exact pinned versions (2026-08-18).
 | 21 | google.golang.org/grpc (indirect) | v1.83.0 | https://github.com/grpc/grpc-go | Apache-2.0 | gRPC authors / Google LLC (CNCF) | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:28 |
 | 22 | google.golang.org/protobuf (indirect) | v1.36.11 | https://github.com/protocolbuffers/protobuf-go | BSD-3-Clause | The Go Authors (2018) / Google LLC | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:29 |
 
-## 5. Backstage and Node.js (128 entries)
+## 5. Backstage and Node.js (129 entries)
 
 `backstage/` was scaffolded with `@backstage/create-app` and tracks the
 Backstage release line 1.49.1. Scaffold-originating files are Apache-2.0;
@@ -280,8 +280,8 @@ Backend workspace dependencies (30 entries; backend runtime):
 | 80 | @backstage/plugin-kubernetes-common | ^0.9.10 (0.9.10) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency (direct backend dependency since 2026-08-18; previously transitive/app-side) | packages/backend/package.json:32 |
 | 81 | @backstage/plugin-scaffolder-backend-module-gitea | ^0.2.19 (0.2.23) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency (direct since 2026-08-19; provides the publish:gitea scaffolder action, registered at packages/backend/src/index.ts:17-19) | packages/backend/package.json:39; backstage/examples/template/template.yaml |
 
-Resolution override pins (47 entries; security-override layer in
-backstage/package.json:51-101 applying repo-wide to all workspaces;
+Resolution override pins (48 entries; security-override layer in
+backstage/package.json:51-102 applying repo-wide to all workspaces;
 transitive-only packages. react-router, react-router-dom, and
 @types/react-dom also carry resolution pins and are listed in the app
 table above. Copyright holders are taken from the installed tarball
@@ -343,6 +343,7 @@ Gitea integration):
 | 126 | @octokit/plugin-paginate-rest | 11.4.1 | https://github.com/octokit/plugin-paginate-rest.js | MIT | Octokit contributors (LICENSE-verified: Copyright (c) 2019 Octokit contributors) | runtime dependency (resolution override) | backstage/package.json:99 |
 | 127 | @tootallnate/once | 2.0.1 | https://github.com/TooTallNate/once | MIT | Nathan Rajlich | build dependency (resolution override) | backstage/package.json:100 |
 | 128 | esbuild | 0.28.1 | https://github.com/evanw/esbuild | MIT | Evan Wallace (LICENSE: (c) 2020 Evan Wallace) | build dependency (resolution override) | backstage/package.json:101 |
+| 129 | urllib | 4.9.1 | https://github.com/node-modules/urllib | MIT | fengmk2 and other contributors (LICENSE: Copyright (c) 2011-2014) | runtime dependency (resolution override; pinned 2026-08-26 for GHSA-hq3h-g68c-hp78, transitive via infinispan ^0.12.0) | backstage/package.json:102 |
 
 ## 6. CI/CD Actions and Images (9 entries)
 
@@ -404,7 +405,7 @@ image are not enumerated (see U19 below).
 
 An honest gap is recorded here rather than hidden. Each row states what
 could not be verified, what IS verified, and where the evidence sits.
-Nothing in this section is counted among the 198 listed entries above
+Nothing in this section is counted among the 199 listed entries above
 unless explicitly noted as a caveat on a listed entry.
 
 Resolution passes of 2026-08-18: a first pass resolved 15 rows with hard

@@ -98,7 +98,8 @@
     "@octokit/request-error": "5.1.1",
     "@octokit/plugin-paginate-rest": "11.4.1",
     "@tootallnate/once": "2.0.1",
-    "esbuild": "0.28.1"
+    "esbuild": "0.28.1",
+    "urllib": "4.9.1"
   },
   "prettier": "@backstage/cli/config/prettier",
   "lint-staged": {

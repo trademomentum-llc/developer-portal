@@ -81,7 +81,19 @@ Accepted residual risks, recorded with evidence and review dates:
   v7 is outside every installed `@backstage/*` peer range (`^6.30.2`), so
   forcing v7 was rejected as an unsupported major against all Backstage peer
   declarations. Remediation path: upstream Backstage shipping v7-compatible
-  peer ranges. Accepted 2026-08-18.
+  peer ranges. Accepted 2026-08-18; re-verified 2026-08-26 against the live
+  dependabot set (same three GHSAs, still no fixed 6.x; 6.30.5/6.30.6 do not
+  cover them).
+- **elliptic <=6.6.1** -- GHSA-848j-6mx2-7j84, low (risky cryptographic
+  primitive implementation), transitive dev-side dependency; no patched
+  release exists. Accepted 2026-08-26.
+- REMEDIATED 2026-08-26: **urllib <=4.9.0** -- GHSA-hq3h-g68c-hp78 (high,
+  CVSS 7.5, credential-bearing headers preserved across cross-origin
+  redirects), transitive via `@backstage/backend-defaults` -> infinispan
+  ^0.12.0 -> urllib ^3.23.0. Fixed by Yarn resolution pin `urllib: 4.9.1`
+  (backstage/package.json); `yarn npm audit --severity high` clean, `yarn tsc`
+  exit 0, infinispan loads against 4.9.1. The vulnerable code path was never
+  exercised: no infinispan cache store is configured in any app-config.
 - **@material-ui/core v4** deprecation -- tracked as upgrade debt, not a
   security emergency (see "What we fix first" above).
 

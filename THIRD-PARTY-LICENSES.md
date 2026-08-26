@@ -692,6 +692,7 @@ LICENSE headers (verified 2026-08-18).
 | @octokit/plugin-paginate-rest | 11.4.1 | MIT | Octokit contributors (LICENSE: Copyright (c) 2019 Octokit contributors) |
 | @tootallnate/once | 2.0.1 | MIT | Nathan Rajlich |
 | esbuild | 0.28.1 | MIT | Evan Wallace ((c) 2020) |
+| urllib | 4.9.1 (pin added 2026-08-26 for GHSA-hq3h-g68c-hp78; transitive via infinispan ^0.12.0) | MIT | fengmk2 and other contributors ((c) 2011-2014) |
 
 Runtime-fetched third-party artifacts adjacent to this scope (not in yarn):
 Playwright downloads browser binaries at `yarn test:e2e` time (per the
