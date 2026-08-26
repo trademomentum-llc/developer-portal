@@ -1,0 +1,76 @@
+# scripts/openbao-values.yaml
+# G5 (BAO-STORAGE-DES-001 section 4): OpenBao production-grade storage.
+# Raft integrated storage on a 1Gi local-path PVC, single replica, with an
+# in-pod auto-unseal sidecar fed by the bootstrap-created Secret
+# openbao-unseal-key. Applied ONLY by scripts/install-openbao-storage.sh:
+#   helm upgrade openbao openbao/openbao --version 0.25.6 \
+#     --namespace openbao --values scripts/openbao-values.yaml
+injector:
+  enabled: false
+server:
+  dev:
+    enabled: false
+  ha:
+    enabled: true
+    replicas: 1
+    raft:
+      enabled: true
+      config: |
+        ui = true
+
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+
+        storage "raft" {
+          path = "/openbao/data"
+        }
+
+        service_registration "kubernetes" {}
+  dataStorage:
+    enabled: true
+    size: 1Gi
+    storageClass: local-path
+    accessMode: ReadWriteOnce
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  extraVolumes:
+    - type: secret
+      name: openbao-unseal-key
+      defaultMode: 256
+  extraContainers:
+    - name: openbao-unseal
+      image: quay.io/openbao/openbao:2.5.1
+      imagePullPolicy: IfNotPresent
+      env:
+        - name: BAO_ADDR
+          value: "http://127.0.0.1:8200"
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          while true; do
+            status=$(bao status -format=json 2>/dev/null || true)
+            case "$status" in
+              *'"sealed":true'*|*'"sealed": true'*)
+                key=$(cat /openbao/unseal/key)
+                if [ -n "$key" ]; then
+                  bao operator unseal "$key" >/dev/null 2>&1 || true
+                fi
+                ;;
+            esac
+            sleep 5
+          done
+      volumeMounts:
+        - name: userconfig-openbao-unseal-key
+          mountPath: /openbao/unseal
+          readOnly: true
+      resources:
+        requests:
+          cpu: "5m"
+          memory: "16Mi"
+        limits:
+          cpu: "50m"
+          memory: "64Mi"

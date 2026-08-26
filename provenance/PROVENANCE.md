@@ -493,3 +493,13 @@ for third-party charts); .gitleaksignore (first-party false-positive
 fingerprints for gitleaks, added 2026-08-18). External services used but
 not incorporated
 (gitea.com SaaS, GitHub, Vercel) are out of scope for this listing.
+
+## Host custody artifacts (G5, 2026-08-26)
+
+Non-repo artifacts held under ~/.rational-reserve/ (outside all remotes):
+openbao/unseal-key and openbao/root-token (dir 700, files 600) -- Shamir
+1-of-1 unseal key and generated root token for the Raft-backed OpenBao
+(BAO-STORAGE-DES-001 D-05); backups/openbao/*.snap (mode 600) -- raft
+snapshots written by scripts/backup-openbao.sh. These are secrets custody,
+not third-party works; recorded here so their existence and location are
+auditable.

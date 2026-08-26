@@ -90,11 +90,21 @@ tofu plan
 ./scripts/install-m1.sh --fresh   # wipe checkpoints, start over
 ./scripts/teardown-m1.sh
 
-./scripts/install-m2.sh           # linear, not checkpointed (short script)
+./scripts/install-m2.sh           # linear, not checkpointed (short script); includes
+                                  #   task_4_5_openbao_storage (idempotent Raft migration)
 ./scripts/smoke-m2.sh             # wraps 7 per-tool smokes: tofu, actions, flux, score,
                                   #                          infracost, gatekeeper, openbao
-./scripts/teardown-m2.sh
+./scripts/teardown-m2.sh          # preserves OpenBao PVC/secrets by default; --wipe-secrets to destroy
+
+# OpenBao persistent storage (G5; spec: docs/specs/2026-08-26-OpenBao-Production-Storage-Technical-Specification.md)
+./scripts/install-openbao-storage.sh     # idempotent migration orchestrator (dev inmem -> Raft+PVC)
+./scripts/bootstrap-openbao-persistent.sh # init/recover-from-custody, unseal, mounts, 13 secrets, seed
+./scripts/smoke-openbao.sh [--with-restart]  # --with-restart = FR-4 lane: secrets must survive pod deletion
+./scripts/backup-openbao.sh              # raft snapshot -> ~/.rational-reserve/backups/openbao/
+./scripts/rollback-openbao-storage.sh    # helm rollback to dev mode; PVC and custody preserved
 ```
+
+Unseal-key and root-token custody: `~/.rational-reserve/openbao/` (dir 700, files 600). If `openbao-0` is deleted, the sidecar auto-unseals from Secret `openbao-unseal-key`; secrets must survive without reseeding (that is the FR-4 lane).
 
 Do not invent a "clean slate" path. If an install script fails mid-way, the blockers documented in `TODO.md` are the canonical remediation list.
 

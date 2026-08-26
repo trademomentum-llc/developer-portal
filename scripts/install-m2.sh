@@ -48,6 +48,11 @@ task_4_tofu_apply() {
     tofu apply -auto-approve
 }
 
+task_4_5_openbao_storage() {
+    info "Task 4.5: OpenBao persistent storage (G5)"
+    OPENBAO_STORAGE_SKIP_FULL_SMOKE=1 "$ROOT/scripts/install-openbao-storage.sh"
+}
+
 task_5_wait_flux() {
     info "Task 5: waiting for Flux reconcile"
     kubectl -n flux-system wait --for=condition=Ready kustomization.kustomize.toolkit.fluxcd.io/platform-addons --timeout=5m
@@ -65,6 +70,7 @@ main() {
     task_2_seed_gitea
     task_3_build_score2openchoreo
     task_4_tofu_apply
+    task_4_5_openbao_storage
     task_5_wait_flux
     task_6_smoke
     info "M2 complete."

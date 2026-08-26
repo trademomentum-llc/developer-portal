@@ -8,6 +8,14 @@ source "${ROOT_DIR}/scripts/lib/smoke-json.sh"
 smoke_json_parse_args "$@"
 smoke_json_begin all
 
+WITH_OPENBAO_RESTART=0
+for arg in ${SMOKE_JSON_ARGS[@]+"${SMOKE_JSON_ARGS[@]}"}; do
+    case "$arg" in
+        --with-openbao-restart) WITH_OPENBAO_RESTART=1 ;;
+        *) echo "smoke-all: unknown argument: $arg" >&2; exit 2 ;;
+    esac
+done
+
 # FR-34: child suites append their own records to the same JSONL file;
 # this suite adds one aggregate record over the suite results.
 if [ -n "${SMOKE_JSON_OUT}" ]; then
@@ -43,6 +51,21 @@ else
     smoke_json_count fail
 fi
 echo
+
+# G5 FR-4 lane (opt-in, heavy, serialized last): deletes openbao-0 and
+# asserts the four M2 keys survive with no reseed.
+if [ "$WITH_OPENBAO_RESTART" = "1" ]; then
+    echo "=== Running smoke-openbao.sh --with-restart (FR-4 lane) ==="
+    if "${ROOT_DIR}/scripts/smoke-openbao.sh" --with-restart; then
+        echo "=== smoke-openbao.sh --with-restart PASSED ==="
+        smoke_json_count pass
+    else
+        echo "=== smoke-openbao.sh --with-restart FAILED ===" >&2
+        FAILED+=("openbao-restart")
+        smoke_json_count fail
+    fi
+    echo
+fi
 
 if [ ${#FAILED[@]} -eq 0 ]; then
     echo "ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4, SECURITY, BACKSTAGE-PRODUCTION)"
