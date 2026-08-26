@@ -18,9 +18,49 @@
 > enforced by scripts/check-handoff-fidelity.sh.
 
 **Last updated:** 2026-08-26
-**Reason for handoff:** PUBLISHED -- 3 signed commits pushed to origin
-(gitea.com) AND github (a25c18c). OQ-06 API-verified closed. New gap
-G14 (urllib HIGH) registered. Details in 0q.
+**Reason for handoff:** G14 FIXED and pushed (5051f9b, urllib pinned
+4.9.1). G15 root-caused: PreToolUse guards never registered under Kimi
+(commit-guard blocks were the .git/hooks layer); hooks now registered in
+kimi config. Details in 0r.
+
+---
+
+## 0r. 2026-08-26 addendum (latest) -- G14 fixed, G15 root-caused
+
+- G14 FIXED, pushed to both remotes (`8a40734..5051f9b`): yarn
+  resolution `urllib: 4.9.1` clears GHSA-hq3h-g68c-hp78 (HIGH). Verified:
+  `yarn why urllib` -> 4.9.1; `yarn npm audit --severity high` clean;
+  `yarn tsc` exit 0; infinispan loads against 4.9.1; vulnerable path
+  unexercised (no infinispan cache store configured). SECURITY.md
+  re-synced (same 3 react-router GHSAs still accepted, elliptic low
+  accepted); provenance listing + licenses updated; certificate
+  re-issued PRC-developer-portal-2026-08-26-r12 with fresh digests.
+- G15 ROOT CAUSE (why the HIGH reached the remotes), two layers:
+  (a) Under Kimi Code, NO PreToolUse guard hooks were registered --
+  `~/.kimi-code/config.toml` had no `[[hooks]]`. The commit-guard blocks
+  observed in-session came from `.git/hooks/commit-msg` (installed by
+  the portfolio installer), a git-internal layer that fires regardless
+  of harness. verify-guard has no git-hook layer, so it silently never
+  ran under Kimi. Evidence: verify-guard.jsonl has zero entries for
+  today's commits/pushes while commit-guard.jsonl logged all six; the
+  binary works standalone (probes logged at 19:54Z and 20:07Z).
+  (b) Even had it run, its `yarn npm audit` lane cannot see this
+  advisory class: the PRE-FIX lockfile audits clean at --severity high
+  (measured against HEAD~1 in a scratch project, exit 0). Dependabot's
+  GitHub Advisory Database was the only sensor that saw it.
+- Remediation landed: all 8 portfolio hooks registered in
+  `~/.kimi-code/config.toml` (validated with `kimi doctor`; backup
+  config.toml.20260826-161104.bak; active on /reload or next session).
+  verify-guard timeout set to Kimi's max 600 (Claude used 1200).
+  `.claude/` added to .gitignore (its untracked state would trip
+  verify-guard's clean-tree push gate under ANY harness).
+- G15 remains PARTIAL: (b) SCA sensor swap to OSV/GHSA coverage needs a
+  spec triad; (c) NEW guard defect found by probing: verify-guard
+  invoked from the repo ROOT blocks commits with `toolchain-fail /
+  go-vet ./...` (no go.mod at root) -- multi-module awareness fix
+  needed before root-directory commits pass under Kimi.
+- First-run verification next session: any commit must produce a
+  verify-guard audit entry in ~/.rational-reserve/logs/verify-guard.jsonl.
 
 ---
 

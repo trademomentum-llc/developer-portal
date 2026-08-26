@@ -29,3 +29,7 @@ backstage/.cache/
 .vercel/
 .vercel
 .env*
+
+# Claude Code local session state (intentionally local-only; also keeps the
+# verify-guard clean-tree push gate usable)
+.claude/
