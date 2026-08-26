@@ -183,3 +183,51 @@ contemporaneous -- written during the work, per the rules in the header.
   seed-repos/platform-config/catalog-info.yaml, seed-repos/platform-addons/catalog-info.yaml,
   backstage/packages/app/package.json, iac/templates/ci.yaml,
   provenance/PROVENANCE-RECOGNITION-CERTIFICATE.md (r10).
+
+## 2026-08-26 -- G5 storage migration, G4 proactive re-pin, OQ-06 verified
+
+- Did: executed the G5 OpenBao persistent-storage triad end to end
+  (requirements -> design -> tech spec -> scratch-release simulation ->
+  live implementation). Simulation caught 5 listing defects (grep -q
+  SIGPIPE race, kubectl wait racing pod recreation x3, retained-PVC
+  skip logic wrong after rollback); all corrected in spec v0.2 before
+  live execution. Live: helm rev 2, PVC Bound, FR-4 inverse proof both
+  directions, secrets survive openbao-0 deletion (93s recovery vs 120s
+  bound), Colima cold restart auto-unseal ~35s with zero human steps.
+  Executed G4 proactively: deleted the three plane-agent cluster-agent-tls
+  Secrets, cert-manager re-issued in <=10s (new expiry 2026-11-24), the
+  --check lane FAILed with drift exactly as designed (inverse proof),
+  re-pinned, agents reconnected to the gateway in 2-3s.
+- OQ-06 CLOSED (verified, not newly done): the gitea.com branch
+  protection rule for main has existed since 2026-08-18T14:41Z --
+  enable_force_push=false, require_signed_commits=true,
+  required_approvals=1, push whitelist trademonentumllc. Verified via
+  the repo API. The spec's wire-level force-push attempt was not run:
+  the local pre-push hook (IN-H-002, no bypass) blocks it before the
+  wire, which is the documented layering (local hook gates this machine,
+  server rule gates everything else). Remaining G7 half: .env.local
+  Vercel OIDC rotation, conditional on it ever having been shared --
+  needs the user's Vercel login; the user's gitea.com web login is
+  unblocked for settings work only if needed (the git credential store
+  still holds a limited-scope gitea.com token; it authenticated repo
+  routes but 403s on /user).
+- Discovered: GitHub dependabot open alerts went 3 -> 7 (1 high).
+  New: urllib <=4.9.0 (GHSA-hq3h-g68c-hp78, CVSS 7.5, credential leak
+  via cross-origin redirects) through infinispan ^0.12.0 -> urllib
+  ^3.23.0, patched at 4.9.1 -- a major bump requiring a yarn resolution;
+  plus new react-router advisories beyond the three documented (G6),
+  plus elliptic low. Registered as G14; breaks the zero-medium+
+  posture until dispositioned.
+- Learned: the scratch-release simulation pattern paid for itself
+  immediately (5 defects caught pre-live, including one -- C9 -- that
+  only manifests on rollback-then-remigrate). Stale readiness-check
+  processes and dead port-forwards keep producing false smoke failures;
+  the wedged-VM signature (kubelet taking ~10 min to issue Killing,
+  host load >150) is now a recognized pattern: bounce Colima first,
+  debug lanes second. Colima portForwarder: none silently kills all
+  localhost forwarding after a VM restart -- the machine now runs
+  portForwarder: ssh (outside-repo config, recorded in handoff 0p).
+- Links: docs/specs/2026-08-26-OpenBao-Production-Storage-Technical-Specification.md,
+  docs/specs/2026-08-26-OpenBao-Storage-Simulation-Report.md,
+  scripts/install-openbao-storage.sh, scripts/repin-plane-agent-ca.sh,
+  TODO.md (G2/G4/G5 closed, G14 new).

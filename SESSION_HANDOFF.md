@@ -18,10 +18,42 @@
 > enforced by scripts/check-handoff-fidelity.sh.
 
 **Last updated:** 2026-08-26
-**Reason for handoff:** G4 CLOSED (proactive cert renewal + re-pin,
-inverse-proven) and G5 lane B CLOSED (Colima cold restart, auto-unseal
-35s, keys intact). smoke-all FULLY GREEN incl. --with-openbao-restart.
-Colima portForwarder repair needs user awareness. Details in 0p.
+**Reason for handoff:** PUBLISHED -- 3 signed commits pushed to origin
+(gitea.com) AND github (a25c18c). OQ-06 API-verified closed. New gap
+G14 (urllib HIGH) registered. Details in 0q.
+
+---
+
+## 0q. 2026-08-26 addendum (night) -- publication + OQ-06 verified + G14
+
+- Publication (user-authorized): 3 signed commits (all %G?=G) pushed to
+  BOTH remotes: `612273b` docs(specs) G5 triad, `5e96363` feat(openbao)
+  G5 implementation, `a25c18c` chore(docs) register/handoff. Evidence:
+  `git push github main` and `git push origin main` both reported
+  `ae3ff5f..a25c18c main -> main`. gitea.com push auth STILL WORKS via
+  the git credential store despite the user's keychain wipe (the stored
+  token is limited-scope: repo routes OK, /user 403; the web login the
+  user lost is only needed for settings UI, not for pushes).
+- OQ-06 VERIFIED CLOSED (was done 2026-08-18, never verified): gitea.com
+  branch protection on `main` -- enable_force_push=false,
+  require_signed_commits=true, required_approvals=1, push whitelist
+  trademonentumllc. Recorded in docs/JOURNAL.md per the tech spec's
+  verification step. Wire-level force-push test intentionally not run
+  (local pre-push hook IN-H-002 blocks it; documented layering).
+- G7 now PARTIAL: only the conditional Vercel OIDC rotation remains
+  (user's Vercel login; only if the token was ever shared).
+- G14 NEW (dependabot drift on the pushed series): urllib HIGH
+  (GHSA-hq3h-g68c-hp78, CVSS 7.5) via infinispan -> urllib ^3.23.0,
+  patched 4.9.1 (major bump, needs yarn resolution + compat check);
+  new react-router mediums beyond the 3 documented; elliptic low.
+  Breaks the zero-medium+ posture until dispositioned; SECURITY.md
+  accepted-risk list is now stale relative to live alerts.
+- GitHub's push banner reported "7 vulnerabilities (1 high, 5 moderate,
+  1 low)" -- `gh api .../dependabot/alerts` open-state query confirms
+  the composition above (two pages: pip-ecosystem labels on the npm
+  urllib package are GitHub's own manifest classification quirk).
+- Open gates entering 2026-08-27: G14 (dependency disposition), G7
+  (Vercel half only, user), G8 (needs G7 + spec triad).
 
 ---
 
