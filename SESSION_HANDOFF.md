@@ -17,10 +17,201 @@
 > to trust the snapshot without re-deriving it. Freshness of this file is
 > enforced by scripts/check-handoff-fidelity.sh.
 
-**Last updated:** 2026-08-24
-**Reason for handoff:** G11 CLOSED -- ALL SMOKE SUITES PASSED. Publication
-current at HEAD. Gap register re-ranked (0i). Cluster incidents of the day
-and their fixes in 0j.
+**Last updated:** 2026-08-26
+**Reason for handoff:** G4 CLOSED (proactive cert renewal + re-pin,
+inverse-proven) and G5 lane B CLOSED (Colima cold restart, auto-unseal
+35s, keys intact). smoke-all FULLY GREEN incl. --with-openbao-restart.
+Colima portForwarder repair needs user awareness. Details in 0p.
+
+---
+
+## 0p. 2026-08-26 addendum (evening) -- G4 + G5 fully closed
+
+- USER AWARENESS, outside-repo change: `~/.colima/default/colima.yaml`
+  had `portForwarder: none`, which made lima ignore ALL guest port
+  forwards after a VM restart (k3s API unreachable on first bounce).
+  Edited to `portForwarder: ssh` (documented default, the behavior the
+  machine had all session). Everything localhost-forwarded (kubectl,
+  gitea, signoz, opencost, backstage) depends on this staying `ssh`.
+- Phase 1 (smoke-all env): killed two stale Backstage instances from
+  08-24 (ports 3001/7008/7009); rebuilt forwards per AGENTS.md table.
+  FR-08 DISSOLVED: dashboards were never missing -- direct API query
+  returned count 2 (platform-overview, hello-m2-red); the lane-C
+  failure was the down 3301 forward rendering empty as "found: none".
+- The 4 pre-restart combined-run failures were all traced to the
+  wedged 4-day-old VM (kubelet taking ~10 min to issue container
+  Killing; node CPU 87-89%; host load 180). Post-bounce the identical
+  invocation passed in ~90s. No code regressions.
+- G4 CLOSED (inverse-proven): deleted cluster-agent-tls in all three
+  plane namespaces 19:06Z; cert-manager re-issued <=10s, new expiry
+  2026-11-24; --check FAILed DRIFT on all three (old vs new
+  fingerprints verbatim in agent report); re-pin applied; --check PASS;
+  agents reconnected to gateway in 2-3s. Next recurrence ~2026-11-24.
+- G5 lane B CLOSED: colima stop/start x2 (second after the
+  portForwarder repair); openbao-0 2/2 Ready, Initialized=true
+  Sealed=false ~35s after container start, ZERO human unseal steps;
+  all 4 FR-4 keys hash-identical across the bounce; repin --check still
+  PASS post-restart.
+- Final verdict 15:33 EDT: `smoke-all.sh --with-openbao-restart` exit
+  0 -- ALL SIX SUITES PASSED, FR-4 lane 29s.
+- Robustness follow-ups observed (pre-existing, not gated): smoke-m3
+  live-trace check has no port-forward retry (flake source); FR-4
+  lane's hard-coded 60s delete timeout can't tolerate a starved
+  kubelet; act-runner dind was CrashLoopBackOff during boot #1
+  (Running post-bounce, CI path verified only via smoke-m2 [actions]
+  dispatched).
+- Open gates entering 2026-08-27: G7 (user-owned) and G8 (needs G7 +
+  own spec triad). Everything else on the register is closed.
+- Working tree unchanged since 0o (3 spec docs + 5 new + 5 edited
+  scripts + doc edits); NO COMMITS -- signed-commit decision awaits
+  the user.
+
+---
+
+## 0o. 2026-08-26 addendum (latest) -- G5 DONE: live migration executed
+
+User GO'd live implementation. Executed per BAO-STORAGE-TECH-001 v0.2.
+Full session log: `~/.rational-reserve/logs/openbao-migration-20260826-170237.log`.
+
+- Phase 1: 5 files created verbatim from spec (openbao-values.yaml,
+  bootstrap/install/backup/rollback scripts), 5 scripts edited (smoke-
+  openbao replaced with --with-restart lane; seeder, smoke-all,
+  teardown-m2, install-m2 per spec diffs), PROVENANCE.md appended.
+- Lane 0 static PASS (bash -n all; helm template: sidecar x1, postStart
+  x0, local-path 1Gi VCT).
+- FR-4 PRE inverse proof: exact spec'd FAIL signature captured, exit 1.
+- Migration: helm rev 1 -> 2; one transient API TLS timeout mid-
+  bootstrap, orchestrator re-run via its own idempotent path (C9 gate
+  worked: PVC+sidecar detected, custody recovery, NO re-init). PVC
+  data-openbao-0 Bound 1Gi; pod 2/2; Initialized=true Sealed=false.
+- FR-4 POST: secrets byte-identical across openbao-0 deletion, no
+  reseed, sidecar auto-unsealed. Recovery 125s (FAIL vs 120s, loaded
+  cluster, honest record) then 93s PASS on settled cluster.
+- Consumers: ClusterSecretStore openbao-kv Ready, ExternalSecrets
+  synced post-handoff, runner pod 2/2, root token is generated 26-char
+  (not root). Backup snapshot 26,023 bytes mode 600.
+- Lane D: sidecar adds 40m/5Mi (pod total 87Mi <= 90Mi baseline);
+  custody 700/600 outside git. Lane E static PASS.
+- DEFERRED (not failures): lane B Colima cold restart (user step);
+  smoke-all combined run (blocked by down port-forwards 3333/29003/9090
+  + pre-existing FR-08 dashboard gap -- m2/security/backstage-
+  production suites all PASS, smoke-security 55/0).
+- AGENTS.md updated with the new OpenBao command block (spec had no
+  such section; flagged gap closed).
+- Bonus unplanned evidence: node wobble during lane C restarted
+  openbao-0 containers; sidecar auto-unsealed with no human step and
+  smoke-m2 [openbao] PASSed minutes later -- the G5 failure mode is
+  demonstrably dead.
+
+Open gates entering 2026-08-27: G4 (cert re-pin deadline 2026-09-24),
+G7 (user-owned), G8 (gated behind G7 + spec triad). G5 lane B and the
+smoke-all environment remediation are open follow-ups, not gates.
+
+Working tree: 3 untracked spec docs + 5 new scripts + 5 edited scripts
++ TODO/handoff/AGENTS/PROVENANCE edits. NO COMMITS this session --
+a large signed commit decision awaits the user.
+
+---
+
+## 0n. 2026-08-26 addendum (late) -- G5 tech spec approved, simulation GO
+
+- User approved BAO-STORAGE-TECH-001; status line updated.
+- Simulation (scratch release `openbao-sim` on k3d-openchoreo, live
+  OpenBao untouched) rehearsed the full migration: fixture with the 13
+  platform secrets, FR-4 pre-change inverse proof FAILed as spec'd,
+  migration PASS, post-change persistence PASS, raft-snapshot backup
+  PASS, rollback PASS (post-rollback restart loses secrets again --
+  inverse proof of rollback), re-migration PASS at 77s recovery.
+- 5 spec defects found and corrected (report:
+  `docs/specs/2026-08-26-OpenBao-Storage-Simulation-Report.md`,
+  BAO-STORAGE-SIM-001): grep -q SIGPIPE race (C6), bare kubectl wait
+  races pod recreation x3 sites (C5/C7/C8), retained-PVC skip logic
+  wrong after rollback (C9). All folded into spec v0.2 (1535->1628
+  lines); changed listings re-verified with `bash -n`; sim-vs-spec diff
+  confirms only naming/comment differences.
+- First-run NFR-2 breach (142s > 120s) was load-induced on the shared
+  node; quiet re-run 77s. Wait budgets now env-overridable, spec
+  default unchanged. Serialized-ops rule applies to implementation.
+- Evidence archived host-side: `~/.rational-reserve/backups/
+  openbao-sim-20260826/` (34 logs + corrected scripts); /tmp scratch
+  removed. Cluster verified clean of sim residue (no ns/PVC).
+- Next: live implementation per spec s5 runbook in a serialized
+  heavy-op window (creates 4 new scripts + openbao-values.yaml, edits 5
+  existing scripts, lanes A-E incl. real FR-4 restart proof).
+- Open gates: G5 (implementation), G4 (deadline 2026-09-24), G7
+  (user-owned), G8 (gated).
+- Working tree: 3 untracked spec docs (design, tech, sim report) +
+  TODO/handoff edits; no commits this session.
+
+---
+
+## 0m. 2026-08-26 addendum -- G5 design approved, tech spec drafted
+
+- User approved BAO-STORAGE-DES-001 (status line updated in the doc).
+- `docs/specs/2026-08-26-OpenBao-Production-Storage-Technical-Specification.md`
+  (BAO-STORAGE-TECH-001, 1535 lines, draft) written. Self-verified by the
+  drafting agent: spec'd values rendered through `helm template` (sidecar
+  once, storageClassName local-path, 1Gi VCT, Retain/Retain, zero
+  postStart), all 5 bash listings pass `bash -n`, 0 non-ASCII bytes.
+  OQ-3 RESOLVED from repo evidence: no CI workflow references OpenBao;
+  runner consumes the token via the ESO-synced Secret.
+- Deviations from the approved design, all recorded in spec s11: 13
+  platform secrets (not 11, measured from live postStart); install-m2.sh
+  wiring placed AFTER task_4_tofu_apply (tofu owns openbao-root-token and
+  would revert it); StatefulSet orphan-delete before upgrade/rollback
+  (volumeClaimTemplates immutable); placeholder-first unseal-key Secret;
+  bootstrap unseals directly on first boot; mount enablement added
+  (fresh Raft has no kv/secret mounts); rollback script named.
+- PENDING USER REVIEW of the tech spec. After approval: implementation
+  per spec s5 runbook (creates scripts/openbao-values.yaml,
+  bootstrap-openbao-persistent.sh, install-openbao-storage.sh,
+  backup-openbao.sh, rollback-openbao-storage.sh, edits 5 existing
+  scripts, then live lanes A-E).
+- Open gates: G5 (tech-spec review -> implementation), G4 (deadline
+  2026-09-24), G7 (user-owned), G8 (gated).
+- Working tree: two untracked spec docs (design, tech); no commits this
+  session.
+
+---
+
+## 0l. 2026-08-24 addendum (23:52 EDT) -- G2 closed, G5 design drafted
+
+Session recovery: previous session (c133f1fc) died on an API timeout
+with its last subagent (carrier recomposed-mechanisms extraction)
+unfinished -- zero output delivered. Redeployed and completed this
+session; result: the carrier's decompose/recompose layer is highly
+templated candidate evidence (one procedure/gate/operator/fractal
+template across all 5 mechanisms); MECH-004 (Forward-Inverse Gap
+Resolver) scores lowest (0.552); the carrier's own decomp gaps state
+its scores lack external validation and its MES rows are not wired to
+a live runner. It adds NO new verified gaps over the register.
+Ingest-only; nothing from it entered the repo.
+
+- G2 DONE: `git stash drop stash@{0}` (wip-non-security-20260730);
+  `git stash list` -> empty. Patch preserved at
+  `~/.rational-reserve/backups/wip-non-security-20260730.patch`
+  (3,357 lines, 68/68 diff headers, 925+/514- stat match) -- drop is
+  reversible from the patch.
+- G4 re-verified: `./scripts/repin-plane-agent-ca.sh --check` 23:52
+  EDT -> PASS, all three plane pins match live certs, no drift;
+  renewal deadline 2026-09-24 stands.
+- G5 advanced: `docs/specs/2026-08-24-OpenBao-Production-Storage-
+  Design-Specification.md` (BAO-STORAGE-DES-001, 573 lines, draft)
+  written: Raft ha.single-replica + 1Gi local-path PVC, auto-unseal
+  sidecar (same openbao:2.5.1 image, Shamir 1-of-1, host custody
+  ~/.rational-reserve/openbao/ 600), one-time bootstrap replacing the
+  postStart root-token script (preserves 11 platform secrets), root
+  token handoff to openbao-kv ClusterSecretStore, FR-4 lane as
+  `smoke-openbao.sh --with-restart`, rollback = helm rollback with PVC
+  Retain. PENDING USER REVIEW -- key dispositions: OQ-1 unseal custody
+  (unseal-key copy lands in etcd; honest-limits stated), OQ-2 weekly
+  raft-snapshot by convention. Then Technical Spec + implementation.
+- G7 unchanged (user-owned). G8 unchanged (gated behind G5/G7).
+- Working tree: new untracked design doc only; no commits made this
+  session.
+
+Open gates entering 2026-08-25: G5 (design review -> tech spec ->
+implementation), G4 (deadline), G7 (user-owned), G8 (gated).
 
 ---
 
