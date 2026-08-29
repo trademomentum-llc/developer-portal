@@ -18,9 +18,60 @@
 > enforced by scripts/check-handoff-fidelity.sh.
 
 **Last updated:** 2026-08-29
-**Reason for handoff:** G16 CLOSED (0s) + Colima self-start incident
-root-caused and remediated (launchd brew-services job removed). Details
-in 0t.
+**Reason for handoff:** Sandbox-home cleanup executed (user-directed):
+~/Projects fake-home artifacts merged into real home or deleted; keychain
+Local Items store repatriated; orphaned ssh-agent killed. Details in 0u.
+
+---
+
+## 0u. 2026-08-29 addendum (late morning) -- sandbox $HOME cleanup
+
+User-directed cleanup of the fake HOME at /Users/nnos/Projects (Codex
+app sandbox mishap, see 0t). All measured:
+
+- KEYCHAIN (the important one): secd had the sandbox
+  Library/Keychains/<UUID>/keychain-2.db (Local Items store) open and
+  live -- writes had been going to the SANDBOX copy since 2026-08-26
+  12:55. Writer chain: orphaned `ssh-agent -s` (PID 64433, started
+  08-26 15:50, PPID 1, HOME=~/Projects, zero identities loaded) via
+  Apple's ssh-agent keychain integration. Also found: the user's login
+  keychain was RESET 2026-08-26 13:37 (real dir holds
+  login.keychain-db.FROM-RESET-1337) -- that is the "keychain deleted
+  everything" event; it happened inside the Codex sandbox window.
+  Remediation: killed the ssh-agent; backed up BOTH keychain-2.db sets
+  to ~/.rational-reserve/backups/sandbox-home-2026-08-29/; killed secd
+  (launchd respawned it); moved the NEWER sandbox keychain-2.db triple
+  into the real Keychains dir. Verified: new secd holds zero sandbox
+  handles; security list-keychains shows the real login keychain.
+- MERGED into real home (rsync -a --ignore-existing, then removed):
+  .codex (616M, session history preserved), .claude, .config, .cache
+  (1.8G), .local, .npm, .ollama (8G models, content-addressed dedup),
+  .factory, .remember, .kimi-work, .kimi-webbridge, .homebrew,
+  .zsh_sessions, Applications, Library/Application Support/{Codex,
+  com.openai.codex, OpenAI}.
+- PRESERVED with sandbox suffix in real home: .zshrc and .zsh_history
+  as ~/.zshrc.sandbox-2026-08 / ~/.zsh_history.sandbox-2026-08 (unique
+  content, name-collided with live files).
+- ARCHIVED (not merged -- live browser profiles must not be
+  file-merged): BraveSoftware, Chromium, Google, Microsoft Edge, Opera,
+  Vivaldi profiles -> ~/.rational-reserve/backups/
+  sandbox-home-2026-08-29/Library-ApplicationSupport/ (169M).
+- DELETED as mishap duplicates/fallout: sandbox .colima (dead duplicate
+  VM definition, 1.8G), .ssh (lima-generated id_ed25519 keypair,
+  fingerprint SHA256:dWe6lLAHHph9SyG5vG6TQEputeTylgA6ZoP+cG6uyD0
+  recorded; if anything was authorized with it, re-authorize with a real
+  key), .kube (dup config), .docker (empty auths), .gitconfig
+  (identity-only dup), .claude.json(.backup), .benchmarks (empty),
+  sandbox Library remainder (Apple daemon noise + 511M Caches).
+- COULD NOT DELETE: ~/Projects/.Trash/AvastBusinessAgent.app --
+  root-signed Avast files, Permission denied without sudo. User action:
+  empty Trash via Finder. (Note: Avast Business Agent AV is installed on
+  this Mac.)
+- LEFT DELIBERATELY (real 2022 user folders, not mishap artifacts):
+  ~/Projects/Desktop, Documents, Downloads.
+- Post-checks: no process with HOME=/Users/nnos/Projects remains;
+  launchctl clean of colima/codex; colima VM running; k3d-openchoreo
+  node Ready 139d. Disk free after cleanup: 298Gi.
 
 ---
 
