@@ -124,6 +124,41 @@ func TestDefaultSteps_GoMultiModule(t *testing.T) {
 	}
 }
 
+func TestDefaultSteps_NodeMultiPackage(t *testing.T) {
+	root := t.TempDir()
+	// No root package.json: one nested yarn package root with tsconfig
+	// and a test script must yield yarn steps pinned to that dir.
+	app := filepath.Join(root, "app")
+	if err := os.MkdirAll(app, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	pkg := []byte(`{"name":"app","scripts":{"test":"jest"}}`)
+	if err := os.WriteFile(filepath.Join(app, "package.json"), pkg, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(app, "yarn.lock"), []byte(""), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(app, "tsconfig.json"), []byte(`{}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	steps := defaultSteps(ToolchainNode, root)
+	if len(steps) != 2 {
+		t.Fatalf("expected 2 steps (tsc + test) for nested yarn package, got %d: %+v", len(steps), steps)
+	}
+	for _, s := range steps {
+		if s.WorkDir != app {
+			t.Errorf("step %q WorkDir = %q, want %q", s.Name, s.WorkDir, app)
+		}
+		if s.Cmd != "yarn" {
+			t.Errorf("yarn package root must use yarn, got %q in %+v", s.Cmd, s)
+		}
+	}
+	if steps[0].Args[0] != "tsc" || steps[1].Args[0] != "test" {
+		t.Errorf("expected [yarn tsc, yarn test], got %+v", steps)
+	}
+}
+
 func TestDefaultSteps_Rust(t *testing.T) {
 	steps := defaultSteps(ToolchainRust, "/tmp")
 	if len(steps) != 3 {
