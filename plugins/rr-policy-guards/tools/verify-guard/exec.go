@@ -30,6 +30,24 @@ import (
 func defaultSteps(t Toolchain, repoRoot string) []Step {
 	switch t {
 	case ToolchainGo:
+		if !fileExists(filepath.Join(repoRoot, "go.mod")) {
+			// Multi-module repository: no module at the root. Run vet and
+			// test per discovered module root instead of `./...` at the
+			// root, which fails with "directory prefix . does not contain
+			// main module or its selected dependencies".
+			var steps []Step
+			for _, dir := range findMarkerDirs(repoRoot, "go.mod") {
+				rel, err := filepath.Rel(repoRoot, dir)
+				if err != nil {
+					rel = dir
+				}
+				steps = append(steps,
+					Step{Toolchain: t, Name: "vet " + rel, Cmd: "go", Args: []string{"vet", "./..."}, Required: true, WorkDir: dir},
+					Step{Toolchain: t, Name: "test " + rel, Cmd: "go", Args: []string{"test", "-race", "-count=1", "./..."}, Required: true, WorkDir: dir},
+				)
+			}
+			return steps
+		}
 		return []Step{
 			{Toolchain: t, Name: "vet", Cmd: "go", Args: []string{"vet", "./..."}, Required: true},
 			{Toolchain: t, Name: "test", Cmd: "go", Args: []string{"test", "-race", "-count=1", "./..."}, Required: true},
