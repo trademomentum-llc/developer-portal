@@ -18,9 +18,42 @@
 > enforced by scripts/check-handoff-fidelity.sh.
 
 **Last updated:** 2026-08-29
-**Reason for handoff:** G16 CLOSED -- all 11 cluster ports loopback-only,
-LAN refuses, persistence proven across colima bounce, smoke-all green.
-Details in 0s.
+**Reason for handoff:** G16 CLOSED (0s) + Colima self-start incident
+root-caused and remediated (launchd brew-services job removed). Details
+in 0t.
+
+---
+
+## 0t. 2026-08-29 addendum (morning) -- colima self-start incident closed
+
+- Verdict (HIGH confidence, evidenced): BENIGN automation. Homebrew's
+  stock colima formula ships a launchd service (`colima start -f`,
+  keep_alive on successful exit, RunAtLoad). On 2026-08-26 16:51 EDT a
+  `brew services restart colima` ran from a shell whose HOME was
+  /Users/nnos/Projects (Codex desktop app's sandbox home), installing
+  the plist at the nonstandard /Users/nnos/Projects/Library/LaunchAgents/
+  homebrew.mxcl.colima.plist -- invisible to the normal
+  ~/Library/LaunchAgents check. Since then launchd respawned it 1557
+  times; every scripted `colima stop` raced the respawn (the ha.pid
+  contention and the "self-starting" VM).
+- Remediation APPLIED (user-directed): `launchctl bootout
+  gui/501/homebrew.mxcl.colima`, `launchctl disable`, plist deleted.
+  Verified: launchctl list has no colima/lima jobs. The VM never went
+  down during removal (VM runs under the lima hostagent; the foreground
+  wrapper was the only casualty) -- node Ready 139d throughout,
+  loopback binds intact.
+- Unplanned live proof: openbao-0 was Killing/recreated during the
+  remediation; the pod returned 2/2 in ~20s and `smoke-openbao.sh`
+  PASSed with no reseed -- FR-4 behavior held in a real event.
+- Watch item: the Codex sandbox home /Users/nnos/Projects/ (with
+  .zshrc, .docker, .kube, .ssh) still exists; Terminal windows into it
+  produce HOME-dependent surprises (this incident was one). Consider
+  removing it or never running brew from there.
+- Also this morning: runbook + register committed (bdf16f1, both
+  remotes). Foreign working-tree changes (package.json formatting churn,
+  config/k3d/openchoreo-loopback.yaml from the 08-26 Claude session)
+  reviewed benign, swept clean (gitleaks x3), left uncommitted. Runbook
+  redacted the live k3d.cluster.token label before commit.
 
 ---
 
