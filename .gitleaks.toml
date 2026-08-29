@@ -1,0 +1,13 @@
+# Gitleaks configuration -- scanning scope hardening.
+# The dir-mode push gate (rr-verify-guard) scans the working tree, which
+# includes gitignored build output. Bundled artifacts under dist/ are
+# generated from committed sources and produce pure-noise generic-api-key
+# findings (source maps and minified bundles); exclude them repo-wide.
+title = "developer-portal gitleaks config"
+
+[allowlist]
+description = "Generated build output, not hand-written content"
+paths = [
+  '''backstage/packages/app/dist''',
+  '''backstage/packages/backend/dist''',
+]
