@@ -17,11 +17,48 @@
 > to trust the snapshot without re-deriving it. Freshness of this file is
 > enforced by scripts/check-handoff-fidelity.sh.
 
-**Last updated:** 2026-08-26
-**Reason for handoff:** G14 FIXED and pushed (5051f9b, urllib pinned
-4.9.1). G15 root-caused: PreToolUse guards never registered under Kimi
-(commit-guard blocks were the .git/hooks layer); hooks now registered in
-kimi config. Details in 0r.
+**Last updated:** 2026-08-29
+**Reason for handoff:** G16 CLOSED -- all 11 cluster ports loopback-only,
+LAN refuses, persistence proven across colima bounce, smoke-all green.
+Details in 0s.
+
+---
+
+## 0s. 2026-08-29 addendum -- G16 loopback binding closed
+
+- User mandate: nothing cluster-related may listen on an open IP.
+  Executed 2026-08-26 (serverlb recreation, interrupted by an OAuth
+  outage) and verified/completed 2026-08-29.
+- Mechanism: `k3d-openchoreo-serverlb` (STATELESS -- the only wildcard
+  publisher; server-0 publishes nothing and was never recreated, etcd
+  untouched) recreated 2026-08-26T21:16Z with HostIp 127.0.0.1 on all
+  11 PortBindings. Belt-and-braces: `~/.colima/_lima/_config/
+  override.yaml` pins wildcard auto-forwards to hostIP 127.0.0.1
+  (verified effective after the 08-29 bounce).
+- Inverse proof (LAN 192.168.1.12): all 11 ports REFUSED on LAN, OK on
+  127.0.0.1, before and after `colima stop && colima start`; serverlb
+  returned as the SAME container (Created 2026-08-26) -- persistence
+  proven. kubectl get nodes: server-0 Ready 139d.
+- smoke-all exit 0 post-bounce: all six suites, SECURITY 61/0/1 incl.
+  the wildcard-listener lane.
+- Runbook: docs/runbooks/2026-08-29-loopback-binding.md (mechanism,
+  exact docker run + confd values.yaml restore content, proofs,
+  rollback). Rollback evidence: /tmp/serverlb-pre-fix-inspect.json,
+  /tmp/lb-values.yaml (tmp -- will not survive reboot; runbook inlines
+  them).
+- Watch items: (1) residual `*:53` limactl hostagent DNS (lima user-v2;
+  drops non-local queries app-layer; no rebind knob -- pf or upstream
+  lima issue if wanted); (2) a concurrent `colima start -f` (PID 46615,
+  PPID 1) appeared during the bounce -- possibly a user/launchd
+  supervisor, investigate if unexpected; (3) colima.yaml carries an
+  unrelated `dnsHosts: {}` edit from another tool, left alone; (4)
+  working tree has changes NOT from this session: `M
+  backstage/packages/app/package.json`, `?? config/` -- left strictly
+  untouched, owner unknown (likely the user's Claude session).
+- Open gates: G15 (partial: SCA sensor swap + go-vet multi-module guard
+  defect, spec triad needed), G7 (Vercel OIDC half, user), G8 (gated).
+- Commits pending user decision: runbook + TODO/handoff updates are
+  uncommitted.
 
 ---
 
