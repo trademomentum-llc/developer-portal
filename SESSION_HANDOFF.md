@@ -17,10 +17,43 @@
 > to trust the snapshot without re-deriving it. Freshness of this file is
 > enforced by scripts/check-handoff-fidelity.sh.
 
-**Last updated:** 2026-08-29
-**Reason for handoff:** Sandbox-home cleanup executed (user-directed):
-~/Projects fake-home artifacts merged into real home or deleted; keychain
-Local Items store repatriated; orphaned ssh-agent killed. Details in 0u.
+**Last updated:** 2026-08-30
+**Reason for handoff:** React Router security remediation landed for issue #24
+(Dependabot medium alerts): app deps + Yarn resolutions upgraded to 7.18.0,
+lockfile refreshed, targeted Backstage validation green. Details in 0v.
+
+---
+
+## 0v. 2026-08-30 addendum -- react-router/react-router-dom medium alerts remediated
+
+Security issue scope (Dependabot mediums GHSA-wrjc-x8rr-h8h6, GHSA-337j-9hxr-rhxg,
+GHSA-jjmj-jmhj-qwj2) was addressed with dependency-only edits plus lockfile
+refresh. All claims measured:
+
+- CI visibility check (required workflow): `actions_list(list_workflow_runs,
+  per_page=10)` -> current PR/codeql runs in progress, latest completed runs
+  on `main` were successful; `actions_list(list_workflow_jobs, run
+  33302135374)` listed four CodeQL jobs; `get_job_logs(job 99232137707,
+  tail=120)` returned successful analysis/upload completion lines.
+- Dependency upgrade committed: `backstage/packages/app/package.json` now
+  declares `react-router`/`react-router-dom` `^7.18.0`; root
+  `backstage/package.json` `resolutions` now pin both to `7.18.0`.
+- Lockfile evidence: `rg 'react-router-dom@npm:7.18.0|react-router@npm:7.18.0'
+  backstage/yarn.lock` matched both entries; `rg
+  'react-router-dom@npm:6.30.4|react-router@npm:6.30.4|@remix-run/router@npm:1.23.3'
+  backstage/yarn.lock` returned no matches.
+- Targeted verification: `cd backstage && yarn tsc` -> exit 0;
+  `yarn workspace app test --watch=false` -> 2 suites passed, 6 tests passed;
+  `yarn npm audit --severity moderate` -> "No audit suggestions".
+- Secret scan: `runtime-tools-secret_scanning` on changed files
+  (`backstage/package.json`, `backstage/packages/app/package.json`,
+  `backstage/yarn.lock`) -> no secrets detected.
+
+Docs synced with the new state:
+- `SECURITY.md` residual advisory entry for react-router updated from accepted
+  risk to remediated (2026-08-30 evidence included).
+- `TODO.md` gap register G6 updated from ACCEPTED RISK to DONE with command
+  evidence.
 
 ---
 

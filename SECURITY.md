@@ -73,17 +73,13 @@ as upgrade debt, not as security emergencies.
 
 Accepted residual risks, recorded with evidence and review dates:
 
-- **react-router / react-router-dom 6.30.4** (Backstage app dependencies and
-  exact Yarn resolution pins) -- three moderate advisories:
-  GHSA-wrjc-x8rr-h8h6 (>=6.0.0 <7.18.0), GHSA-337j-9hxr-rhxg
-  (>=6.4.0 <7.18.0), GHSA-jjmj-jmhj-qwj2 (>=6.30.2 <=6.30.4). No fixed 6.x
-  exists (max published 6.x = 6.30.4, verified via `npm view` 2026-08-18);
-  v7 is outside every installed `@backstage/*` peer range (`^6.30.2`), so
-  forcing v7 was rejected as an unsupported major against all Backstage peer
-  declarations. Remediation path: upstream Backstage shipping v7-compatible
-  peer ranges. Accepted 2026-08-18; re-verified 2026-08-26 against the live
-  dependabot set (same three GHSAs, still no fixed 6.x; 6.30.5/6.30.6 do not
-  cover them).
+- REMEDIATED 2026-08-30: **react-router / react-router-dom** three moderate
+  advisories (GHSA-wrjc-x8rr-h8h6, GHSA-337j-9hxr-rhxg, GHSA-jjmj-jmhj-qwj2)
+  were addressed by upgrading `backstage/packages/app/package.json` to
+  `^7.18.0`, updating root Yarn `resolutions` in `backstage/package.json` to
+  `7.18.0`, and refreshing `backstage/yarn.lock` to remove 6.30.4 entries.
+  Validation: `yarn tsc` exit 0, `yarn workspace app test --watch=false` passed
+  (2 suites), and `yarn npm audit --severity moderate` reported no suggestions.
 - **elliptic <=6.6.1** -- GHSA-848j-6mx2-7j84, low (risky cryptographic
   primitive implementation), transitive dev-side dependency; no patched
   release exists. Accepted 2026-08-26.
