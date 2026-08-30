@@ -11,9 +11,10 @@
 ENV_FILE="${RR_VERIFY_GUARD_ENV:-$HOME/.rational-reserve/guard/gitea-local.env}"
 
 if [ -r "$ENV_FILE" ]; then
+    set -a
     # shellcheck disable=SC1090
     . "$ENV_FILE"
-    export RR_VERIFY_GUARD_GITEA_URL RR_VERIFY_GUARD_GITEA_TOKEN
+    set +a
 fi
 
 exec "$(dirname "$0")/../bin/rr-verify-guard.bin" "$@"

@@ -243,8 +243,17 @@ func run(stdin io.Reader, stdout, stderr io.Writer) int {
 			degraded = append(degraded, "actions-skip / env")
 		}
 
-		// 2d. Optional `act --rm` full run.
-		if ActAvailable() && DockerAvailable() {
+		// 2d. Optional `act --rm` full run. Gated by the repo config's
+		// act.enabled (the schema field previously declared but never
+		// honored): workflows that need live forge credentials (mirror
+		// pushes, deploys) cannot pass under local emulation, so a repo
+		// may opt out of full runs while keeping `act --list` grammar
+		// validation in 2a.
+		actFullRun := ActAvailable() && DockerAvailable()
+		if cfg.Act.Enabled != nil && !*cfg.Act.Enabled {
+			actFullRun = false
+		}
+		if actFullRun {
 			_, aFail := ActRunWorkflows(workflows)
 			if aFail != nil {
 				reason := "act-failure / " + lastPathSegment(aFail.Args[1])
@@ -259,9 +268,13 @@ func run(stdin io.Reader, stdout, stderr io.Writer) int {
 				return exitBlock
 			}
 		} else {
-			if !ActAvailable() {
+			switch {
+			case cfg.Act.Enabled != nil && !*cfg.Act.Enabled:
+				// Repo opted out of full act runs via .rr-verify-guard.json;
+				// not a degradation.
+			case !ActAvailable():
 				degraded = append(degraded, "act-missing")
-			} else {
+			default:
 				degraded = append(degraded, "docker-unavailable")
 			}
 		}

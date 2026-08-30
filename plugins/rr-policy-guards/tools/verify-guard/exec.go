@@ -431,6 +431,12 @@ func runStep(repoRoot, runID string, s Step) Result {
 	} else {
 		cmd.Dir = repoRoot
 	}
+	// CI-equivalent execution environment: CI=true keeps test runners out
+	// of interactive/watch modes (jest --watch hangs at 0% CPU forever
+	// without it; observed hanging a push verification on backstage).
+	// GIT_TERMINAL_PROMPT=0 keeps any git subprocess from blocking on a
+	// credential prompt.
+	cmd.Env = append(os.Environ(), "CI=true", "GIT_TERMINAL_PROMPT=0")
 	var buf bytes.Buffer
 	logPath := stepLogPath(runID, s)
 	if logFile, err := openLogFile(logPath); err == nil {
