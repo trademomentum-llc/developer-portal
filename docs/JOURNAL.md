@@ -119,3 +119,115 @@ the work, not reconstructed after it.
 
 **End of seed block.** Every entry appended below this line must be
 contemporaneous -- written during the work, per the rules in the header.
+
+## 2026-08-20 -- Wave-0 acceptance on the resized cluster
+
+- Author/context: goal continuation session; user completed the Colima
+  resize (6 CPU / 12 GiB), unblocking the queued Wave-0 acceptance.
+- Tried: re-run install-m3.sh, run the full smoke umbrella, push
+  hello-m2 through the new Trivy/OSV security gates live, and land the
+  in-flight Engagement-plane slice (CiRunsCard + tab).
+- Failed: the first live gate runs (#39/#40) exposed a vacuous-pass
+  wiring bug -- dind sibling containers made `-v "$PWD:/src"` an empty
+  mount, so Trivy fs "passed" scanning nothing; a stale local-Gitea
+  developer-portal mirror then 127'd the artifact-commit step; and a
+  partial packages/app/dist (no index.html) had both Backstage backends
+  404ing /, silently failing the auth and production smokes. The
+  linkify-it 5.0.2 downgrade, first judged spurious on tsc evidence,
+  proved REQUIRED once build:all actually ran. And after run #46 went
+  green, the rollout itself was blocked: all three cluster-plane agents
+  had been silently disconnected since 06-30 (websocket bad handshake)
+  because the Cluster*Plane CRs pin the install-time agent clientCA and
+  the self-signed agent certs renewed on 06-26.
+- Learned: static review and tsc do not cover runner topology or
+  bundler type paths -- only live execution does (third time this
+  project: serviceLocatorMethod, the dind mounts, linkify-it). Time-boxed
+  platform lesson: self-signed agent certs pinned into CRs are a renewal
+  time bomb (next expiry 2026-09-24); re-pinned all three CRs, agents
+  reconnected, pod rolled to :59b8c8d. Fixed: --volumes-from
+  "$(hostname)" mounts (6964ca9), mirror synced (dbd79de), dist rebuilt
+  + index.html guard (ea29c84), smoke umbrella ALL SUITES PASSED (AUTH,
+  M2, M3, M4, SECURITY, BACKSTAGE-PRODUCTION), smoke-security 46/0/3
+  (FR-03 flipped PASS), Engagement slice committed (e82f2bc),
+  provenance cert r9.
+- Links: seed-repos/hello-m2/.gitea/workflows/ci.yaml,
+  backstage/packages/app/src/modules/openchoreo-cards/CiRunsCard.tsx,
+  scripts/start-backstage-production.sh, provenance/PROVENANCE-RECOGNITION-CERTIFICATE.md.
+
+## 2026-08-21 -- Ops debt sweep, publication repair, Phase 1 closure
+
+- Author/context: user-directed continuation; close out operational debt
+  and finish earlier roadmap phases before starting new ones.
+- Tried: fix the plane-agent cert renewal time bomb, CI reliability debt
+  (Trivy DB cache, EOL alpine base), the dev /api proxy gap, the broken
+  Gitea->GitHub publication path, and Phase 1 leftovers (catalog
+  entities for the GitOps repos, dead template hygiene).
+- Failed: two hello-m2 runs (#48, #49) died on infrastructure flakes
+  (cluster-wide sandbox churn killed the runner's dind; then a TLS
+  handshake timeout pulling the runner image) before #50 went green;
+  the verify-guard audit chain tripped on a two-writer race with a
+  concurrent Codex-harness guard install (caught exactly as designed);
+  the sync workflow needed two rounds (refs/pull rejection, then the
+  clone's mirror flag refusing refspecs); the user's Vercel-as-CI idea
+  for the cert issue was a category error -- the pinning is in-cluster
+  mTLS, invisible to any external CI; and the Colima VM itself stopped
+  twice mid-session, churning every pod (openbao needed a reseed,
+  m2i-6's inmem weakness again) and producing a second guard-log race.
+- Learned: adjacency is not causality for infrastructure (Vercel cannot
+  fix in-cluster cert pinning); float-and-pin fragility is the recurring
+  theme of the week (agent clientCA pins, floating base tags, lockfile
+  overrides) -- deterministic re-pin scripts + smoke drift checks are
+  the cheap mitigation. Phase 1 exit criteria now all met; smoke-security
+  47/0/3 including the new clientCA freshness lane.
+- Links: scripts/repin-plane-agent-ca.sh, .github/workflows/sync-from-gitea.yml,
+  seed-repos/platform-config/catalog-info.yaml, seed-repos/platform-addons/catalog-info.yaml,
+  backstage/packages/app/package.json, iac/templates/ci.yaml,
+  provenance/PROVENANCE-RECOGNITION-CERTIFICATE.md (r10).
+
+## 2026-08-26 -- G5 storage migration, G4 proactive re-pin, OQ-06 verified
+
+- Did: executed the G5 OpenBao persistent-storage triad end to end
+  (requirements -> design -> tech spec -> scratch-release simulation ->
+  live implementation). Simulation caught 5 listing defects (grep -q
+  SIGPIPE race, kubectl wait racing pod recreation x3, retained-PVC
+  skip logic wrong after rollback); all corrected in spec v0.2 before
+  live execution. Live: helm rev 2, PVC Bound, FR-4 inverse proof both
+  directions, secrets survive openbao-0 deletion (93s recovery vs 120s
+  bound), Colima cold restart auto-unseal ~35s with zero human steps.
+  Executed G4 proactively: deleted the three plane-agent cluster-agent-tls
+  Secrets, cert-manager re-issued in <=10s (new expiry 2026-11-24), the
+  --check lane FAILed with drift exactly as designed (inverse proof),
+  re-pinned, agents reconnected to the gateway in 2-3s.
+- OQ-06 CLOSED (verified, not newly done): the gitea.com branch
+  protection rule for main has existed since 2026-08-18T14:41Z --
+  enable_force_push=false, require_signed_commits=true,
+  required_approvals=1, push whitelist trademonentumllc. Verified via
+  the repo API. The spec's wire-level force-push attempt was not run:
+  the local pre-push hook (IN-H-002, no bypass) blocks it before the
+  wire, which is the documented layering (local hook gates this machine,
+  server rule gates everything else). Remaining G7 half: .env.local
+  Vercel OIDC rotation, conditional on it ever having been shared --
+  needs the user's Vercel login; the user's gitea.com web login is
+  unblocked for settings work only if needed (the git credential store
+  still holds a limited-scope gitea.com token; it authenticated repo
+  routes but 403s on /user).
+- Discovered: GitHub dependabot open alerts went 3 -> 7 (1 high).
+  New: urllib <=4.9.0 (GHSA-hq3h-g68c-hp78, CVSS 7.5, credential leak
+  via cross-origin redirects) through infinispan ^0.12.0 -> urllib
+  ^3.23.0, patched at 4.9.1 -- a major bump requiring a yarn resolution;
+  plus new react-router advisories beyond the three documented (G6),
+  plus elliptic low. Registered as G14; breaks the zero-medium+
+  posture until dispositioned.
+- Learned: the scratch-release simulation pattern paid for itself
+  immediately (5 defects caught pre-live, including one -- C9 -- that
+  only manifests on rollback-then-remigrate). Stale readiness-check
+  processes and dead port-forwards keep producing false smoke failures;
+  the wedged-VM signature (kubelet taking ~10 min to issue Killing,
+  host load >150) is now a recognized pattern: bounce Colima first,
+  debug lanes second. Colima portForwarder: none silently kills all
+  localhost forwarding after a VM restart -- the machine now runs
+  portForwarder: ssh (outside-repo config, recorded in handoff 0p).
+- Links: docs/specs/2026-08-26-OpenBao-Production-Storage-Technical-Specification.md,
+  docs/specs/2026-08-26-OpenBao-Storage-Simulation-Report.md,
+  scripts/install-openbao-storage.sh, scripts/repin-plane-agent-ca.sh,
+  TODO.md (G2/G4/G5 closed, G14 new).

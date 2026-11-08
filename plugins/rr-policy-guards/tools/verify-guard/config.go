@@ -33,7 +33,9 @@ type ToolchainConfig struct {
 	Skip bool `json:"skip"`
 }
 
-// ActConfig configures whether `act` runs at all for this repo.
+// ActConfig configures the `act --rm` full-run phase (main.go 2d).
+// enabled=false opts the repo out of full local workflow execution;
+// `act --list` grammar validation (2a) is unaffected.
 type ActConfig struct {
 	Enabled *bool `json:"enabled"`
 }

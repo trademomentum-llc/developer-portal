@@ -18,6 +18,18 @@ command:
 
 clusterRole:
   create: true
+  # FR-05: k8sattributes needs to read pods/namespaces to enrich filelog
+  # records with k8s metadata and openchoreo.dev/* pod labels.
+  rules:
+    - apiGroups:
+        - ""
+      resources:
+        - pods
+        - namespaces
+      verbs:
+        - get
+        - list
+        - watch
 
 resources:
   requests:
@@ -61,12 +73,77 @@ config:
       operators:
         - type: json_parser
 
+    # FR-05: tail all pod logs from /var/log/pods into SigNoz logs.
+    # gatekeeper-audit keeps its dedicated receiver above and is excluded
+    # here to avoid double-ingestion. Path metadata (namespace, pod, uid,
+    # container) is extracted from the file path so the k8s_attributes/logs
+    # processor can associate the record with the pod and promote the
+    # openchoreo.dev/* labels (FR-11 tenancy filter keys).
+    filelog/k8s-pods:
+      include:
+        - /var/log/pods/*/*/*.log
+      exclude:
+        - /var/log/pods/gatekeeper-system_gatekeeper-audit-*/*/*.log
+      start_at: end
+      include_file_name: false
+      include_file_path: true
+      operators:
+        - type: regex_parser
+          id: k8s-path-metadata
+          regex: '^/var/log/pods/(?P<namespace>[^_]+)_(?P<pod>[^_]+)_(?P<uid>[0-9a-fA-F-]{36})/(?P<container>[^/]+)/(?P<restart>\d+)\.log$'
+          parse_from: attributes["log.file.path"]
+        - type: move
+          if: 'attributes.namespace != nil'
+          from: attributes.namespace
+          to: resource["k8s.namespace.name"]
+        - type: move
+          if: 'attributes.pod != nil'
+          from: attributes.pod
+          to: resource["k8s.pod.name"]
+        - type: move
+          if: 'attributes.uid != nil'
+          from: attributes.uid
+          to: resource["k8s.pod.uid"]
+        - type: move
+          if: 'attributes.container != nil'
+          from: attributes.container
+          to: resource["k8s.container.name"]
+        - type: remove
+          if: 'attributes.restart != nil'
+          field: attributes.restart
+        # Strip the CRI/containerd log envelope (timestamp, stream, flags) so
+        # body holds the application log line and observed_time is the real
+        # record timestamp.
+        - type: container
+          id: container-parser
+
   processors:
     batch: {}
     # Minimal k8s_attributes config for local demo stability. The workload's own
     # resource attributes are the preferred source for openchoreo.* keys.
     k8s_attributes:
       passthrough: true
+    # FR-05: association for filelog records, keyed on the pod UID that the
+    # k8s-path-metadata operator lifts out of the log file path. Promotes the
+    # openchoreo.dev/* pod labels to openchoreo.* attributes (FR-11).
+    k8s_attributes/logs:
+      pod_association:
+        - sources:
+            - from: resource_attribute
+              name: k8s.pod.uid
+      extract:
+        metadata:
+          - k8s.namespace.name
+          - k8s.pod.name
+          - k8s.pod.uid
+          - k8s.container.name
+        labels:
+          - from: pod
+            key: openchoreo.dev/project
+            tag_name: openchoreo.project
+          - from: pod
+            key: openchoreo.dev/component
+            tag_name: openchoreo.component
     resource:
       attributes:
         # These will be overridden / supplemented by the workload's own
@@ -83,17 +160,31 @@ config:
         insecure: true
       # Future: add API token when auth is enabled in SigNoz
 
+  connectors:
+    # FR-07: derive RED metrics (calls + latency histograms) from traces and
+    # feed them back into the metrics pipeline, which exports OTLP to SigNoz.
+    # Span resource attributes (including openchoreo.project and
+    # openchoreo.runtime_namespace from workload instrumentation) are copied
+    # onto the derived metric resource, so dashboards can filter per project.
+    spanmetrics:
+      aggregation_temporality: AGGREGATION_TEMPORALITY_CUMULATIVE
+      histogram:
+        explicit:
+          buckets: ["10ms", "50ms", "100ms", "250ms", "500ms", "1s", "2s", "5s", "10s"]
+      dimensions_cache_size: 1000
+      namespace: spanmetrics
+
   service:
     pipelines:
       traces:
         receivers: [otlp]
         processors: [k8s_attributes, batch]
-        exporters: [otlp/signoz]
+        exporters: [otlp/signoz, spanmetrics]
       metrics:
-        receivers: [otlp]
+        receivers: [otlp, spanmetrics]
         processors: [k8s_attributes, batch]
         exporters: [otlp/signoz]
       logs:
-        receivers: [otlp, filelog/gatekeeper-audit]
-        processors: [k8s_attributes, batch]
+        receivers: [otlp, filelog/k8s-pods, filelog/gatekeeper-audit]
+        processors: [k8s_attributes/logs, resource, batch]
         exporters: [otlp/signoz]

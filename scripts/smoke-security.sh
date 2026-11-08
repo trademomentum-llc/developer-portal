@@ -9,14 +9,18 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONTEXT="${KUBECTL_CONTEXT:-k3d-openchoreo}"
 
+source "${REPO_ROOT}/scripts/lib/smoke-json.sh"
+smoke_json_parse_args "$@"
+smoke_json_begin security
+
 PASSED=0
 FAILED=0
 SKIPPED=0
 
 info() { echo "[smoke-security] $*"; }
-pass() { echo "PASS: $*"; PASSED=$((PASSED + 1)); }
-fail() { echo "FAIL: $*" >&2; FAILED=$((FAILED + 1)); }
-skip() { echo "SKIP: $*"; SKIPPED=$((SKIPPED + 1)); }
+pass() { echo "PASS: $*"; PASSED=$((PASSED + 1)); smoke_json_count pass; }
+fail() { echo "FAIL: $*" >&2; FAILED=$((FAILED + 1)); smoke_json_count fail; }
+skip() { echo "SKIP: $*"; SKIPPED=$((SKIPPED + 1)); smoke_json_count skip; }
 
 # yaml_ok <file>: 0 = parses, 1 = invalid, 2 = no YAML parser available.
 yaml_ok() {
@@ -183,8 +187,11 @@ else
 fi
 
 # FR-07: collector values carry the filelog receiver, pipeline entry, and hostPath mount.
+# The logs pipeline receivers list may include additional receivers (e.g.
+# filelog/k8s-pods); membership of filelog/gatekeeper-audit is what matters,
+# not exact list equality.
 if grep -q "filelog/gatekeeper-audit" "${REPO_ROOT}/observability/otel/collector-values.local.yaml" \
-  && grep -q "receivers: \[otlp, filelog/gatekeeper-audit\]" "${REPO_ROOT}/observability/otel/collector-values.local.yaml" \
+  && grep "receivers: \[otlp" "${REPO_ROOT}/observability/otel/collector-values.local.yaml" | grep -q "filelog/gatekeeper-audit" \
   && grep -q "path: /var/log/pods" "${REPO_ROOT}/observability/otel/collector-values.local.yaml"; then
     pass "OTEL collector filelog gatekeeper-audit receiver present"
 else
@@ -281,21 +288,30 @@ else
     fail "Certificates in envoy-gateway not Ready within 120s"
 fi
 
-# D4: FR-10 config files exist and parse.
-for f in .github/dependabot.yml .github/workflows/code-scanning.yml; do
-    if [ ! -f "${REPO_ROOT}/${f}" ]; then
-        fail "${f} missing"
-        continue
-    fi
-    yaml_ok "${REPO_ROOT}/${f}" && rc=0 || rc=$?
+# D4: FR-10 config files exist and parse. dependabot.yml is required;
+# code-scanning.yml must NOT exist: GitHub-side CodeQL is provided by the
+# org "GitHub recommended" security configuration (default setup), which
+# rejects SARIF from an in-repo advanced workflow -- the two cannot
+# coexist, so the file was removed 2026-08-21 (see spec section 10
+# amendment). The dynamic CodeQL workflow is green on every push.
+f="${REPO_ROOT}/.github/dependabot.yml"
+if [ ! -f "${f}" ]; then
+    fail ".github/dependabot.yml missing"
+else
+    yaml_ok "${f}" && rc=0 || rc=$?
     if [ "${rc}" -eq 0 ]; then
-        pass "${f} exists and is valid YAML"
+        pass ".github/dependabot.yml exists and is valid YAML"
     elif [ "${rc}" -eq 2 ]; then
-        skip "${f} YAML validity (no yq or python3+yaml on this host)"
+        skip ".github/dependabot.yml YAML validity (no yq or python3+yaml on this host)"
     else
-        fail "${f} does not parse as YAML"
+        fail ".github/dependabot.yml does not parse as YAML"
     fi
-done
+fi
+if [ -f "${REPO_ROOT}/.github/workflows/code-scanning.yml" ]; then
+    fail "code-scanning.yml present -- conflicts with the org default CodeQL setup (remove it; see spec section 10 amendment)"
+else
+    pass "no in-repo advanced CodeQL workflow (org default setup owns GitHub-side scanning)"
+fi
 
 # D5: dependabot.yml covers every go.mod root (enumeration per spec 10.2;
 # a missing root fails the suite, spec 14.1 negative test).
@@ -439,6 +455,136 @@ if [ -x "${AUDIT_CHAIN_BIN}" ]; then
         fi
     done
 fi
+
+# =============================================================================
+# Plane agent clientCA freshness (operational guard; 2026-08-20 incident)
+# =============================================================================
+# The Cluster*Plane CRs pin each agent's self-signed cert as clientCA; every
+# cert-manager renewal silently breaks the gateway channel (websocket bad
+# handshake, observed 2026-06-30..08-20). Fail loudly on drift so a stale pin
+# is caught before it takes the planes down again.
+info "Plane agent clientCA freshness"
+
+if kubectl --context k3d-openchoreo get clusterdataplane default >/dev/null 2>&1; then
+    if "${REPO_ROOT}/scripts/repin-plane-agent-ca.sh" --check >/dev/null 2>&1; then
+        pass "all plane agent clientCA pins match live certs"
+    else
+        fail "plane agent clientCA drift (repair: scripts/repin-plane-agent-ca.sh)"
+    fi
+else
+    skip "cluster not reachable; clientCA freshness not checked"
+fi
+
+# =============================================================================
+# Scaffolder-inherited project CI (FR-38/OQ-31)
+# =============================================================================
+# New projects get test + security stages from the portal template. The
+# live e2e (scaffold-e2e-20260821 run 1) showed two wiring bugs: Trivy ran
+# before the lockfile existed (num=0), and osv-scanner v2.5.1 exits 128 on
+# a valid empty lockfile. These checks pin the repaired contract.
+info "Scaffolder template CI inheritance (FR-38/OQ-31)"
+
+SCAFFOLD_WF="${REPO_ROOT}/backstage/examples/template/content/.gitea/workflows/ci.yaml"
+if [ ! -f "${SCAFFOLD_WF}" ]; then
+    fail "backstage/examples/template/content/.gitea/workflows/ci.yaml missing"
+else
+    if grep -qF "name: Unit tests (node --test)" "${SCAFFOLD_WF}" \
+        && grep -qF "name: Generate lockfile for the scanner" "${SCAFFOLD_WF}" \
+        && grep -qF "name: Trivy filesystem scan (gate)" "${SCAFFOLD_WF}" \
+        && grep -qF "name: OSV dependency scan (gate)" "${SCAFFOLD_WF}"; then
+        pass "scaffolder template CI has test + lockfile + Trivy + OSV stages"
+    else
+        fail "scaffolder template CI is missing a required inherited stage"
+    fi
+
+    gen_line="$(grep -n "name: Generate lockfile for the scanner" "${SCAFFOLD_WF}" | head -1 | cut -d: -f1)"
+    trivy_line="$(grep -n "name: Trivy filesystem scan (gate)" "${SCAFFOLD_WF}" | head -1 | cut -d: -f1)"
+    osv_line="$(grep -n "name: OSV dependency scan (gate)" "${SCAFFOLD_WF}" | head -1 | cut -d: -f1)"
+    if [ -n "${gen_line}" ] && [ -n "${trivy_line}" ] && [ -n "${osv_line}" ] \
+        && [ "${gen_line}" -lt "${trivy_line}" ] && [ "${trivy_line}" -lt "${osv_line}" ]; then
+        pass "scaffolder template CI generates the lockfile before Trivy and OSV"
+    else
+        fail "scaffolder template CI step order is lockfile -> Trivy -> OSV (got gen=${gen_line} trivy=${trivy_line} osv=${osv_line})"
+    fi
+
+    if grep -qF "aquasec/trivy@${TRIVY_DIGEST}" "${SCAFFOLD_WF}" \
+        && grep -qF "ghcr.io/google/osv-scanner@${OSV_DIGEST}" "${SCAFFOLD_WF}"; then
+        pass "scaffolder template CI references the pinned Trivy and OSV-Scanner digests"
+    else
+        fail "scaffolder template CI is missing a spec-pinned scanner digest"
+    fi
+
+    if grep -qF 'rc=$?' "${SCAFFOLD_WF}" \
+        && grep -qF '[ "${rc}" -eq 128 ]' "${SCAFFOLD_WF}" \
+        && grep -qF '[ "${DECLARED}" = "0" ]' "${SCAFFOLD_WF}" \
+        && grep -qF '[ "${LOCKED}" = "0" ]' "${SCAFFOLD_WF}"; then
+        pass "scaffolder template CI accepts OSV 128 only on a verified empty tree"
+    else
+        fail "scaffolder template CI is missing fail-closed OSV empty-tree handling"
+    fi
+fi
+
+# =============================================================================
+# Loopback-only host listeners (LAN exposure)
+# =============================================================================
+# Backstage, Gitea port-forwards, and the other host-side portal surfaces must
+# not bind 0.0.0.0 / * / [::]. Wildcard binds were observed on :7008/:7009
+# during the 2026-08-21 Colima SSH tightening review.
+info "Host listener scope (loopback only)"
+
+while IFS='|' read -r kind msg; do
+    case "${kind}" in
+        pass) pass "${msg}" ;;
+        fail) fail "${msg}" ;;
+        skip) skip "${msg}" ;;
+    esac
+done < <(python3 <<'PY'
+import re
+import subprocess
+
+ports = (3001, 7008, 7009, 3333, 3002, 29003, 3301, 9090)
+
+try:
+    out = subprocess.check_output(
+        ["lsof", "-nP", "-iTCP", "-sTCP:LISTEN"],
+        text=True,
+        errors="replace",
+    )
+except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+    print(f"skip|lsof not available ({exc})")
+    raise SystemExit(0)
+
+wildcard_re = re.compile(r"^(?:\*|0\.0\.0\.0|\[::\])$")
+loopback_re = re.compile(r"^(?:127\.0\.0\.1|\[::1\])$")
+name_re = re.compile(r"TCP\s+(\S+):(\d+)\s+\(LISTEN\)")
+
+by_port = {p: [] for p in ports}
+for line in out.splitlines():
+    m = name_re.search(line)
+    if not m:
+        continue
+    addr, port_s = m.group(1), m.group(2)
+    port = int(port_s)
+    if port in by_port:
+        by_port[port].append(addr)
+
+for port in ports:
+    addrs = by_port[port]
+    if not addrs:
+        print(f"skip|port {port} has no host listener")
+        continue
+    wild = [a for a in addrs if wildcard_re.match(a)]
+    if wild:
+        print(f"fail|port {port} has a wildcard listener ({', '.join(wild)})")
+        continue
+    bad = [a for a in addrs if not loopback_re.match(a)]
+    if bad:
+        print(f"fail|port {port} listens on non-loopback address ({', '.join(bad)})")
+        continue
+    uniq = ", ".join(sorted(set(addrs)))
+    print(f"pass|port {port} is loopback-only ({uniq})")
+PY
+)
 
 # =============================================================================
 # Summary
