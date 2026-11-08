@@ -152,7 +152,7 @@ per-repo from the module cache at the exact pinned versions (2026-08-18).
 | 21 | google.golang.org/grpc (indirect) | v1.83.0 | https://github.com/grpc/grpc-go | Apache-2.0 | gRPC authors / Google LLC (CNCF) | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:28 |
 | 22 | google.golang.org/protobuf (indirect) | v1.36.11 | https://github.com/protocolbuffers/protobuf-go | BSD-3-Clause | The Go Authors (2018) / Google LLC | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:29 |
 
-## 5. Backstage and Node.js (128 entries)
+## 5. Backstage and Node.js (129 entries)
 
 `backstage/` was scaffolded with `@backstage/create-app` and tracks the
 Backstage release line 1.49.1. Scaffold-originating files are Apache-2.0;
@@ -280,8 +280,8 @@ Backend workspace dependencies (30 entries; backend runtime):
 | 80 | @backstage/plugin-kubernetes-common | ^0.9.10 (0.9.10) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency (direct backend dependency since 2026-08-18; previously transitive/app-side) | packages/backend/package.json:32 |
 | 81 | @backstage/plugin-scaffolder-backend-module-gitea | ^0.2.19 (0.2.23) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency (direct since 2026-08-19; provides the publish:gitea scaffolder action, registered at packages/backend/src/index.ts:17-19) | packages/backend/package.json:39; backstage/examples/template/template.yaml |
 
-Resolution override pins (47 entries; security-override layer in
-backstage/package.json:51-101 applying repo-wide to all workspaces;
+Resolution override pins (48 entries; security-override layer in
+backstage/package.json:51-102 applying repo-wide to all workspaces;
 transitive-only packages. react-router, react-router-dom, and
 @types/react-dom also carry resolution pins and are listed in the app
 table above. Copyright holders are taken from the installed tarball
@@ -311,7 +311,7 @@ Gitea integration):
 | 94 | minimatch | 9.0.9 (exactly one installed copy; exactly one yarn.lock resolution) | https://github.com/isaacs/minimatch | ISC | Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:89; the descriptor-scoped pins formerly at :67-70 were dead config and were removed in the 2026-08-18 remediation |
 | 95 | immutable | 4.3.9 | https://github.com/immutable-js/immutable-js | MIT | Lee Byron and contributors | runtime dependency (resolution override) | backstage/package.json:67 |
 | 96 | tar | 7.5.22 | https://github.com/isaacs/node-tar | BlueOak-1.0.0 | Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:68 |
-| 97 | linkify-it | 6.1.0 | https://github.com/markdown-it/linkify-it | MIT | Vitaly Puzrin (2015) | runtime dependency (resolution override) | backstage/package.json:69 |
+| 97 | linkify-it | 5.0.2 | https://github.com/markdown-it/linkify-it | MIT | Vitaly Puzrin (2015) | runtime dependency (resolution override; re-pinned from 6.1.0 on 2026-08-20 -- markdown-it 14.2.0 type declarations break yarn build:all against v6; 5.0.2 satisfies its ^5.0.1 range, audit clean) | backstage/package.json:69 |
 | 98 | fast-xml-builder | 1.3.0 | https://github.com/NaturalIntelligence/fast-xml-builder | MIT | Natural Intelligence (2026); author Amit Gupta | runtime dependency (resolution override) | backstage/package.json:70 |
 | 99 | brace-expansion | 5.0.9 | https://github.com/juliangruber/brace-expansion | MIT | Julian Gruber; TypeScript port Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:71 |
 | 100 | fast-uri | 4.1.2 | https://github.com/fastify/fast-uri | BSD-3-Clause | Vincent Le Goff | runtime dependency (resolution override) | backstage/package.json:72 |
@@ -343,6 +343,7 @@ Gitea integration):
 | 126 | @octokit/plugin-paginate-rest | 11.4.1 | https://github.com/octokit/plugin-paginate-rest.js | MIT | Octokit contributors (LICENSE-verified: Copyright (c) 2019 Octokit contributors) | runtime dependency (resolution override) | backstage/package.json:99 |
 | 127 | @tootallnate/once | 2.0.1 | https://github.com/TooTallNate/once | MIT | Nathan Rajlich | build dependency (resolution override) | backstage/package.json:100 |
 | 128 | esbuild | 0.28.1 | https://github.com/evanw/esbuild | MIT | Evan Wallace (LICENSE: (c) 2020 Evan Wallace) | build dependency (resolution override) | backstage/package.json:101 |
+| 129 | urllib | 4.9.1 | https://github.com/node-modules/urllib | MIT | fengmk2 and other contributors (LICENSE: Copyright (c) 2011-2014) | runtime dependency (resolution override; pinned 2026-08-26 for GHSA-hq3h-g68c-hp78, transitive via infinispan ^0.12.0) | backstage/package.json:102 |
 
 ## 6. CI/CD Actions and Images (9 entries)
 
@@ -352,11 +353,11 @@ Gitea integration):
 | 2 | actions/setup-go | pinned SHA 40f1582b2485089dde7abd97c1529aa768e1baff (v5.6.0; pinned 2026-08-18, previously the mutable @v5 tag); installs Go 1.26 | https://github.com/actions/setup-go | MIT | GitHub, Inc. and contributors (2018) | fetched at install time (CI action) | iac/templates/ci.yaml:16-18; seed-repos/hello-m2/.gitea/workflows/ci.yaml:16-18 |
 | 3 | opentofu/setup-opentofu | pinned SHA 9d84900f3238fab8cd84ce47d658d25dd008be2f (v1.0.8; pinned 2026-08-18, previously the mutable @v1 tag); installs OpenTofu 1.9.0 | https://github.com/opentofu/setup-opentofu | MPL-2.0 | OpenTofu Authors (LICENSE records Copyright (c) 2020 HashiCorp, Inc., inherited from forked hashicorp/setup-terraform) | fetched at install time (CI action) | iac/templates/ci.yaml:31; seed-repos/hello-m2/.gitea/workflows/ci.yaml:31 |
 | 4 | golang (Docker Official Image) | tag 1.26-alpine (no digest) | https://hub.docker.com/_/golang | BSD-3-Clause (Go toolchain) | The Go Authors / Google LLC | runtime image (CI build stage) | seed-repos/hello-m2/Dockerfile:1 |
-| 5 | alpine (Docker Official Image) | tag 3.20 (no digest; floating tag, snapshot 2026-08-18) | https://hub.docker.com/_/alpine | Multi-license aggregate; Alpine 3.20.10, 14 packages enumerated 2026-08-18 (sha256-verified blobs): GPL-2.0-only (alpine-baselayout 3.6.5-r0, alpine-baselayout-data 3.6.5-r0, apk-tools 2.14.4-r1, busybox 1.36.1-r31, busybox-binsh 1.36.1-r31, scanelf 1.3.7-r2, ssl_client 1.36.1-r31), MIT (alpine-keys 2.4-r1, musl 1.2.5-r3), MPL-2.0 AND MIT (ca-certificates-bundle 20260413-r0), Apache-2.0 (libcrypto3 3.3.7-r0, libssl3 3.3.7-r0), MIT AND BSD-2-Clause AND GPL-2.0-or-later (musl-utils 1.2.5-r3), Zlib (zlib 1.3.2-r0) | Alpine Linux development team | runtime image (hello-m2 runtime stage) | seed-repos/hello-m2/Dockerfile:6 |
+| 5 | alpine (Docker Official Image) | tag 3.24 (no digest; floating tag, snapshot 2026-08-21) | https://hub.docker.com/_/alpine | Multi-license aggregate; Alpine 3.24.1, 16 packages enumerated 2026-08-21 by pulling the image and reading apk metadata (apk info --license): GPL-2.0-only (alpine-baselayout 3.7.2-r1, alpine-baselayout-data 3.7.2-r1, apk-tools 3.0.6-r0, busybox 1.37.0-r31, busybox-binsh 1.37.0-r31, libapk 3.0.6-r0, scanelf 1.3.9-r1, ssl_client 1.37.0-r31), MIT (alpine-keys 2.6-r0, alpine-release 3.24.1-r0, musl 1.2.6-r2), MPL-2.0 AND MIT (ca-certificates-bundle 20260611-r0), Apache-2.0 (libcrypto3 3.5.7-r0, libssl3 3.5.7-r0), MIT AND BSD-2-Clause AND GPL-2.0-or-later (musl-utils 1.2.6-r2), Zlib (zlib 1.3.2-r0) | Alpine Linux development team | runtime image (hello-m2 runtime stage; bumped from EOL 3.20 on 2026-08-21) | seed-repos/hello-m2/Dockerfile:6 |
 | 6 | node (Docker Official Image) | tag 24-trixie-slim (no digest; floating tag, snapshot 2026-08-18) | https://hub.docker.com/_/node + https://github.com/nodejs/docker-node | MIT (image build files and Node.js runtime; runtime bundles third-party libraries under their own licenses incl. Apache-2.0, Unicode-3.0, BSD variants); Debian trixie-slim base layer: debootstrap minbase from Debian main only (all packages DFSG-free per the Debian Social Contract), per-package list not enumerated (PARTIAL) | Joyent, Inc. and Node.js contributors; Debian Project (base layer, not enumerated) | runtime image (Backstage backend image base; pulled at docker build time via yarn build-image; upstream Dockerfile FROM debian:trixie-slim, NODE_VERSION=24.19.0) | backstage/packages/backend/Dockerfile:15; backstage/packages/backend/package.json:16 |
 | 7 | Trivy | image aquasec/trivy:0.74.0@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 (digest verified against the registry manifest for tag 0.74.0, 2026-08-18) | https://github.com/aquasecurity/trivy | Apache-2.0 | Aqua Security (upstream org; stock Apache-2.0 LICENSE, no filled copyright line) | runtime image (CI scanning gates: filesystem and image scans with SARIF artifacts); digest-pinned following the March 2026 Trivy supply-chain compromise (CVE-2026-33634) | seed-repos/hello-m2/.gitea/workflows/ci.yaml:29-45,92-107; iac/templates/ci.yaml:29-45,77-92 |
 | 8 | OSV-Scanner | image ghcr.io/google/osv-scanner:v2.5.1@sha256:8108ae94eadea5a02c9bec6e646909d5b790b44bd62d7f5b7f0b1d6d0ffc7734 (digest verified against the registry manifest for tag v2.5.1, 2026-08-18) | https://github.com/google/osv-scanner | Apache-2.0 | Google | runtime image (CI dependency scan gate; suppression file seed-repos/hello-m2/osv-scanner.toml) | seed-repos/hello-m2/.gitea/workflows/ci.yaml:44; iac/templates/ci.yaml:44; seed-repos/hello-m2/osv-scanner.toml |
-| 9 | CodeQL action (github/codeql-action) | pinned SHA ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd (annotated tag v4.37.7 peeled commit; re-verified via ls-remote 2026-08-18) | https://github.com/github/codeql-action | MIT | GitHub (LICENSE: Copyright (c) 2020 GitHub) | fetched at install time (CI action); MIRROR SCOPE: used only by .github/workflows/code-scanning.yml on the GitHub mirror -- Gitea Actions runs .gitea/workflows only, so it never executes on the forge; the CodeQL CLI binaries the action downloads at runtime carry their own custom terms (github/codeql-cli-binaries, no SPDX identifier) | .github/workflows/code-scanning.yml |
+| 9 | CodeQL action (github/codeql-action) (REMOVED 2026-08-21) | was pinned SHA ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd (annotated tag v4.37.7 peeled commit; re-verified via ls-remote 2026-08-18) | https://github.com/github/codeql-action | MIT | GitHub (LICENSE: Copyright (c) 2020 GitHub) | REMOVED: the org's "GitHub recommended" code-security configuration enables CodeQL default setup, which rejects SARIF from an in-repo advanced workflow; code-scanning.yml removed, GitHub-side scanning now owned by the org default setup (GitHub-managed, MIT action remains its upstream; the CodeQL CLI terms note still applies to that managed path) | formerly .github/workflows/code-scanning.yml |
 
 Base images in this group remain tag-only (no digests); the three actions
 were pinned to commit SHAs and the two scanner images (Trivy, OSV-Scanner)
@@ -365,15 +366,14 @@ are digest-pinned as of 2026-08-18 (see the entries above).
 Actions. jq, curl, docker, and git in CI steps are runner-image-provided
 binaries with no repo-level pin.
 
-Base-layer detail (snapshot 2026-08-18): the Alpine layer of
-golang:1.26-alpine is a DIFFERENT, newer base than alpine:3.20 -- as of
-2026-08-18 golang:1.26-alpine is Alpine 3.24.1-based (16 packages,
-including apk-tools 3.0.6/libapk, busybox 1.37.0, musl 1.2.6-r2,
-libcrypto3/libssl3 3.5.7 Apache-2.0, ca-certificates-bundle 20260611
-MPL-2.0 AND MIT, zlib Zlib). alpine:3.20, golang:1.26-alpine, and
-node:24-trixie-slim are floating tags; the enumerations here are a
-snapshot of 2026-08-18 and drift as tags move -- digest pinning would
-close this.
+Base-layer detail (snapshot 2026-08-21): since the 2026-08-21 bump, both
+Dockerfile stages ride the same Alpine line -- golang:1.26-alpine is
+Alpine 3.24.1-based and the runtime stage is alpine:3.24 (3.24.1, 16
+packages, enumerated in entry 5; supersedes the 2026-08-18 note that the
+two stages were on different Alpine lines). alpine:3.24,
+golang:1.26-alpine, and node:24-trixie-slim are floating tags; the
+enumerations here are a snapshot and drift as tags move -- digest
+pinning would close this.
 
 ## 7. Schemas and Specifications (1 entry)
 
@@ -405,7 +405,7 @@ image are not enumerated (see U19 below).
 
 An honest gap is recorded here rather than hidden. Each row states what
 could not be verified, what IS verified, and where the evidence sits.
-Nothing in this section is counted among the 198 listed entries above
+Nothing in this section is counted among the 199 listed entries above
 unless explicitly noted as a caveat on a listed entry.
 
 Resolution passes of 2026-08-18: a first pass resolved 15 rows with hard
@@ -424,9 +424,10 @@ Intelligence (2026), author Amit Gupta, upstream
 github.com/NaturalIntelligence/fast-xml-builder); the vendored Score
 schema is byte-identical to score-spec/spec commit
 3ecb17d430c2bbf46d2dfc161fabc7d432d6d1f5 (score-v1b1.json at the
-repository root); alpine:3.20 is fully enumerated (14 packages, Alpine
-3.20.10); the golang:1.26-alpine layer is a different, newer Alpine
-3.24.1-based image; the descriptor-scoped minimatch pins at
+repository root); alpine:3.24 is fully enumerated (16 packages, Alpine
+3.24.1; supersedes the 2026-08-18 alpine:3.20 enumeration after the
+EOL-driven runtime bump); golang:1.26-alpine rides the same Alpine
+3.24.1 line; the descriptor-scoped minimatch pins at
 backstage/package.json:67-70 are dead config shadowed by the bare pin at
 :93 (exactly one installed copy and one yarn.lock resolution exist); all
 113 installed @backstage/* packages confirmed to ship no LICENSE file;
@@ -493,3 +494,13 @@ for third-party charts); .gitleaksignore (first-party false-positive
 fingerprints for gitleaks, added 2026-08-18). External services used but
 not incorporated
 (gitea.com SaaS, GitHub, Vercel) are out of scope for this listing.
+
+## Host custody artifacts (G5, 2026-08-26)
+
+Non-repo artifacts held under ~/.rational-reserve/ (outside all remotes):
+openbao/unseal-key and openbao/root-token (dir 700, files 600) -- Shamir
+1-of-1 unseal key and generated root token for the Raft-backed OpenBao
+(BAO-STORAGE-DES-001 D-05); backups/openbao/*.snap (mode 600) -- raft
+snapshots written by scripts/backup-openbao.sh. These are secrets custody,
+not third-party works; recorded here so their existence and location are
+auditable.

@@ -114,24 +114,30 @@ func logAudit(action, reason, command, session string) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return
 	}
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o600)
-	if err != nil {
-		return
-	}
-	defer f.Close()
+	// The tail read and the append are one critical section: they must run
+	// under the inter-process lock or concurrent guards break the chain
+	// (see auditlock.go).
+	_ = withAuditLock(path, func() error {
+		f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o600)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
 
-	evt := AuditEvent{
-		Timestamp: time.Now().UTC().Format(time.RFC3339Nano),
-		Action:    action,
-		Reason:    reason,
-		Command:   command,
-		Session:   session,
-		PrevHash:  prevHashForPath(path),
-	}
-	data, err := json.Marshal(evt)
-	if err != nil {
-		return
-	}
-	data = append(data, '\n')
-	_, _ = f.Write(data)
+		evt := AuditEvent{
+			Timestamp: time.Now().UTC().Format(time.RFC3339Nano),
+			Action:    action,
+			Reason:    reason,
+			Command:   command,
+			Session:   session,
+			PrevHash:  prevHashForPath(path),
+		}
+		data, err := json.Marshal(evt)
+		if err != nil {
+			return err
+		}
+		data = append(data, '\n')
+		_, err = f.Write(data)
+		return err
+	})
 }

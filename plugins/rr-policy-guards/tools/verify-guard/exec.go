@@ -30,17 +30,55 @@ import (
 func defaultSteps(t Toolchain, repoRoot string) []Step {
 	switch t {
 	case ToolchainGo:
+		if !fileExists(filepath.Join(repoRoot, "go.mod")) {
+			// Multi-module repository: no module at the root. Run vet and
+			// test per discovered module root instead of `./...` at the
+			// root, which fails with "directory prefix . does not contain
+			// main module or its selected dependencies".
+			var steps []Step
+			for _, dir := range findMarkerDirs(repoRoot, "go.mod") {
+				rel, err := filepath.Rel(repoRoot, dir)
+				if err != nil {
+					rel = dir
+				}
+				steps = append(steps,
+					Step{Toolchain: t, Name: "vet " + rel, Cmd: "go", Args: []string{"vet", "./..."}, Required: true, WorkDir: dir},
+					Step{Toolchain: t, Name: "test " + rel, Cmd: "go", Args: []string{"test", "-race", "-count=1", "./..."}, Required: true, WorkDir: dir},
+				)
+			}
+			return steps
+		}
 		return []Step{
 			{Toolchain: t, Name: "vet", Cmd: "go", Args: []string{"vet", "./..."}, Required: true},
 			{Toolchain: t, Name: "test", Cmd: "go", Args: []string{"test", "-race", "-count=1", "./..."}, Required: true},
 		}
 	case ToolchainNode:
-		var steps []Step
-		if fileExists(filepath.Join(repoRoot, "tsconfig.json")) {
-			steps = append(steps, Step{Toolchain: t, Name: "tsc-noEmit", Cmd: "npx", Args: []string{"--no-install", "tsc", "--noEmit"}, Required: true})
+		// Multi-package repositories (e.g. a backend app under a
+		// subdirectory) have no package.json at the root. Discover
+		// package roots and pin steps to each with WorkDir, mirroring the
+		// SCA lane. Yarn-berry package roots (yarn.lock present) run
+		// yarn; npm is not pnp-aware and would fail there.
+		pkgRoots := []string{repoRoot}
+		if !fileExists(filepath.Join(repoRoot, "package.json")) {
+			pkgRoots = findMarkerDirs(repoRoot, "package.json")
 		}
-		if hasNpmScript(repoRoot, "test") {
-			steps = append(steps, Step{Toolchain: t, Name: "npm-test", Cmd: "npm", Args: []string{"test", "--silent"}, Required: true})
+		var steps []Step
+		for _, dir := range pkgRoots {
+			yarn := fileExists(filepath.Join(dir, "yarn.lock"))
+			if fileExists(filepath.Join(dir, "tsconfig.json")) {
+				if yarn {
+					steps = append(steps, Step{Toolchain: t, Name: "tsc-noEmit " + dir, Cmd: "yarn", Args: []string{"tsc"}, Required: true, WorkDir: dir})
+				} else {
+					steps = append(steps, Step{Toolchain: t, Name: "tsc-noEmit " + dir, Cmd: "npx", Args: []string{"--no-install", "tsc", "--noEmit"}, Required: true, WorkDir: dir})
+				}
+			}
+			if hasNpmScript(dir, "test") {
+				if yarn {
+					steps = append(steps, Step{Toolchain: t, Name: "yarn-test " + dir, Cmd: "yarn", Args: []string{"test"}, Required: true, WorkDir: dir})
+				} else {
+					steps = append(steps, Step{Toolchain: t, Name: "npm-test " + dir, Cmd: "npm", Args: []string{"test", "--silent"}, Required: true, WorkDir: dir})
+				}
+			}
 		}
 		return steps
 	case ToolchainRust:
@@ -393,6 +431,12 @@ func runStep(repoRoot, runID string, s Step) Result {
 	} else {
 		cmd.Dir = repoRoot
 	}
+	// CI-equivalent execution environment: CI=true keeps test runners out
+	// of interactive/watch modes (jest --watch hangs at 0% CPU forever
+	// without it; observed hanging a push verification on backstage).
+	// GIT_TERMINAL_PROMPT=0 keeps any git subprocess from blocking on a
+	// credential prompt.
+	cmd.Env = append(os.Environ(), "CI=true", "GIT_TERMINAL_PROMPT=0")
 	var buf bytes.Buffer
 	logPath := stepLogPath(runID, s)
 	if logFile, err := openLogFile(logPath); err == nil {

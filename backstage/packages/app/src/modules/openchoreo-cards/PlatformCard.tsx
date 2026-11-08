@@ -31,6 +31,13 @@ export const PlatformCard = () => {
           <Link to="http://localhost:3301/services">
             SigNoz platform health
           </Link>
+          {/* FR-20: manual dev->staging promotion runbook (OQ-14: promotion
+              stays a manual commit). TechDocs of the developer-portal
+              component (techdocs-ref dir:., docs/runbooks/promotion.md);
+              builds on demand with the local generator. */}
+          <Link to="http://localhost:3001/docs/default/component/developer-portal/runbooks/promotion/">
+            Promotion runbook (dev to staging)
+          </Link>
           <Typography variant="caption" style={{ marginTop: 8, opacity: 0.7 }}>
             Local-registry, Gitea runner, and OpenChoreo plane health are
             surfaced here; live status integration is deferred to M4 platform

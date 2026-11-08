@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: platform-addons
+  description: Flux-watched cluster add-ons and Gatekeeper constraints kustomization. Drift correction only; OpenChoreo remains the workload deployer.
+  annotations:
+    gitea.io/project: openchoreo/platform-addons
+  links:
+    - url: http://localhost:3333/openchoreo/platform-addons
+      title: Gitea repo
+      icon: web
+spec:
+  type: gitops-config
+  owner: openchoreo
+  system: developer-portal
