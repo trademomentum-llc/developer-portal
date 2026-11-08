@@ -260,6 +260,7 @@ This script is a convenience wrapper that:
    ```
    k3d cluster create k3d-openchoreo \
      --servers 1 --agents 1 \
+     --api-port 127.0.0.1:6550 \
      --k3s-arg '--flannel-backend=none@server:*' \
      --k3s-arg '--disable=traefik@server:*' \
      --port 80:80@loadbalancer \
@@ -268,6 +269,12 @@ This script is a convenience wrapper that:
 4. Installs Cilium via Helm and waits for `cilium status`.
 5. Runs `install-m1.sh`, `install-m2.sh`, `install-m3.sh`, `install-m4.sh`, `install-m4-networking.sh`.
 6. Re-pushes seed repos.
+
+`--api-port 127.0.0.1:6550` is mandatory on this rebuild. k3d defaults to
+publishing the API on `0.0.0.0:6550`, which exposes the kube-apiserver to
+the LAN. Host-side NodePort / Envoy publishes that the loadbalancer maps
+must similarly be loopback-scoped where the host forwards them; do not
+reintroduce wildcard binds as part of the Cilium cutover.
 
 ---
 

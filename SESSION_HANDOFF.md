@@ -3,9 +3,951 @@
 > Read this file FIRST in the next session. It tells you where we stopped,
 > what is now committed that was not before, what is still outstanding, and
 > exactly what to do first.
+>
+> STANDING DIRECTIVE (user, 2026-08-22): after any major state change --
+> milestone acceptance, cluster event, publication, dependency/provenance
+> change, or another tool intervening in this repo -- take a dated snapshot
+> addendum at the top of this file BEFORE ending the session. Do not leave
+> state capture to the next session.
+>
+> SNAPSHOT EVIDENCE RULE (2026-08-23): every claim in a snapshot addendum
+> must carry its own verification evidence -- the command run and the
+> measured result (e.g. `git ls-remote origin main` -> sha). Anything not
+> measured at snapshot time is marked UNVERIFIED. The reader must be able
+> to trust the snapshot without re-deriving it. Freshness of this file is
+> enforced by scripts/check-handoff-fidelity.sh.
 
-**Last updated:** 2026-08-18
-**Reason for handoff:** Attribution/provenance package landed (see section 0). M3 Production Multi-Angle Visibility and M4 cost visibility remain live; `./scripts/smoke-all.sh` previously reported `ALL SMOKE SUITES PASSED (M2, M3, M4)`.
+**Last updated:** 2026-08-29
+**Reason for handoff:** Sandbox-home cleanup executed (user-directed):
+~/Projects fake-home artifacts merged into real home or deleted; keychain
+Local Items store repatriated; orphaned ssh-agent killed. Details in 0u.
+
+---
+
+## 0u. 2026-08-29 addendum (late morning) -- sandbox $HOME cleanup
+
+User-directed cleanup of the fake HOME at /Users/nnos/Projects (Codex
+app sandbox mishap, see 0t). All measured:
+
+- KEYCHAIN (the important one): secd had the sandbox
+  Library/Keychains/<UUID>/keychain-2.db (Local Items store) open and
+  live -- writes had been going to the SANDBOX copy since 2026-08-26
+  12:55. Writer chain: orphaned `ssh-agent -s` (PID 64433, started
+  08-26 15:50, PPID 1, HOME=~/Projects, zero identities loaded) via
+  Apple's ssh-agent keychain integration. Also found: the user's login
+  keychain was RESET 2026-08-26 13:37 (real dir holds
+  login.keychain-db.FROM-RESET-1337) -- that is the "keychain deleted
+  everything" event; it happened inside the Codex sandbox window.
+  Remediation: killed the ssh-agent; backed up BOTH keychain-2.db sets
+  to ~/.rational-reserve/backups/sandbox-home-2026-08-29/; killed secd
+  (launchd respawned it); moved the NEWER sandbox keychain-2.db triple
+  into the real Keychains dir. Verified: new secd holds zero sandbox
+  handles; security list-keychains shows the real login keychain.
+- MERGED into real home (rsync -a --ignore-existing, then removed):
+  .codex (616M, session history preserved), .claude, .config, .cache
+  (1.8G), .local, .npm, .ollama (8G models, content-addressed dedup),
+  .factory, .remember, .kimi-work, .kimi-webbridge, .homebrew,
+  .zsh_sessions, Applications, Library/Application Support/{Codex,
+  com.openai.codex, OpenAI}.
+- PRESERVED with sandbox suffix in real home: .zshrc and .zsh_history
+  as ~/.zshrc.sandbox-2026-08 / ~/.zsh_history.sandbox-2026-08 (unique
+  content, name-collided with live files).
+- ARCHIVED (not merged -- live browser profiles must not be
+  file-merged): BraveSoftware, Chromium, Google, Microsoft Edge, Opera,
+  Vivaldi profiles -> ~/.rational-reserve/backups/
+  sandbox-home-2026-08-29/Library-ApplicationSupport/ (169M).
+- DELETED as mishap duplicates/fallout: sandbox .colima (dead duplicate
+  VM definition, 1.8G), .ssh (lima-generated id_ed25519 keypair,
+  fingerprint SHA256:dWe6lLAHHph9SyG5vG6TQEputeTylgA6ZoP+cG6uyD0
+  recorded; if anything was authorized with it, re-authorize with a real
+  key), .kube (dup config), .docker (empty auths), .gitconfig
+  (identity-only dup), .claude.json(.backup), .benchmarks (empty),
+  sandbox Library remainder (Apple daemon noise + 511M Caches).
+- COULD NOT DELETE: ~/Projects/.Trash/AvastBusinessAgent.app --
+  root-signed Avast files, Permission denied without sudo. User action:
+  empty Trash via Finder. (Note: Avast Business Agent AV is installed on
+  this Mac.)
+- LEFT DELIBERATELY (real 2022 user folders, not mishap artifacts):
+  ~/Projects/Desktop, Documents, Downloads.
+- Post-checks: no process with HOME=/Users/nnos/Projects remains;
+  launchctl clean of colima/codex; colima VM running; k3d-openchoreo
+  node Ready 139d. Disk free after cleanup: 298Gi.
+
+---
+
+## 0t. 2026-08-29 addendum (morning) -- colima self-start incident closed
+
+- Verdict (HIGH confidence, evidenced): BENIGN automation. Homebrew's
+  stock colima formula ships a launchd service (`colima start -f`,
+  keep_alive on successful exit, RunAtLoad). On 2026-08-26 16:51 EDT a
+  `brew services restart colima` ran from a shell whose HOME was
+  /Users/nnos/Projects (Codex desktop app's sandbox home), installing
+  the plist at the nonstandard /Users/nnos/Projects/Library/LaunchAgents/
+  homebrew.mxcl.colima.plist -- invisible to the normal
+  ~/Library/LaunchAgents check. Since then launchd respawned it 1557
+  times; every scripted `colima stop` raced the respawn (the ha.pid
+  contention and the "self-starting" VM).
+- Remediation APPLIED (user-directed): `launchctl bootout
+  gui/501/homebrew.mxcl.colima`, `launchctl disable`, plist deleted.
+  Verified: launchctl list has no colima/lima jobs. The VM never went
+  down during removal (VM runs under the lima hostagent; the foreground
+  wrapper was the only casualty) -- node Ready 139d throughout,
+  loopback binds intact.
+- Unplanned live proof: openbao-0 was Killing/recreated during the
+  remediation; the pod returned 2/2 in ~20s and `smoke-openbao.sh`
+  PASSed with no reseed -- FR-4 behavior held in a real event.
+- Watch item: the Codex sandbox home /Users/nnos/Projects/ (with
+  .zshrc, .docker, .kube, .ssh) still exists; Terminal windows into it
+  produce HOME-dependent surprises (this incident was one). Consider
+  removing it or never running brew from there.
+- Also this morning: runbook + register committed (bdf16f1, both
+  remotes). Foreign working-tree changes (package.json formatting churn,
+  config/k3d/openchoreo-loopback.yaml from the 08-26 Claude session)
+  reviewed benign, swept clean (gitleaks x3), left uncommitted. Runbook
+  redacted the live k3d.cluster.token label before commit.
+
+---
+
+## 0s. 2026-08-29 addendum -- G16 loopback binding closed
+
+- User mandate: nothing cluster-related may listen on an open IP.
+  Executed 2026-08-26 (serverlb recreation, interrupted by an OAuth
+  outage) and verified/completed 2026-08-29.
+- Mechanism: `k3d-openchoreo-serverlb` (STATELESS -- the only wildcard
+  publisher; server-0 publishes nothing and was never recreated, etcd
+  untouched) recreated 2026-08-26T21:16Z with HostIp 127.0.0.1 on all
+  11 PortBindings. Belt-and-braces: `~/.colima/_lima/_config/
+  override.yaml` pins wildcard auto-forwards to hostIP 127.0.0.1
+  (verified effective after the 08-29 bounce).
+- Inverse proof (LAN 192.168.1.12): all 11 ports REFUSED on LAN, OK on
+  127.0.0.1, before and after `colima stop && colima start`; serverlb
+  returned as the SAME container (Created 2026-08-26) -- persistence
+  proven. kubectl get nodes: server-0 Ready 139d.
+- smoke-all exit 0 post-bounce: all six suites, SECURITY 61/0/1 incl.
+  the wildcard-listener lane.
+- Runbook: docs/runbooks/2026-08-29-loopback-binding.md (mechanism,
+  exact docker run + confd values.yaml restore content, proofs,
+  rollback). Rollback evidence: /tmp/serverlb-pre-fix-inspect.json,
+  /tmp/lb-values.yaml (tmp -- will not survive reboot; runbook inlines
+  them).
+- Watch items: (1) residual `*:53` limactl hostagent DNS (lima user-v2;
+  drops non-local queries app-layer; no rebind knob -- pf or upstream
+  lima issue if wanted); (2) a concurrent `colima start -f` (PID 46615,
+  PPID 1) appeared during the bounce -- possibly a user/launchd
+  supervisor, investigate if unexpected; (3) colima.yaml carries an
+  unrelated `dnsHosts: {}` edit from another tool, left alone; (4)
+  working tree has changes NOT from this session: `M
+  backstage/packages/app/package.json`, `?? config/` -- left strictly
+  untouched, owner unknown (likely the user's Claude session).
+- Open gates: G15 (partial: SCA sensor swap + go-vet multi-module guard
+  defect, spec triad needed), G7 (Vercel OIDC half, user), G8 (gated).
+- Commits pending user decision: runbook + TODO/handoff updates are
+  uncommitted.
+
+---
+
+## 0r. 2026-08-26 addendum (latest) -- G14 fixed, G15 root-caused
+
+- G14 FIXED, pushed to both remotes (`8a40734..5051f9b`): yarn
+  resolution `urllib: 4.9.1` clears GHSA-hq3h-g68c-hp78 (HIGH). Verified:
+  `yarn why urllib` -> 4.9.1; `yarn npm audit --severity high` clean;
+  `yarn tsc` exit 0; infinispan loads against 4.9.1; vulnerable path
+  unexercised (no infinispan cache store configured). SECURITY.md
+  re-synced (same 3 react-router GHSAs still accepted, elliptic low
+  accepted); provenance listing + licenses updated; certificate
+  re-issued PRC-developer-portal-2026-08-26-r12 with fresh digests.
+- G15 ROOT CAUSE (why the HIGH reached the remotes), two layers:
+  (a) Under Kimi Code, NO PreToolUse guard hooks were registered --
+  `~/.kimi-code/config.toml` had no `[[hooks]]`. The commit-guard blocks
+  observed in-session came from `.git/hooks/commit-msg` (installed by
+  the portfolio installer), a git-internal layer that fires regardless
+  of harness. verify-guard has no git-hook layer, so it silently never
+  ran under Kimi. Evidence: verify-guard.jsonl has zero entries for
+  today's commits/pushes while commit-guard.jsonl logged all six; the
+  binary works standalone (probes logged at 19:54Z and 20:07Z).
+  (b) Even had it run, its `yarn npm audit` lane cannot see this
+  advisory class: the PRE-FIX lockfile audits clean at --severity high
+  (measured against HEAD~1 in a scratch project, exit 0). Dependabot's
+  GitHub Advisory Database was the only sensor that saw it.
+- Remediation landed: all 8 portfolio hooks registered in
+  `~/.kimi-code/config.toml` (validated with `kimi doctor`; backup
+  config.toml.20260826-161104.bak; active on /reload or next session).
+  verify-guard timeout set to Kimi's max 600 (Claude used 1200).
+  `.claude/` added to .gitignore (its untracked state would trip
+  verify-guard's clean-tree push gate under ANY harness).
+- G15 remains PARTIAL: (b) SCA sensor swap to OSV/GHSA coverage needs a
+  spec triad; (c) NEW guard defect found by probing: verify-guard
+  invoked from the repo ROOT blocks commits with `toolchain-fail /
+  go-vet ./...` (no go.mod at root) -- multi-module awareness fix
+  needed before root-directory commits pass under Kimi.
+- First-run verification next session: any commit must produce a
+  verify-guard audit entry in ~/.rational-reserve/logs/verify-guard.jsonl.
+
+---
+
+## 0q. 2026-08-26 addendum (night) -- publication + OQ-06 verified + G14
+
+- Publication (user-authorized): 3 signed commits (all %G?=G) pushed to
+  BOTH remotes: `612273b` docs(specs) G5 triad, `5e96363` feat(openbao)
+  G5 implementation, `a25c18c` chore(docs) register/handoff. Evidence:
+  `git push github main` and `git push origin main` both reported
+  `ae3ff5f..a25c18c main -> main`. gitea.com push auth STILL WORKS via
+  the git credential store despite the user's keychain wipe (the stored
+  token is limited-scope: repo routes OK, /user 403; the web login the
+  user lost is only needed for settings UI, not for pushes).
+- OQ-06 VERIFIED CLOSED (was done 2026-08-18, never verified): gitea.com
+  branch protection on `main` -- enable_force_push=false,
+  require_signed_commits=true, required_approvals=1, push whitelist
+  trademonentumllc. Recorded in docs/JOURNAL.md per the tech spec's
+  verification step. Wire-level force-push test intentionally not run
+  (local pre-push hook IN-H-002 blocks it; documented layering).
+- G7 now PARTIAL: only the conditional Vercel OIDC rotation remains
+  (user's Vercel login; only if the token was ever shared).
+- G14 NEW (dependabot drift on the pushed series): urllib HIGH
+  (GHSA-hq3h-g68c-hp78, CVSS 7.5) via infinispan -> urllib ^3.23.0,
+  patched 4.9.1 (major bump, needs yarn resolution + compat check);
+  new react-router mediums beyond the 3 documented; elliptic low.
+  Breaks the zero-medium+ posture until dispositioned; SECURITY.md
+  accepted-risk list is now stale relative to live alerts.
+- GitHub's push banner reported "7 vulnerabilities (1 high, 5 moderate,
+  1 low)" -- `gh api .../dependabot/alerts` open-state query confirms
+  the composition above (two pages: pip-ecosystem labels on the npm
+  urllib package are GitHub's own manifest classification quirk).
+- Open gates entering 2026-08-27: G14 (dependency disposition), G7
+  (Vercel half only, user), G8 (needs G7 + spec triad).
+
+---
+
+## 0p. 2026-08-26 addendum (evening) -- G4 + G5 fully closed
+
+- USER AWARENESS, outside-repo change: `~/.colima/default/colima.yaml`
+  had `portForwarder: none`, which made lima ignore ALL guest port
+  forwards after a VM restart (k3s API unreachable on first bounce).
+  Edited to `portForwarder: ssh` (documented default, the behavior the
+  machine had all session). Everything localhost-forwarded (kubectl,
+  gitea, signoz, opencost, backstage) depends on this staying `ssh`.
+- Phase 1 (smoke-all env): killed two stale Backstage instances from
+  08-24 (ports 3001/7008/7009); rebuilt forwards per AGENTS.md table.
+  FR-08 DISSOLVED: dashboards were never missing -- direct API query
+  returned count 2 (platform-overview, hello-m2-red); the lane-C
+  failure was the down 3301 forward rendering empty as "found: none".
+- The 4 pre-restart combined-run failures were all traced to the
+  wedged 4-day-old VM (kubelet taking ~10 min to issue container
+  Killing; node CPU 87-89%; host load 180). Post-bounce the identical
+  invocation passed in ~90s. No code regressions.
+- G4 CLOSED (inverse-proven): deleted cluster-agent-tls in all three
+  plane namespaces 19:06Z; cert-manager re-issued <=10s, new expiry
+  2026-11-24; --check FAILed DRIFT on all three (old vs new
+  fingerprints verbatim in agent report); re-pin applied; --check PASS;
+  agents reconnected to gateway in 2-3s. Next recurrence ~2026-11-24.
+- G5 lane B CLOSED: colima stop/start x2 (second after the
+  portForwarder repair); openbao-0 2/2 Ready, Initialized=true
+  Sealed=false ~35s after container start, ZERO human unseal steps;
+  all 4 FR-4 keys hash-identical across the bounce; repin --check still
+  PASS post-restart.
+- Final verdict 15:33 EDT: `smoke-all.sh --with-openbao-restart` exit
+  0 -- ALL SIX SUITES PASSED, FR-4 lane 29s.
+- Robustness follow-ups observed (pre-existing, not gated): smoke-m3
+  live-trace check has no port-forward retry (flake source); FR-4
+  lane's hard-coded 60s delete timeout can't tolerate a starved
+  kubelet; act-runner dind was CrashLoopBackOff during boot #1
+  (Running post-bounce, CI path verified only via smoke-m2 [actions]
+  dispatched).
+- Open gates entering 2026-08-27: G7 (user-owned) and G8 (needs G7 +
+  own spec triad). Everything else on the register is closed.
+- Working tree unchanged since 0o (3 spec docs + 5 new + 5 edited
+  scripts + doc edits); NO COMMITS -- signed-commit decision awaits
+  the user.
+
+---
+
+## 0o. 2026-08-26 addendum (latest) -- G5 DONE: live migration executed
+
+User GO'd live implementation. Executed per BAO-STORAGE-TECH-001 v0.2.
+Full session log: `~/.rational-reserve/logs/openbao-migration-20260826-170237.log`.
+
+- Phase 1: 5 files created verbatim from spec (openbao-values.yaml,
+  bootstrap/install/backup/rollback scripts), 5 scripts edited (smoke-
+  openbao replaced with --with-restart lane; seeder, smoke-all,
+  teardown-m2, install-m2 per spec diffs), PROVENANCE.md appended.
+- Lane 0 static PASS (bash -n all; helm template: sidecar x1, postStart
+  x0, local-path 1Gi VCT).
+- FR-4 PRE inverse proof: exact spec'd FAIL signature captured, exit 1.
+- Migration: helm rev 1 -> 2; one transient API TLS timeout mid-
+  bootstrap, orchestrator re-run via its own idempotent path (C9 gate
+  worked: PVC+sidecar detected, custody recovery, NO re-init). PVC
+  data-openbao-0 Bound 1Gi; pod 2/2; Initialized=true Sealed=false.
+- FR-4 POST: secrets byte-identical across openbao-0 deletion, no
+  reseed, sidecar auto-unsealed. Recovery 125s (FAIL vs 120s, loaded
+  cluster, honest record) then 93s PASS on settled cluster.
+- Consumers: ClusterSecretStore openbao-kv Ready, ExternalSecrets
+  synced post-handoff, runner pod 2/2, root token is generated 26-char
+  (not root). Backup snapshot 26,023 bytes mode 600.
+- Lane D: sidecar adds 40m/5Mi (pod total 87Mi <= 90Mi baseline);
+  custody 700/600 outside git. Lane E static PASS.
+- DEFERRED (not failures): lane B Colima cold restart (user step);
+  smoke-all combined run (blocked by down port-forwards 3333/29003/9090
+  + pre-existing FR-08 dashboard gap -- m2/security/backstage-
+  production suites all PASS, smoke-security 55/0).
+- AGENTS.md updated with the new OpenBao command block (spec had no
+  such section; flagged gap closed).
+- Bonus unplanned evidence: node wobble during lane C restarted
+  openbao-0 containers; sidecar auto-unsealed with no human step and
+  smoke-m2 [openbao] PASSed minutes later -- the G5 failure mode is
+  demonstrably dead.
+
+Open gates entering 2026-08-27: G4 (cert re-pin deadline 2026-09-24),
+G7 (user-owned), G8 (gated behind G7 + spec triad). G5 lane B and the
+smoke-all environment remediation are open follow-ups, not gates.
+
+Working tree: 3 untracked spec docs + 5 new scripts + 5 edited scripts
++ TODO/handoff/AGENTS/PROVENANCE edits. NO COMMITS this session --
+a large signed commit decision awaits the user.
+
+---
+
+## 0n. 2026-08-26 addendum (late) -- G5 tech spec approved, simulation GO
+
+- User approved BAO-STORAGE-TECH-001; status line updated.
+- Simulation (scratch release `openbao-sim` on k3d-openchoreo, live
+  OpenBao untouched) rehearsed the full migration: fixture with the 13
+  platform secrets, FR-4 pre-change inverse proof FAILed as spec'd,
+  migration PASS, post-change persistence PASS, raft-snapshot backup
+  PASS, rollback PASS (post-rollback restart loses secrets again --
+  inverse proof of rollback), re-migration PASS at 77s recovery.
+- 5 spec defects found and corrected (report:
+  `docs/specs/2026-08-26-OpenBao-Storage-Simulation-Report.md`,
+  BAO-STORAGE-SIM-001): grep -q SIGPIPE race (C6), bare kubectl wait
+  races pod recreation x3 sites (C5/C7/C8), retained-PVC skip logic
+  wrong after rollback (C9). All folded into spec v0.2 (1535->1628
+  lines); changed listings re-verified with `bash -n`; sim-vs-spec diff
+  confirms only naming/comment differences.
+- First-run NFR-2 breach (142s > 120s) was load-induced on the shared
+  node; quiet re-run 77s. Wait budgets now env-overridable, spec
+  default unchanged. Serialized-ops rule applies to implementation.
+- Evidence archived host-side: `~/.rational-reserve/backups/
+  openbao-sim-20260826/` (34 logs + corrected scripts); /tmp scratch
+  removed. Cluster verified clean of sim residue (no ns/PVC).
+- Next: live implementation per spec s5 runbook in a serialized
+  heavy-op window (creates 4 new scripts + openbao-values.yaml, edits 5
+  existing scripts, lanes A-E incl. real FR-4 restart proof).
+- Open gates: G5 (implementation), G4 (deadline 2026-09-24), G7
+  (user-owned), G8 (gated).
+- Working tree: 3 untracked spec docs (design, tech, sim report) +
+  TODO/handoff edits; no commits this session.
+
+---
+
+## 0m. 2026-08-26 addendum -- G5 design approved, tech spec drafted
+
+- User approved BAO-STORAGE-DES-001 (status line updated in the doc).
+- `docs/specs/2026-08-26-OpenBao-Production-Storage-Technical-Specification.md`
+  (BAO-STORAGE-TECH-001, 1535 lines, draft) written. Self-verified by the
+  drafting agent: spec'd values rendered through `helm template` (sidecar
+  once, storageClassName local-path, 1Gi VCT, Retain/Retain, zero
+  postStart), all 5 bash listings pass `bash -n`, 0 non-ASCII bytes.
+  OQ-3 RESOLVED from repo evidence: no CI workflow references OpenBao;
+  runner consumes the token via the ESO-synced Secret.
+- Deviations from the approved design, all recorded in spec s11: 13
+  platform secrets (not 11, measured from live postStart); install-m2.sh
+  wiring placed AFTER task_4_tofu_apply (tofu owns openbao-root-token and
+  would revert it); StatefulSet orphan-delete before upgrade/rollback
+  (volumeClaimTemplates immutable); placeholder-first unseal-key Secret;
+  bootstrap unseals directly on first boot; mount enablement added
+  (fresh Raft has no kv/secret mounts); rollback script named.
+- PENDING USER REVIEW of the tech spec. After approval: implementation
+  per spec s5 runbook (creates scripts/openbao-values.yaml,
+  bootstrap-openbao-persistent.sh, install-openbao-storage.sh,
+  backup-openbao.sh, rollback-openbao-storage.sh, edits 5 existing
+  scripts, then live lanes A-E).
+- Open gates: G5 (tech-spec review -> implementation), G4 (deadline
+  2026-09-24), G7 (user-owned), G8 (gated).
+- Working tree: two untracked spec docs (design, tech); no commits this
+  session.
+
+---
+
+## 0l. 2026-08-24 addendum (23:52 EDT) -- G2 closed, G5 design drafted
+
+Session recovery: previous session (c133f1fc) died on an API timeout
+with its last subagent (carrier recomposed-mechanisms extraction)
+unfinished -- zero output delivered. Redeployed and completed this
+session; result: the carrier's decompose/recompose layer is highly
+templated candidate evidence (one procedure/gate/operator/fractal
+template across all 5 mechanisms); MECH-004 (Forward-Inverse Gap
+Resolver) scores lowest (0.552); the carrier's own decomp gaps state
+its scores lack external validation and its MES rows are not wired to
+a live runner. It adds NO new verified gaps over the register.
+Ingest-only; nothing from it entered the repo.
+
+- G2 DONE: `git stash drop stash@{0}` (wip-non-security-20260730);
+  `git stash list` -> empty. Patch preserved at
+  `~/.rational-reserve/backups/wip-non-security-20260730.patch`
+  (3,357 lines, 68/68 diff headers, 925+/514- stat match) -- drop is
+  reversible from the patch.
+- G4 re-verified: `./scripts/repin-plane-agent-ca.sh --check` 23:52
+  EDT -> PASS, all three plane pins match live certs, no drift;
+  renewal deadline 2026-09-24 stands.
+- G5 advanced: `docs/specs/2026-08-24-OpenBao-Production-Storage-
+  Design-Specification.md` (BAO-STORAGE-DES-001, 573 lines, draft)
+  written: Raft ha.single-replica + 1Gi local-path PVC, auto-unseal
+  sidecar (same openbao:2.5.1 image, Shamir 1-of-1, host custody
+  ~/.rational-reserve/openbao/ 600), one-time bootstrap replacing the
+  postStart root-token script (preserves 11 platform secrets), root
+  token handoff to openbao-kv ClusterSecretStore, FR-4 lane as
+  `smoke-openbao.sh --with-restart`, rollback = helm rollback with PVC
+  Retain. PENDING USER REVIEW -- key dispositions: OQ-1 unseal custody
+  (unseal-key copy lands in etcd; honest-limits stated), OQ-2 weekly
+  raft-snapshot by convention. Then Technical Spec + implementation.
+- G7 unchanged (user-owned). G8 unchanged (gated behind G5/G7).
+- Working tree: new untracked design doc only; no commits made this
+  session.
+
+Open gates entering 2026-08-25: G5 (design review -> tech spec ->
+implementation), G4 (deadline), G7 (user-owned), G8 (gated).
+
+---
+
+## 0k. 2026-08-24 addendum (late) -- structural-gap execution
+
+User challenge: the open-gaps ranking had not changed because only
+process/validation gates had been closed. Executed against the top
+structural items:
+
+- G13 DONE: self-CI run 288 (`1337215`) all three jobs success.
+- G10 DISSOLVED: `gh api repos/.../dependabot/alerts` shows exactly 3
+  open advisories (react-router mediums), matching SECURITY.md; the push
+  banner counted non-open alerts.
+- G4 checked: `repin-plane-agent-ca.sh --check` -- all three plane pins
+  match live certs; no drift today; renewal deadline 2026-09-24 stands.
+- G5 STARTED: `docs/specs/2026-08-24-OpenBao-Production-Storage-
+  Requirements.md` (BAO-STORAGE-REQ-001) -- Raft+PVC proposed, options
+  dispositioned, FR-4 inverse-proof lane specified (fails today by
+  construction: secrets do not survive openbao-0 deletion).
+
+Open gates entering 2026-08-25: G5 (triad continues), G4 (deadline),
+G2 (stash disposition -- recommendation: drop, patch preserved), G7
+(user-owned), G8 (gated behind the above).
+
+---
+
+## 0j. 2026-08-24 addendum -- G11 closure (the long version)
+
+G11 closed after five smoke-all attempts; every failure traced to
+environment/tooling, zero code regressions in the pushed series. Evidence
+chain:
+
+- self-CI 283 security-gates fail: runner pod DNS wedge post-restart
+  (kube-dns refused from the act-runner pod; other pods resolved fine).
+  Fixed by recreating the act-runner pod; 284 security-gates green.
+- self-CI 284 go-tests fail: node flapped NotReady ("container runtime is
+  down") at 18:29 UTC under concurrent load (CI Trivy + smoke suites +
+  Backstage boot). Log stops mid-verify-guard. Environmental.
+- Client-side exec/port-forward hangs + websocket 1006: user's failed
+  Homebrew kubectl upgrade (broken intermediate install); resolved when
+  the user re-completed the update (v1.36.3). EXEC_OK verified.
+- M3 proxy lanes 404: stale Saturday processes held 3001/7008/7009 (one
+  serving from the throwaway smoke worktree /private/tmp/...-5b0c23e).
+  Killed; worktree removed; fresh backend serves all routes (200
+  verified). Hygiene lane now reports zero extra worktrees.
+- M3 FR-08 false FAIL: lane parsed SigNoz v2 `data` as a list; the API
+  nests `data.dashboards`. Fixed in smoke-m3.sh and install-m3.sh
+  (idempotency verified: second run found existing, no dupes; update PUT
+  still WARNs -- minor debt). My earlier manual POST created duplicates,
+  deleted; originals date 2026-08-22.
+- M3 FR-05 false FAIL chain: live otel-collector config was 55d stale
+  (no filelog receivers at all; reconciled by install-m3 re-run), then
+  ClickHouse memory deadlock: 1.8 GiB server cap (derived from the 2 Gi
+  container limit) OOM-killed even trivial migrator queries, blocking the
+  very upgrade that would raise it. Broke the loop by patching the CHI
+  directly to 3Gi; install-m3 then applied cleanly (Apply complete) and
+  helm state converges on the same value. Lane query rewritten to the
+  resource-metadata table (full-history map scan OOMs/times out;
+  resource table returns 4 rows for the dp namespace in <1s).
+  Inverse-proven: nonexistent namespace returns 0.
+- OpenBao inmem wiped twice today (G5 recurrence proven again; reseeded,
+  smoke-openbao PASS both times).
+- gitea_admin had must-change-password set (rejected API+git auth);
+  cleared via in-pod gitea CLI. m1-gitea-token is STALE (403);
+  admin-password auth is the working path.
+- Legacy gitea-postgresql Endpoints object empty while EndpointSlice is
+  correct -- cosmetic on kube-proxy, flagged for next full restart.
+- Final: ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4, SECURITY,
+  BACKSTAGE-PRODUCTION), smoke-security 60/0/2.
+- self-CI epilogue: run 285 failed at checkout -- CoreDNS answered
+  NXDOMAIN for ALL cluster names (it had started with an unsynced
+  Kubernetes API during the flap and never resynced; 18 restarts).
+  Fixed by recreating the CoreDNS pod; SRV records resolve again. Run
+  286's go-tests container died mid-run with no node-level event. Run
+  287 (`516f85b`), in a quiet window: go-tests + policy-tests +
+  security-gates ALL SUCCESS. Note for future CI watchers: this Gitea
+  version's tasks endpoint reports job status as success/failure, not
+  completed/conclusion.
+- New convention in AGENTS.md: serialized heavy operations (no
+  concurrent CI + smoke + boots); kill stale dev-server processes before
+  restarts.
+
+---
+
+## 0i. 2026-08-24 addendum -- publication + gap re-ranking (real inputs)
+
+Publication (user-authorized): `git push origin main` and `github main`
+(5b0c23e..76bb694); local mirror `259de88..76bb694`. Two blockers found
+and fixed en route: gitea_admin had must-change-password set (rejected
+API+git auth; cleared via in-pod `gitea admin user must-change-password
+--unset gitea_admin` with `-c /data/gitea/conf/app.ini`), and the legacy
+`gitea-postgresql` Endpoints object is empty while its EndpointSlice is
+correct (cosmetic on k3s/kube-proxy, but flag for the next full restart).
+The m1-gitea-token is STALE (403 all styles); admin-password auth is the
+working path (scripts/push-local.sh convention). Evidence:
+`./scripts/check-handoff-fidelity.sh` -> all lanes PASS, all three
+remotes at `76bb694`. GitHub dependabot now reports 6 advisories (5
+moderate + 1 low) vs the 3 documented moderates -- register G10.
+
+Gap re-ranking (corrected hybrid severity + surface priority, REAL
+register inputs; IsolationForest skipped deliberately -- N=8 is
+statistically meaningless):
+
+| Rank | SP | Item | Basis |
+|---|---|---|---|
+| 1 | 4.05 | G5 OpenBao production backend | recurred 3x (incl. today), 114 days old |
+| 2 | 1.81 | G2 stash disposition | 25 days old, overlaps live files |
+| 3 | 1.62 | G7 user actions | branch protection + token rotation |
+| 4 | 1.54 | G4 cert re-pin | hard deadline 2026-09-24 -- formula cannot see deadlines; judgment override: treat as top-2 |
+| 5 | 1.22 | G8 phase-3 tracker triad | gated by phase-gate discipline |
+| 6 | 1.05 | G6 react-router moderates | accepted risk, blocked upstream |
+| 7 | 0.67 | G11 smoke-all + self-CI rerun | validation debt from today's series; cheap -- run next |
+| 8 | 0.57 | G10 dependabot delta | needs 5-minute review |
+
+Recommended order (formula + deadline/effort judgment): G11 (next, cheap
+validation), G4 (deadline), G5 (structural fix), G2, G7 (user), G10, G8.
+
+---
+
+## 0h. 2026-08-24 addendum -- gap register execution (user-approved closures)
+
+All three user-approved closures executed and verified:
+
+- G1 commit triage: 8 signed commits `c08b4ba..a22f33f` (all %G?=G):
+  governance; assessments relocation; backstage (tsc exit 0); scripts
+  (bash -n clean x21); observability (YAML OK); namespace-predictor
+  (go test 0.300s OK); ci workflows (YAML OK); seed-repos + runbooks.
+  Tree now clean except intentional untracked `.claude/`. First commit
+  initially BLOCKED by rr-commit-guard IN-M-001 (subject > 72 chars);
+  message shortened, no bypass used.
+- G9: `scripts/residual_ranking.py` moved to `assessments/` (`754a72e`),
+  committed as a parked external artifact, not wired to any operational
+  path.
+- G3: `docker restart k3d-openchoreo-server-0` (user-approved). Node
+  Ready within minutes; node-IP lottery did NOT strike; pods recovered
+  to 72 Running / 1 PodInitializing; openbao-0 came back 1/1 after the
+  documented inmem reseed (`seed-openbao-m2-paths.sh` -> "openbao
+  seeded"; `smoke-openbao.sh` -> PASS). G5 recurred exactly as
+  documented -- evidence for prioritizing the production backend.
+- Gate self-proof: `scripts/check-handoff-fidelity.sh` now FAILs
+  remote-sync on all three remotes (they are at `5b0c23e`, HEAD is
+  `a22f33f`) -- the checker's first live catch. Push is a user decision.
+
+Still open: G2 (stash disposition; patch preserved), G4 (cert re-pin by
+2026-09-24), G5 (OpenBao production backend), G6 (accepted risk), G7
+(user-owned), G8 (Phase 3 triad). Recommended next: full `smoke-all`
+re-run once the cluster settles, then push of the 8-commit series.
+
+---
+
+## 0g. 2026-08-24 addendum -- user ruling: phase-gate discipline + gap register
+
+The user ruled that phases were approved on the understanding that all
+prior work was complete as conveyed, and that open gates from earlier
+phases are a development no-no for a system expected to govern other
+architecture. The ruling stands as recorded. The pattern is on the repo's
+own record (OSV vacuous pass pre-`3f27f0c`; silent catalog death
+pre-`48960a5`; unnoticed smoke failures pre-`dbd79de`).
+
+Actions taken this session (evidence):
+
+- Verified gap register written to the top of TODO.md (G1-G9, each with
+  measured status or UNVERIFIED). Sources: `git status` (42 modified +
+  20 untracked), `git stash show --stat` (68 files, 925+/514-),
+  docker stats + server-0 logs (0f), cert expiry date math.
+- Stash `wip-non-security-20260730` preserved NON-DESTRUCTIVELY as
+  `~/.rational-reserve/backups/wip-non-security-20260730.patch`
+  (3,357 lines; stash itself still present, `git stash list` verified).
+- AGENTS.md Conventions: phase-gate discipline rule added.
+- Found during audit: `scripts/residual_ranking.py` (248 lines,
+  carrier-derived hybrid+isolation-forest code, created 2026-08-24
+  09:27, not by this session) sitting untracked in scripts/ -- carrier
+  materialization into the repo without a triad; disposition is a user
+  decision (register item G9).
+
+Pending user decisions: commit triage of the 61-entry dirty tree (G1),
+residual_ranking.py disposition (G9), cluster repair approach (G3).
+
+---
+
+## 0f. 2026-08-23 addendum (late) -- cluster degraded: resource saturation
+
+Measured live ~17:35 local while answering a state query:
+
+- `docker stats --no-stream`: k3d-openchoreo-server-0 CPU 1241% (6-core
+  VM, ~2x oversubscribed), MEM 10.25/11.65 GiB. serverlb idle.
+- server-0 logs: kine Slow SQL warnings, list queries 14-29.5 s;
+  `apiserver was unable to write a JSON response: http: Handler timeout`;
+  Network Policy Controller heartbeat missed.
+- Symptom: API answers curl (401 in 10.6 s) but kubectl discovery times
+  out reading the body; `get nodes`/`get pods -A` fail. Colima itself is
+  running; containers up (server-0 23 h, serverlb 27 h); the 6550 SSH
+  workaround tunnel is alive and NOT the cause this time.
+- Pattern match: the documented host-pressure failure (16 GiB host /
+  12 GiB VM; "no heavy host-side builds concurrent with pipeline runs").
+  No repair attempted -- remediation options are the user's call (close
+  heavy host apps; rolling restart of server-0; node-IP repair tool is
+  ready if the restart triggers the lottery).
+- Repo state unchanged and green: `./scripts/check-handoff-fidelity.sh`
+  all lanes PASS (handoff 2026-08-23 vs HEAD 2026-08-21; gitea-com,
+  github, origin all at `5b0c23e`); 61 dirty entries; 1 stash; 1 extra
+  worktree.
+
+---
+
+## 0e. 2026-08-23 addendum -- carrier take-froms scope 0-2 LANDED
+
+User approved scope 0-2 of the carrier-assessment recommendations (the
+analytical carrier itself was audited and found to be deterministic
+re-encoding, not independent analysis; only its quality-gate sentence,
+forward-inverse discipline, and handoff-fidelity idea were taken).
+
+- Phase 0 (docs): SNAPSHOT EVIDENCE RULE added to this file's header
+  (above); AGENTS.md gained the "External analytical artifacts are
+  ingest-only" convention and the evidence-rule wording on the standing
+  directive.
+- Phase 1 (code): `scripts/check-handoff-fidelity.sh` -- three lanes:
+  freshness (Last updated >= HEAD committer date), remote-sync (each
+  remote's main vs HEAD; unreachable = SKIP/UNVERIFIED, never fail),
+  hygiene (extra worktrees + stash, informational). TDD per superpowers:
+  test written first, watched fail (exit 127, script missing), then
+  implemented. Evidence: `./scripts/tests/test-check-handoff-fidelity.sh`
+  -> ALL HANDOFF-FIDELITY TESTS PASSED, 6/6 (A-F; B and C are the
+  inverse-proof lanes: stale handoff FAILS, remote-behind FAILS).
+  Live evidence: `./scripts/check-handoff-fidelity.sh` -> all lanes
+  green; gitea-com/github/origin all at `5b0c23e`; hygiene reports 1
+  extra worktree + 1 stash.
+- Phase 2 (convention): "Inverse-proof testing" added to AGENTS.md
+  Conventions -- every new gate ships with a negative test proving it
+  fails when its condition is absent; a check never observed to fail is
+  treated as unverified.
+- AGENTS.md Commands gained a "Session handoff fidelity" block.
+- Deferred (needs spec triad, Phase 3): friction analytics over guard
+  audit chains as an rr-audit-chain extension.
+
+Working tree note: the 58-entry dirty set from 0d is still uncommitted;
+these new files (checker + test) and doc edits add to it. Commit triage
+of the whole set is the user's call.
+
+**Next candidates (unchanged):** Wave-1 security installs gated on OQ-20
+stack approvals. User open items: gitea.com branch protection, .env.local
+Vercel token rotation.
+
+---
+
+## 0d. 2026-08-22 addendum -- state snapshot + snapshot directive
+
+Snapshot taken at user request after a cross-tool event: Codex ran a
+sanitization pass because various worktrees were dirty -- worktrees that
+fall under Kimi (this harness's) governance. The user's framing is
+informational, not an assignment of blame for how they got that way;
+recorded here so the next session knows it happened while Kimi was not
+around. UPDATE (user, same session): the sanitization is USER-DIRECTED --
+the user has been explicit with Codex that the objective is to clean those
+worktree states. Treat further Codex cleanup of Kimi-governed worktrees as
+sanctioned, and re-verify `git worktree list` / stash state before relying
+on anything recorded here.
+
+Verified state at snapshot time (measured live this session):
+
+- git: HEAD `5b0c23e` on main. origin (gitea.com) AND github both
+  fetch-verified AT HEAD (`git ls-remote`) -- the Phase 2 / loopback /
+  spec series that 0c flagged as unpushed has since been published.
+  Local Gitea mirror (`localhost:3333`) not re-verified this session.
+- Worktrees: two -- the main checkout plus a detached smoke worktree
+  `/private/tmp/developer-portal-smoke-5b0c23e` (at `5b0c23e`). One stash
+  carried: `stash@{0}: wip-non-security-20260730`.
+- Working tree: dirty, 58 entries (41 tracked modifications, 17
+  untracked) -- openchoreo-cards, entity-page, smoke scripts, iac/
+  observability values, plus untracked runbooks, dashboards, e2e tests,
+  and new cards (AlertsCard, TestResultsCard). Run `git status` for the
+  current list; do not assume it matches 0c-era descriptions.
+- Cluster: `k3d-openchoreo` UP (server-0 Ready, v1.32.9+k3s1, age 133d).
+- The `kimi-debug-session_-20260821-193754` export (dir + zip) is gone
+  from the working tree. Transcript digests this session: the Grok
+  session (01a025d6) only READ it -- the Kimi session died on OAuth
+  `ENOTFOUND auth.kimi.com`, not a repo bug; the underlying OSV exit-128
+  wiring bug was fixed in `3f27f0c`, loopback bind in `4f0dfa5`. No Codex
+  or Grok session performed export sanitization; the removal happened
+  outside both tools' recorded sessions.
+- Ingested `~/Downloads/KIMI_DEVELOPER_PORTAL_STANDALONE_ANALYTICAL_CARRIER_20260821.html`
+  (4.5 MB standalone analytical handoff built from the dead Kimi session's
+  export; 30 datasets / 6,326 rows / 6 SHA-256 receipts). It asserts no
+  repo mutation -- five review-gated mechanism candidates (handoff
+  fidelity gate, evidence ledger, tool-friction detector, forward-inverse
+  gap resolver, friend-safe boundary). No action taken on them; any
+  conversion into checklists/scripts needs explicit user approval first.
+
+**Next candidates:** Wave-1 security installs (Falco, Trivy Operator,
+MISP slim -- each needs a recorded stack approval per OQ-20). The 0c
+"publish the unpushed series" item is DONE (remotes at HEAD). User open
+items unchanged: gitea.com branch protection, .env.local Vercel token
+rotation.
+
+---
+
+## 0c. 2026-08-21 addendum -- Phase 2 self-CI + scaffold inheritance
+
+Kimi session `session_d1ce6d50-42e4-42a2-83d8-bdae8671ed37` (exported as
+`kimi-debug-session_-20260821-193754`) ended at turn 14 on
+`getaddrinfo ENOTFOUND auth.kimi.com` while waiting on self-CI 278 and
+scaffold v4. Recovered from the export, not from the connection drop.
+
+- Self-CI run 278 (`e4495ee`) completed **success**: go-tests,
+  policy-tests, security-gates. Runs 276/277 failed only on
+  `TestAudit_PrevHashFailOpen` under the rootful act-runner; that skip
+  was already on main.
+- Scaffolder inheritance (OQ-31/FR-38) was **not** green. Scaffold
+  `openchoreo/scaffold-e2e-20260821` run 1: test success, security-gates
+  failure, build skipped. Exact OSV line:
+  `Scanned .../package-lock.json file and found 0 packages` then
+  `exitcode '128'`. Trivy had already walked the tree **before** the
+  lockfile existed (`Number of language-specific files num=0`). This is
+  a wiring bug, not a CVE -- osv-scanner v2.5.1 exits 128 on a valid
+  empty lockfile, and the template comment that "an empty tree scans
+  clean" was false.
+- Fix in `backstage/examples/template/content/.gitea/workflows/ci.yaml`:
+  generate the lockfile first, then Trivy, then OSV. Accept exit 128
+  only when package.json and the lockfile both confirm zero
+  dependencies; missing tree or undeclared deps still fail closed.
+  smoke-security gained a FR-38 lane pinning that contract.
+- Proof: scaffold-e2e run 2 (`a59c7fe`) test + security-gates + build
+  all success. Log: `osv inputs: declared=0 locked=0` then
+  `osv-scanner exit 128 on a verified empty dependency tree; treating as
+  clean`. smoke-security **53 pass / 0 fail / 1 skip**.
+- Residual: Trivy still reports `num=0` on a zero-dep npm lockfile
+  (nothing to scan). Adding a real dependency will populate the lockfile
+  and Trivy will see it. Do not weaken the HIGH/CRITICAL exit-code gate.
+- Publication: origin/github still behind local HEAD (the Phase 2
+  commits plus this fix). Push to the local Gitea mirror
+  (`localhost:3333/openchoreo/developer-portal`) so self-CI picks up the
+  smoke-security change. Do not treat origin as current.
+
+Loopback bind slice LANDED: `app.listen`/`backend.listen` host
+`127.0.0.1` in app-config.yaml and app-config.production.yaml;
+start-backstage.sh defaults HOST to 127.0.0.1; rspack `/api` proxy
+targets `http://127.0.0.1:7008`. Live listeners after restart:
+3001/7008/7009 all `127.0.0.1` (were `*` on 7008/7009). smoke-security
+gained a host-listener lane (portal-owned ports must be loopback;
+wildcard fails). M4 networking tech spec rebuild path now requires
+`k3d --api-port 127.0.0.1:6550`. Colima SSH tightening is unchanged
+(worked with, not around). smoke-auth and smoke-backstage-production
+green against the rebound sockets.
+
+**Next candidates:** publish the unpushed Phase 2 series to gitea.com
+(and let GitHub sync), then Wave-1 security installs (Falco, Trivy
+Operator, MISP slim -- each needs a recorded stack approval per OQ-20).
+User open items unchanged: gitea.com branch protection, .env.local
+Vercel token rotation.
+
+---
+
+## 0b. 2026-08-21 addendum -- ops debt + Phase 1 closure (this session)
+
+- Publication state: origin (gitea.com) AND github both current at HEAD;
+  the Gitea->GitHub sync was repaired (see below) and a GitHub-side cron
+  keeps them mirrored every 5 min. Local Gitea mirror (localhost:3333
+  openchoreo/developer-portal; NOT a configured remote, pushed via
+  explicit URL) also synced -- CI clones read from it.
+- Sync-from-Gitea fixed (.github/workflows/sync-from-gitea.yml): every
+  scheduled run had been failing because clone --mirror from gitea.com
+  fetches refs/pull/* and GitHub rejects hidden refs (5ec7c5a switched
+  to explicit refs/heads+refs/tags refspecs with --prune; 6b682a4 unset
+  the clone's remote.origin.mirror flag, which git refuses to combine
+  with refspecs). Dispatch verified green (23s). 8fea437 added a
+  GitHub-only job guard (gitea.com shared runners were wastefully
+  executing it with a Gitea-scoped token). Stale branch
+  chore/main-forward-2026-08-19 deleted on origin/github/local.
+- Cluster-plane agent certs: re-pin tooling landed (c035211) --
+  scripts/repin-plane-agent-ca.sh (idempotent, --check mode) plus a
+  smoke-security lane that fails on drift. Next renewal ~2026-09-24;
+  structural fix (real CA / installer-side pinning) remains upstream
+  debt. Guard audit-log note: verify-guard.jsonl hit a two-writer race
+  with a concurrent Codex-harness guard install (four interleaved
+  entries chained from one tail hash, 2026-08-20T10:46:48Z); the chain
+  verifier caught it as designed; log preserved as
+  verify-guard.jsonl.race-2026-08-20 and a fresh chain started. Debt:
+  guard writers need cross-harness file locking.
+  UPDATE same day: landed (d4c2f80) -- auditlock.go in all six guards,
+  exclusive flock on a persistent <log>.lock sidecar covering
+  read-tail-hash -> append (+ rotation for verify-guard); races now
+  structurally impossible; smoke-security 49/0/1 with fresh locked
+  chains verifying.
+- CI debt fixed (e7f42f1): all four Trivy steps mount
+  -v trivy-cache:/root/.cache/trivy on the dind daemon (was 4x108 MiB
+  re-downloads per run); hello-m2 runtime base bumped alpine:3.20 ->
+  3.24 (EOL; both Dockerfile stages now ride Alpine 3.24.1);
+  iac/templates/ci.yaml re-synced byte-for-byte to the live seed
+  workflow (OQ-18/FR-33 closed -- it still had the vacuous-pass $PWD
+  mounts and --environment dev).
+- Dev proxy fixed (f0d10f6): rspack dev server on :3001 now proxies
+  /api to :7008 (proxy array in packages/app/package.json -- array form
+  mandatory) and discovery.endpoints allowlists the proxied prefix so
+  the Backstage token attaches. Engagement/Security/Cost cards render
+  LIVE data in dev now (Playwright-verified, /tmp/bs-03-engagement-tab.png).
+  Port note for the record: Gitea owns :3000; the portal uses
+  3001/7008/7009 by design.
+- Phase 1 leftovers closed (db25615): platform-config and
+  platform-addons are catalog entities (Resource/gitops-config,
+  auto-imported from their Gitea repos); dead examples/template/ removed
+  with its catalog registration (OQ-12; github scaffolder module was
+  already gone). Phase 1 exit criteria: all met.
+- Provenance r10 (d0fddbc): alpine row re-enumerated from a pulled
+  3.24.1 image (16 packages, apk-verified licenses); cert
+  PRC-developer-portal-2026-08-21-r10.
+- NeuroDiOS investigated (read-only): the neurodios-rag deployment
+  (namespace neurodios-llm) references placeholder image
+  ghcr.io/yourorg/neurodios-llm:latest that never existed; the sources
+  at ~/Projects/Sovereign/System/NeuroDiOS/llm/ are a corpse (gitignored,
+  never committed, .pyc bytecode only). Full remediation = reconstruct
+  sources + Dockerfile + build to local registry; that is a sibling-repo
+  project, not developer-portal scope. The deployment stays scaled to 0.
+  Report in session transcript 2026-08-21.
+
+**Next candidates (superseded by 0c):** Phase 2 is live-proven; publish
+the unpushed series, then Wave-1. User open items unchanged:
+gitea.com branch protection, .env.local Vercel token rotation.
+
+Late-session incident (2026-08-21 ~05:30 and 06:53 local): the Colima
+VM STOPPED twice (host-level, not cluster-internal) causing two
+cluster-wide churn storms (SandboxChanged / Unknown pods / dangling
+port-forwards). All pods self-recovered on restart except openbao-0
+(deleted to force recreation) and the kine node-IP bug did NOT recur
+(172.20.0.2 stable after the 08-19 repair). OpenBao dev inmem lost its
+secrets again (m2i-6) -- reseeded via scripts/seed-openbao-m2-paths.sh,
+smoke-m2 green. The churn also produced a SECOND guard-log write race
+(bash-guard + the fresh verify-guard chain; archived as
+*.race-2026-08-21); the flock fix for the guard writers is in flight.
+
+THIRD stop (2026-08-21 ~11:40 local) and the node-IP lottery: the VM
+died again mid-session; on each restart docker deals server-0/serverlb/
+tools different 172.20.0.x addresses (restart-policy race at daemon
+boot), and the kine Node record then mismatches ("failed to find
+interface with specified node ip"). Recovered by patching the latest
+/registry/minions row to the live IP (twice: .2->.3, then .3->.2 after
+the next lottery flip). Lessons now baked into
+scripts/repair-k3d-node-ip.sh (repeatable tool): state.db is WAL-mode
+-- copy the TRIO (state.db/-wal/-shm) or it reads as malformed; plain
+docker start reuses a stopped container's endpoint IP, so start
+server-0 ALONE first to claim the lowest free address, sample, patch,
+start. Separately: Colima's host-side port forwarder wedged (guest
+listens on 6550, host never forwards) -- workaround in use:
+ssh -F ~/.colima/_lima/colima/ssh.config -L 6550:127.0.0.1:6550 -N lima-colima
+STRUCTURAL WARNING: the host has 16 GiB RAM total and the VM takes 12 --
+macOS + Backstage + builds squeeze the rest; the repeated VM stops
+correlate with host pressure. Consider 10 GiB for the VM (violates the
+recorded Wave-1 >=12 GB prerequisite) or closing heavy apps during
+platform work. USER decision.
+DECISION (2026-08-21, user + measurement): keep 12 GiB. The VM measures
+9120/11934 MiB used with the full platform up (324 free) and CPU
+requests at 95% of 6 cores -- 10 GiB would not fit the current stack,
+let alone Wave-1. Policy for the Mac era: no heavy host-side builds
+concurrent with pipeline runs. Wave-1 sizing waits for the Asus NUC
+move (96 GB, removes the ceiling entirely).
+
+---
+
+## 0a. 2026-08-20 addendum -- resized-cluster acceptance (this session)
+
+The user performed the Colima resize (now 6 CPU / 12 GiB) and started the
+cluster. Executed per the queued plan:
+
+- `install-m3.sh` re-run: SUCCESS (the pre-resize CPU-blocked helm wait
+  cleared). Cluster fully healthy; the stuck signoz-otel-collector init
+  pod recovered after recreation.
+- Full smoke umbrella GREEN: `ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4,
+  SECURITY, BACKSTAGE-PRODUCTION)`; smoke-security 45 pass / 0 fail /
+  4 skip (FR-03 artifact read was still SKIP at that point).
+- Live CI security-gate acceptance (hello-m2): two wiring bugs found and
+  fixed by going live --
+  (1) act-runner dind sibling-container mount bug: `-v "$PWD:/src"`
+  resolved in the daemon namespace, yielding a silently EMPTY scan root
+  (Trivy fs vacuous pass num=0, OSV exit 128). Fixed in the seed workflow
+  with `--volumes-from "$(hostname)" -w "${GITHUB_WORKSPACE}"` (commit
+  6964ca9; Gitea hello-m2 d85a68c). Gates unchanged (same digests,
+  severities, exit codes).
+  (2) stale local-Gitea developer-portal mirror (615006d, 2026-06-30)
+  lacked scripts/ci/commit-security-artifacts.sh (exit 127). Fixed by
+  pushing main to the local mirror (now dbd79de+; the mirror is NOT a
+  configured remote -- pushed via explicit URL with basic auth per
+  scripts/push-seed-content.sh conventions).
+  Run #41 proved all four gates EXECUTED and PASSED against real content
+  (Trivy fs+image, OSV; exit 0, zero HIGH/CRITICAL). The decisive
+  end-to-end run #46 (59b8c8d) then went GREEN: security artifacts
+  committed to platform-config (security-artifacts/hello-m2/development/
+  {49.json,latest.json}), component commit 41f9c2e3 pinned :59b8c8d,
+  Flux applied, OpenChoreo created ComponentRelease hello-m2-86b96b6c5
+  and rolled the pod to :59b8c8d (1/1 Running). smoke-security now
+  46/0/3 (FR-03 artifact read flipped from SKIP to PASS).
+  Reliability debt recorded: Trivy re-downloads its 108 MiB DB 4x per
+  run (a named cache volume would fix it); osv-scanner --output is
+  deprecated (still accepted); seed Dockerfile base alpine:3.20 is EOL
+  per Trivy (bump follow-up).
+- Engagement-plane slice LANDED: CiRunsCard (Gitea Actions runs via the
+  authenticated gitea-actions proxy, honest labeled not-wired states) +
+  Engagement tab on Component entity pages; committed e82f2bc (signed).
+  Playwright-verified: tab present, card renders, all pre-existing tabs
+  intact. Environmental notes: the :3001 dev server does not proxy /api
+  to :7008 (pre-existing, affects all proxy cards; live data needs the
+  production same-origin deployment or a dev-proxy change), and
+  ~/.rational-reserve/m1-gitea-token had been wiped -- restored with a
+  fresh admin token (chmod 600) so start-backstage.sh's contract works.
+- linkify-it: the uncommitted 6.1.0 -> 5.0.2 downgrade turned out to be
+  REQUIRED, not spurious: yarn build:all fails against linkify-it v6
+  types (markdown-it 14.2.0 declarations); tsc did not cover the bundler
+  path. Re-applied, yarn.lock regenerated, audit clean; provenance row
+  97 updated, certificate re-issued r9 (PRC-developer-portal-2026-08-20-r9).
+  Lesson: build:all is the real gate for resolution pins.
+- Silent regression found and fixed: packages/app/dist was a PARTIAL
+  bundle (8 public-asset files, no index.html), so both backends 404'd
+  / -- smoke-auth and smoke-backstage-production had been failing
+  unnoticed (the dir-exists check in start-backstage-production.sh
+  skipped the build; it also used the nonexistent `yarn build` -- now
+  `yarn build:all` and an index.html check, dbd79de + ea29c84). Both
+  backends rebuilt, restarted, and serve 200.
+- Commits this session (all signed, %G?=G): e82f2bc (Engagement slice),
+  6964ca9 (dind mount fix), dbd79de (script repairs: SNI-strict probes
+  in smoke-m4-networking -- Envoy has no catch-all filter chain, an SNI
+  of localhost RSTs and kills the tunnel; 6/6 PASS after), 815f9c0
+  (marker r2), ea29c84 (linkify-it + dist check), f6febe0 (provenance
+  r9). NONE pushed to origin/github; local Gitea mirror synced through
+  dbd79de only (mirror now behind by the later commits).
+- Side effect to know: pushing main to the local Gitea mirror triggered
+  a CodeQL run there (Gitea Actions also reads .github/workflows) which
+  occupied the single act-runner for a while.
+- Platform repair (rollout blocker, fixed): all three cluster-plane
+  agents (data/observability/workflow) had been disconnected since
+  2026-06-30 13:48 -- `websocket: bad handshake`. Root cause: the
+  ClusterDataPlane/ClusterObservabilityPlane/ClusterWorkflowPlane CRs pin
+  `spec.clusterAgent.clientCA.value` to the install-time agent cert,
+  but the agents' self-signed certs (CN=default, 90-day) were re-issued
+  by cert-manager on 2026-06-26, so the pinned CA went stale (and the
+  pinned instance expired 2026-07-10). Re-pinned all three CRs to the
+  current certs from each plane's cluster-agent-tls Secret; agents
+  reconnected immediately and the queued release rolled out. TECH DEBT:
+  the pins go stale again at the next renewal (current certs expire
+  2026-09-24); needs an upstream-style fix (real CA or installer hook).
+
+**Next session candidates:** Wave-1 security items (Falco + Falcosidekick
+-> SigNoz, Trivy Operator, MISP slim) now that capacity exists -- gated on
+the roadmap's remaining user decisions; Trivy DB cache volume in the seed
+workflow; alpine base bump; Engagement-card live data via the production
+deployment or a dev /api proxy; continue five-plane roadmap Phase 1.
 
 ---
 

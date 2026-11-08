@@ -2,7 +2,36 @@
 
 > Action list ordered by priority and dependency.
 
-**Snapshot date:** 2026-06-30 (2026-08-18 addendum prepended)
+**Snapshot date:** 2026-06-30 (2026-08-24 gap register prepended)
+
+---
+
+## 2026-08-24 Gap register -- VERIFIED OPEN ITEMS (user directive: close gates before advancing)
+
+User ruling 2026-08-24: completion was conveyed while gates stood open
+(pattern on record: OSV vacuous pass pre-`3f27f0c`, silent catalog death
+pre-`48960a5`, unnoticed smoke failures pre-`dbd79de`). No phase
+advances while items below stand open. Statuses verified live today
+unless marked UNVERIFIED.
+
+| ID | Item | Status verified 2026-08-24 | Closure action |
+|---|---|---|---|
+| G1 | Dirty working tree: 42 modified + 20 untracked | **DONE** -- 8 signed commits `c08b4ba..a22f33f` (all %G?=G); tree clean except intentional `.claude/`; verify: tsc exit 0, go test OK, bash -n clean, YAML 12/12 | Remaining: push decision (remotes 8 behind; fidelity gate correctly FAILs remote-sync) |
+| G2 | Stash `wip-non-security-20260730`: 68 files, 925+/514-, overlaps live files (hello-m2 main.go +95) | **DONE** 2026-08-24 -- stash dropped; `git stash list` empty | Patch preserved at `~/.rational-reserve/backups/wip-non-security-20260730.patch` (3,357 lines, 68/68 diff headers, stat matches 925+/514-) for any future apply/split |
+| G3 | Cluster k3d-openchoreo degraded: kine Slow SQL 14-29 s, server-0 CPU 1241%, API handler timeouts | **DONE** -- rolling restart of server-0 (user-approved); node Ready, 72 pods Running / 1 PodInitializing, openbao-0 1/1 after reseed (`seed-openbao-m2-paths.sh` + `smoke-openbao.sh` PASS) | Full smoke-all re-run recommended when settled |
+| G4 | Cluster-plane agent cert pins stale at renewal; current certs expire 2026-09-24 | **DONE** 2026-08-26 -- proactive renewal executed: cluster-agent-tls Secrets deleted 19:06Z, cert-manager re-issued in <=10s (new expiry 2026-11-24); inverse proof captured (--check FAILed DRIFT on all 3 planes with old/new fingerprints verbatim); re-pin applied, --check PASS; agents reconnected to gateway in 2-3s ("connected to control plane"); pins survived the Colima cold restart | Recurs ~2026-11-24 -- rerun repin on renewal (smoke check fails loudly); structural fix (real CA) deferred upstream |
+| G5 | m2i-6 OpenBao dev-mode inmem loses secrets on restart | **DONE** 2026-08-26 -- live migration + ALL acceptance lanes closed: lane B Colima cold restart PASSED (auto-unseal ~35s after container start, zero human steps; all 4 FR-4 keys hash-identical across the bounce); final `smoke-all.sh --with-openbao-restart` exit 0, all six suites, FR-4 at 29s | None -- fully closed |
+| G6 | react-router 6.30.4 moderates | ACCEPTED RISK (SECURITY.md) | Upstream Backstage v7 support |
+| G7 | User actions: gitea.com branch protection (OQ-06); .env.local Vercel OIDC token rotation | PARTIAL 2026-08-26 -- OQ-06 VERIFIED CLOSED: gitea.com rule for `main` exists since 2026-08-18 (API-verified: enable_force_push=false, require_signed_commits=true, required_approvals=1, push whitelist trademonentumllc; wire-level force-push test not run -- local pre-push hook IN-H-002 blocks it by design). REMAINING: Vercel OIDC rotation only if the token was ever shared (needs user's Vercel login) | User (Vercel only, conditional) |
+| G8 | Phase 3 residual/friction tracker over real event sources (CI runs, smoke results, guard audit chains) | OPEN, gated | Spec triad required per POLICIES.md |
+| G14 | Dependabot open alerts went 3 -> 7 on the pushed series: urllib <=4.9.0 HIGH (GHSA-hq3h-g68c-hp78, CVSS 7.5, credential leak via cross-origin redirects) via infinispan ^0.12.0 -> urllib ^3.23.0 (patched 4.9.1, major bump -> yarn resolution needed); new react-router mediums beyond the 3 documented in SECURITY.md; elliptic low | **DONE** 2026-08-26 -- yarn resolution `urllib: 4.9.1` (backstage/package.json); `yarn why urllib` -> 4.9.1 via infinispan; `yarn npm audit --severity high` clean; `yarn tsc` exit 0; infinispan loads against 4.9.1; vulnerable path unexercised (no infinispan cache store configured). react-router mediums = same 3 GHSAs already accepted in SECURITY.md (no fixed 6.x; re-verified); elliptic low accepted (no patch). SECURITY.md + provenance updated; certificate re-issued r12 | Dependabot server-side alert closure follows on its next scan of the pushed fix |
+| G15 | Publication gate failed open on 2026-08-26: verify-guard produced ZERO audit entries for the day's 6 commits + pushes while commit-guard logged all of them. Root cause: under Kimi Code NO PreToolUse guards were registered (config.toml had no [[hooks]]); the commit-guard blocks seen in-session came from the harness-independent `.git/hooks/commit-msg` git layer. Second layer: the guard's SCA sensor is blind to the GHSA class -- pre-fix lockfile (urllib 3.27.3, vulnerable) audits CLEAN under `yarn npm audit --severity high` (measured vs HEAD~1 lockfile, exit 0); only GitHub dependabot saw it | PARTIAL 2026-08-26 -- layer (a) fixed: all 8 portfolio hooks registered in `~/.kimi-code/config.toml` (kimi doctor validated; active next session / after /reload; verify-guard timeout capped at Kimi's 600s max vs Claude's 1200); `.claude/` added to .gitignore so the clean-tree push gate is usable. OPEN remainders: (b) SCA sensor swap to a GHSA-covering scanner (OSV, already in CI) -- needs spec triad; (c) guard defect: verify-guard run from repo ROOT blocks commits with `toolchain-fail / go-vet ./...` (no go.mod at root; measured) -- multi-module awareness fix needed | Verify next session: a commit from repo root must produce a verify-guard audit entry; then spec the (b)+(c) fixes |
+| G16 | Cluster ports exposed on 0.0.0.0 (k3s API 6550, LB 8080/8443/10081-2/11080-2/11085/19080/19443 reachable from LAN) | **DONE** 2026-08-29 -- serverlb (stateless) recreated with HostIp 127.0.0.1 on all 11 PortBindings; lima override.yaml pins wildcard auto-forwards to hostIP 127.0.0.1 (verified effective post-bounce); inverse proof: all 11 ports REFUSE on LAN IP 192.168.1.12, OK on 127.0.0.1, before AND after a colima stop/start (persistence proven, serverlb same container, server-0 never recreated); smoke-all exit 0 post-bounce incl. SECURITY 61/0/1 with the wildcard-listener lane. Runbook: docs/runbooks/2026-08-29-loopback-binding.md | Residual, not cluster-owned: limactl `*:53` (lima user-v2 DNS, drops non-local queries app-layer, no rebind knob -- pf firewall or upstream lima issue if wanted); macOS apps (ControlCenter, rapportd, Logic Pro) out of scope |
+| G9 | `scripts/residual_ranking.py` (248 lines, carrier-derived, created 2026-08-24 09:27, NOT by Kimi) sits untracked in scripts/ | **DONE** -- relocated to `assessments/residual_ranking.py`, committed `754a72e` as parked external artifact | None |
+| G13 | self-CI run 288 unwatched | **DONE** -- run 288 (`1337215`) all three jobs success | None |
+| G10 | GitHub dependabot reports 6 advisories (5 moderate + 1 low) vs 3 documented moderates in SECURITY.md | **DISSOLVED** -- `gh api .../dependabot/alerts` shows exactly 3 open, all react-router/react-router-dom medium, matching SECURITY.md; the push banner counted non-open alerts | None |
+| G11 | smoke-all + self-CI rerun after the 2026-08-24 commit series and cluster restart | **DONE** -- ALL SMOKE SUITES PASSED (AUTH, M2, M3, M4, SECURITY, BACKSTAGE-PRODUCTION); self-CI run 287 (`516f85b`) go-tests + policy-tests + security-gates all success | None |
+| G12 | FR-08 "dashboards missing" | **DISSOLVED** -- dashboards existed since 08-22; lane parse bug (SigNoz v2 nests list under data.dashboards) caused false FAIL; fixed in smoke-m3.sh and install-m3.sh (idempotency verified: no duplicate creation) | None |
 
 ---
 
@@ -85,6 +114,50 @@ acceptance (lifecycle re-runs + live CI + smoke-all integration).
   repair note: kine DB node-IP patch after the Colima restart
   (backup at ~/.rational-reserve/backups/). NEXT USER STEP: Colima
   resize to >= 6 CPU / 12 GB, then the M3 re-run + live CI acceptance.
+- 2026-08-20 acceptance -- DONE: user resized Colima (6c/12GiB);
+  install-m3.sh re-run SUCCESS; smoke-all GREEN incl. security suite
+  (45/0/4); live CI gates proven (runs #39-#41 exposed and fixed the
+  dind --volumes-from mount bug, 6964ca9; stale local-Gitea mirror
+  synced through dbd79de); Engagement slice (CiRunsCard + tab) landed
+  e82f2bc; linkify-it re-pinned 5.0.2 for build:all (ea29c84, cert r9);
+  partial dist / 404 regression fixed (both backends rebuilt and 200).
+  Run #46 (59b8c8d) GREEN end-to-end: artifacts committed, Flux applied,
+  pod rolled to :59b8c8d. Rollout was blocked by a platform fault: all
+  three cluster-plane agents disconnected since 06-30 because the
+  Cluster*Plane CRs pin the install-time agent cert as clientCA and the
+  self-signed certs renewed 06-26 -- re-pinned to current certs (renews
+  break it again; next expiry 2026-09-24 -- needs an upstream fix).
+  New reliability debt: Trivy DB re-downloaded 4x per run (add a named
+  cache volume); seed Dockerfile alpine:3.20 EOL per Trivy; dev server
+  :3001 does not proxy /api to :7008 (pre-existing, all proxy cards
+  affected).
+- 2026-08-21 ops debt sweep -- DONE: cert re-pin tool + smoke drift
+  check (c035211; verify-guard.jsonl two-writer race with a concurrent
+  Codex harness recorded, log archived as .race-2026-08-20, fresh chain
+  started; structural fix = cross-harness file locking in guard
+  writers); Trivy named cache volume on all four steps + runtime base
+  alpine:3.24 + template re-synced to the live seed byte-for-byte
+  (e7f42f1, closes OQ-18/FR-33); dev /api proxy fixed and live-verified
+  (f0d10f6); Phase 1 leftovers closed (db25615: platform-config/
+  platform-addons catalog entities, dead example template removed,
+  OQ-11/OQ-12); provenance cert r10 (d0fddbc). Publication: origin +
+  github + local mirror all synced; Gitea->GitHub sync workflow repaired
+  (refs/pull rejection + mirror-flag conflict, 5ec7c5a/6b682a4) and
+  guarded GitHub-only (8fea437); stale chore/main-forward-2026-08-19
+  branch deleted everywhere.
+  CORRECTION same day: the OQ-12 half of db25615 was wrong -- the
+  roadmap's 'dead example-nodejs-template' note predates the 08-19
+  publish:gitea slice that made examples/template the LIVE project-
+  creation path; deleting it zeroed the catalog's Template entities.
+  Restored + re-registered (ee46a96). The github-module half of OQ-12
+  stays done.
+- 2026-08-21 Phase 2 -- LIVE-PROVEN: self-CI (FR-17/OQ-27) run 278/279
+  GREEN; scaffolder test-stage inheritance (FR-38/OQ-31) live-proven on
+  scaffold-e2e-20260821 run 2 after OSV empty-tree 128 was handled
+  fail-closed. Promotion stays manual (OQ-14).
+- 2026-08-21 loopback bind -- LANDED: Backstage :3001/:7008/:7009 bind
+  127.0.0.1 only; smoke-security fails on wildcard portal ports; Cilium
+  rebuild path records `k3d --api-port 127.0.0.1:6550`.
 
 ## 2026-08-18 Active goal: five-plane collaborative portal
 

@@ -71,7 +71,11 @@ func TestDispatchExec_Rejected(t *testing.T) {
 }
 
 func TestDefaultSteps_Go(t *testing.T) {
-	steps := defaultSteps(ToolchainGo, "/tmp")
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "go.mod"), []byte("module example.com/root\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	steps := defaultSteps(ToolchainGo, root)
 	if len(steps) < 2 {
 		t.Fatalf("expected at least 2 steps for Go, got %d", len(steps))
 	}
@@ -80,6 +84,78 @@ func TestDefaultSteps_Go(t *testing.T) {
 	}
 	if steps[1].Cmd != "go" || steps[1].Args[0] != "test" {
 		t.Errorf("second Go step should be go test, got %+v", steps[1])
+	}
+	if steps[0].WorkDir != "" {
+		t.Errorf("single-module repo must run steps at the root (empty WorkDir), got %q", steps[0].WorkDir)
+	}
+}
+
+func TestDefaultSteps_GoMultiModule(t *testing.T) {
+	root := t.TempDir()
+	// No go.mod at the root: two nested module roots must each get
+	// vet+test steps pinned to their own directory.
+	for _, mod := range []string{"tools/alpha", "plugins/beta"} {
+		dir := filepath.Join(root, mod)
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(dir, "go.mod"), []byte("module example.com/"+mod+"\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	steps := defaultSteps(ToolchainGo, root)
+	if len(steps) != 4 {
+		t.Fatalf("expected 4 steps (vet+test x2 modules), got %d: %+v", len(steps), steps)
+	}
+	dirs := map[string]int{}
+	for _, s := range steps {
+		if s.WorkDir == "" {
+			t.Errorf("multi-module step %q must set WorkDir, got empty", s.Name)
+		}
+		dirs[s.WorkDir]++
+		if s.Cmd != "go" || (s.Args[0] != "vet" && s.Args[0] != "test") {
+			t.Errorf("unexpected step %+v", s)
+		}
+	}
+	for _, mod := range []string{"tools/alpha", "plugins/beta"} {
+		if dirs[filepath.Join(root, mod)] != 2 {
+			t.Errorf("module %s: expected 2 steps, got %d", mod, dirs[filepath.Join(root, mod)])
+		}
+	}
+}
+
+func TestDefaultSteps_NodeMultiPackage(t *testing.T) {
+	root := t.TempDir()
+	// No root package.json: one nested yarn package root with tsconfig
+	// and a test script must yield yarn steps pinned to that dir.
+	app := filepath.Join(root, "app")
+	if err := os.MkdirAll(app, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	pkg := []byte(`{"name":"app","scripts":{"test":"jest"}}`)
+	if err := os.WriteFile(filepath.Join(app, "package.json"), pkg, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(app, "yarn.lock"), []byte(""), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(app, "tsconfig.json"), []byte(`{}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	steps := defaultSteps(ToolchainNode, root)
+	if len(steps) != 2 {
+		t.Fatalf("expected 2 steps (tsc + test) for nested yarn package, got %d: %+v", len(steps), steps)
+	}
+	for _, s := range steps {
+		if s.WorkDir != app {
+			t.Errorf("step %q WorkDir = %q, want %q", s.Name, s.WorkDir, app)
+		}
+		if s.Cmd != "yarn" {
+			t.Errorf("yarn package root must use yarn, got %q in %+v", s.Cmd, s)
+		}
+	}
+	if steps[0].Args[0] != "tsc" || steps[1].Args[0] != "test" {
+		t.Errorf("expected [yarn tsc, yarn test], got %+v", steps)
 	}
 }
 

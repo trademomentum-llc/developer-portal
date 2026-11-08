@@ -1,19 +1,20 @@
 # Provenance Recognition Certificate
 
-**Certificate ID:** PRC-developer-portal-2026-08-19-r8
+**Certificate ID:** PRC-developer-portal-2026-08-26-r12
 
-**Supersedes:** PRC-developer-portal-2026-08-18-r7 (scaffolder
-publish-to-Gitea re-issue: @backstage/plugin-scaffolder-backend-module-gitea
-added as a direct backend dependency (publish:gitea action);
-@backstage/plugin-scaffolder-backend-module-github marked REMOVED
-2026-08-19 -- dead dependency, declared but never registered, replaced by
-the Gitea module; its row is retained with the marker per the listing's
-removal convention. Component total 198, up from 197). Chain history:
-r1-r4 were issued and superseded before the provenance package's first
-commit and exist in no retained history; r5 entered git history at commit
-d85e568, r6 at 82783ee, and r7 at f20cff8; the retention-in-git-history
-rule in the Revocation and update rule section has been in force since
-r5, so r5, r6, r7, and this r8 are all retained.
+**Supersedes:** PRC-developer-portal-2026-08-21-r11 (urllib security
+re-issue: group 5 gained entry 129 -- urllib 4.9.1 resolution override
+pin added 2026-08-26 for GHSA-hq3h-g68c-hp78 (high, credential leak via
+cross-origin redirects; transitive via @backstage/backend-defaults ->
+infinispan ^0.12.0). Component total 198 -> 199; resolution override
+pins 47 -> 48. Also carries the r11-stale PROVENANCE.md change from the
+G5 OpenBao custody-artifact block, committed earlier the same day).
+Chain history: r1-r4 were issued and superseded before the provenance
+package's first commit and exist in no retained history; r5 entered git
+history at commit d85e568, r6 at 82783ee, and r7 at f20cff8; the
+retention-in-git-history rule in the Revocation and update rule section
+has been in force since r5, so r5 through r11 and this r12 are all
+retained.
 
 ---
 
@@ -42,9 +43,11 @@ components listed in `provenance/PROVENANCE.md`, grouped as follows:
 | 8. Documentation Tooling | 2 |
 | **Total** | **198** |
 
-The total includes one row retained with a REMOVED 2026-08-19 marker
-(@backstage/plugin-scaffolder-backend-module-github, group 5 #68): a
-removal is recorded, not erased, per the listing's convention.
+The total includes two rows retained with REMOVED markers
+(@backstage/plugin-scaffolder-backend-module-github, group 5 #68,
+REMOVED 2026-08-19; github/codeql-action, group 6 #9, REMOVED
+2026-08-21 -- org default CodeQL setup owns GitHub-side scanning):
+a removal is recorded, not erased, per the listing's convention.
 
 In addition, 3 UNVERIFIED items and honest gaps are recorded in the
 UNVERIFIED subsection of the listing (original U-numbers retained: U7,
@@ -86,20 +89,20 @@ is `provenance/PROVENANCE.md`; this table is a summary, not a duplicate.
 | 2. Helm Charts and Container Images | 16 | Apache-2.0, MIT, BSD-3-Clause, PostgreSQL (Cilium userspace Apache-2.0 with eBPF objects dual GPL-2.0-only OR BSD-2-Clause); deployed versions firmed 2026-08-18: Gitea chart gitea-12.5.0 / app 1.25.4, Gatekeeper v3.17.1 (matches pin), Envoy gateway v1.3.1 with envoy distroless-v1.33.0, act_runner 0.3.1 with dind 29.4.0-dind | github.com/fluxcd/flux2; gitea.com/gitea/helm-chart; github.com/SigNoz/signoz; github.com/envoyproxy/gateway |
 | 3. IaC Providers | 5 | MPL-2.0 | github.com/hashicorp/terraform-provider-kubernetes; github.com/alekc/terraform-provider-kubectl |
 | 4. Go Tooling and Modules | 22 | BSD-3-Clause, Apache-2.0, MIT, LGPL-2.1, MIT AND Apache-2.0 (x/net v0.56.0, x/sys v0.46.0, x/text v0.39.0 as of 2026-08-18; govulncheck firmed to v1.7.0, host-installed via go install) | go.dev; github.com/go-yaml/yaml; github.com/open-telemetry/opentelemetry-go |
-| 5. Backstage and Node.js | 128 | Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, ISC, BlueOak-1.0.0, (MPL-2.0 OR Apache-2.0); 47 resolution override pins (@octokit/* pins confirmed load-bearing via @backstage/integration); vendored Yarn 4.18.0 with npmMinimalAgeGate "7d"; plugin-scaffolder-backend-module-gitea added 2026-08-19 (publish:gitea), plugin-scaffolder-backend-module-github marked REMOVED the same day | github.com/backstage/backstage; github.com/facebook/react; github.com/yarnpkg/berry |
-| 6. CI/CD Actions and Images | 9 | MIT, MPL-2.0, BSD-3-Clause, GPL-2.0-only, Apache-2.0, MPL-2.0 AND MIT, MIT AND BSD-2-Clause AND GPL-2.0-or-later, Zlib; actions SHA-pinned 2026-08-18 (checkout v4.4.0, setup-go v5.6.0, setup-opentofu v1.0.8, codeql-action v4.37.7 mirror-scope); Trivy 0.74.0 and OSV-Scanner v2.5.1 digest-pinned (registry-manifest verified); base images floating-tag snapshots | github.com/actions/checkout; hub.docker.com/_/golang; hub.docker.com/_/alpine; hub.docker.com/_/node |
+| 5. Backstage and Node.js | 129 | Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, ISC, BlueOak-1.0.0, (MPL-2.0 OR Apache-2.0); 48 resolution override pins (@octokit/* pins confirmed load-bearing via @backstage/integration; urllib 4.9.1 pin added 2026-08-26 for GHSA-hq3h-g68c-hp78); vendored Yarn 4.18.0 with npmMinimalAgeGate "7d"; plugin-scaffolder-backend-module-gitea added 2026-08-19 (publish:gitea), plugin-scaffolder-backend-module-github marked REMOVED the same day | github.com/backstage/backstage; github.com/facebook/react; github.com/yarnpkg/berry |
+| 6. CI/CD Actions and Images | 9 | MIT, MPL-2.0, BSD-3-Clause, GPL-2.0-only, Apache-2.0, MPL-2.0 AND MIT, MIT AND BSD-2-Clause AND GPL-2.0-or-later, Zlib; actions SHA-pinned 2026-08-18 (checkout v4.4.0, setup-go v5.6.0, setup-opentofu v1.0.8); codeql-action marked REMOVED 2026-08-21 (org default CodeQL setup owns GitHub-side scanning); Trivy 0.74.0 and OSV-Scanner v2.5.1 digest-pinned (registry-manifest verified); base images floating-tag snapshots | github.com/actions/checkout; hub.docker.com/_/golang; hub.docker.com/_/alpine; hub.docker.com/_/node |
 | 7. Schemas and Specifications | 1 | Apache-2.0 (vendored schema byte-identical to score-spec/spec commit 3ecb17d430c2bbf46d2dfc161fabc7d432d6d1f5) | github.com/score-spec/spec |
 | 8. Documentation Tooling | 2 | BSD-2-Clause, Apache-2.0 | github.com/mkdocs/mkdocs; github.com/backstage/mkdocs-techdocs-core |
 
 ## Integrity
 
 SHA-256 digests computed with `shasum -a 256` at generation time
-(2026-08-19):
+(2026-08-26, r12):
 
 - `THIRD-PARTY-LICENSES.md`:
-  `d453454931970da2d909c7e0f417cc1e5b2ebed9c448e805af1b118a7c79821e`
+  `7bcf460be9bd1a02f2541b7930090461b3ce7a45ac8795a6cf25415ec5449109`
 - `provenance/PROVENANCE.md`:
-  `49dc4334fdcd7e81cc4a8dfd2eb3ef1133bb840e122a1c31439fb785f0782169`
+  `30c3ec968fc9263d6619cbc10c846774b05cea2a09f7f869c827e1556b4b48ec`
 
 Any change to either file invalidates the corresponding digest and
 requires this certificate to be regenerated. Verify with:
@@ -112,7 +115,7 @@ and compare against the values above.
 
 ## Attestation
 
-- **Date of issuance:** 2026-08-19
+- **Date of issuance:** 2026-08-26
 - **Issuer attestation:** Issued by the maintainers of developer-portal
   (Sovereign portfolio) on the date above, from the verified dependency
   inventory of the repository at that date.
