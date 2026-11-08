@@ -130,6 +130,9 @@ func TestAudit_PrevHashChain(t *testing.T) {
 }
 
 func TestAudit_PrevHashFailOpen(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("root bypasses the chmod-based read denial this test simulates")
+	}
 	tmp := filepath.Join(t.TempDir(), "audit.jsonl")
 	t.Setenv("RR_COMMIT_GUARD_AUDIT_LOG", tmp)
 

@@ -15,10 +15,16 @@
  * where GenerateK8sNameWithLengthLimit lives in
  * internal/dataplane/kubernetes/name.go.
  *
- * This file is a byte-for-byte semantic replica of that logic.
+ * This file is a byte-for-byte semantic replica of that logic for ASCII
+ * inputs (the only inputs Kubernetes object names allow in practice; all
+ * openchoreo.dev/* annotation values are ASCII slugs). Known boundary:
+ * upstream sanitizeName keeps Unicode letters (`unicode.IsLetter`) while
+ * this port maps non-ASCII to '-', and JS/Go Unicode case-folding differ
+ * (e.g. U+0130) -- non-ASCII parity is explicitly out of contract.
  *
- * Determinism guarantee: For any identical (c, p, e) triple the output string
- * is identical between the Go binary and this TS function.
+ * Determinism guarantee: For any identical ASCII (c, p, e) triple the output
+ * string is identical between the Go binary and this TS function, pinned by
+ * namespace-predictor.test.ts (FR-37), which executes the Go binary.
  *
  * Primary test vector (verified against the live cluster):
  *   predictRuntimeNamespace("default", "default", "development")
@@ -53,8 +59,12 @@ function sha256(message: string): Uint8Array {
   const len = msgBuffer.length;
 
   const bitLen = len * 8;
+  // paddingLen spans the 0x80 terminator byte plus the zero fill, so the
+  // total block size is len + paddingLen + 8 and lands on a 64-byte
+  // boundary. (An earlier revision added the terminator twice and produced
+  // non-SHA-256 digests; the Go/TS equality test pins this.)
   const paddingLen = (len % 64 < 56) ? (56 - (len % 64)) : (120 - (len % 64));
-  const padded = new Uint8Array(len + 1 + paddingLen + 8);
+  const padded = new Uint8Array(len + paddingLen + 8);
   padded.set(msgBuffer);
   padded[len] = 0x80;
 
@@ -229,8 +239,10 @@ export function predictRuntimeNamespace(
 }
 
 // ---------------------------------------------------------------------------
-// Embedded equivalence test vectors (run at import time in dev for sanity)
-// These must match the output of `go run main.go <c> <p> <e>` exactly.
+// Embedded equivalence test vectors (same table as main_test.go and the
+// FR-37 jest test). All expected values are outputs of the Go reference
+// binary; vector 0 is additionally verified against the live
+// k3d-openchoreo cluster.
 // ---------------------------------------------------------------------------
 
 const TEST_VECTORS: Array<{
@@ -242,6 +254,8 @@ const TEST_VECTORS: Array<{
   { c: 'default', p: 'default', e: 'development', expected: 'dp-default-default-development-f8e58905' },
   { c: 'default', p: 'hello-m2', e: 'development', expected: 'dp-default-hello-m2-development-bd0274a8' },
   { c: 'openchoreo-control', p: 'prod-api', e: 'production', expected: 'dp-openchoreo-co-prod-api-production-bf865e69' },
+  { c: 'underscore_ns', p: 'my_project', e: 'prod_env', expected: 'dp-underscore-ns-my-project-prod-env-f1cc0757' },
+  { c: 'long-control-ns', p: 'very-long-project-name-that-keeps-going', e: 'development', expected: 'dp-long-control--very-long-pro-development-121ccff5' },
 ];
 
 export function runSelfTest(): { passed: number; failed: number; details: string[] } {
@@ -261,6 +275,7 @@ export function runSelfTest(): { passed: number; failed: number; details: string
   return { passed, failed, details };
 }
 
-// Note: Placeholder expected values above are updated by cross-executing the
-// Go binary. The canonical vector #0 is authoritative and verified against the
-// live k3d-openchoreo cluster.
+// Note: every expected value above is the output of the Go reference binary;
+// vector #0 is authoritative and verified against the live k3d-openchoreo
+// cluster. The FR-37 jest test (namespace-predictor.test.ts) re-executes the
+// Go binary and asserts equality with this port for the same table.
