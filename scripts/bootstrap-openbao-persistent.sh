@@ -96,10 +96,38 @@ init_or_recover() {
     fi
 }
 
+# The unseal key is written to a 0600 temp file (umask 077) and passed with
+# --from-file, never --from-literal, so it does not appear in kubectl argv,
+# xtrace, or logs. A trap on EXIT/INT/TERM removes the file.
 sync_unseal_secret() {
-    kubectl -n "$OPENBAO_NS" create secret generic "$UNSEAL_SECRET" \
-        --from-literal=key="$UNSEAL_KEY" --dry-run=client -o yaml \
-        | kubectl apply -f - >/dev/null
+    local _xtrace=0 _rc=0
+    case "$-" in
+        *x*) _xtrace=1 ;;
+    esac
+    # Disable xtrace before any expansion of UNSEAL_KEY.
+    set +x
+    if [ -z "${UNSEAL_KEY:-}" ]; then
+        if [ "$_xtrace" -eq 1 ]; then
+            set -x
+        fi
+        fail "sync_unseal_secret: UNSEAL_KEY is empty"
+    fi
+    (
+        set +x
+        set -euo pipefail
+        umask 077
+        tmp=$(mktemp) || exit 1
+        trap 'rm -f -- "$tmp"' EXIT INT TERM
+        printf '%s' "$UNSEAL_KEY" > "$tmp"
+        chmod 600 "$tmp"
+        kubectl -n "$OPENBAO_NS" create secret generic "$UNSEAL_SECRET" \
+            --from-file=key="$tmp" --dry-run=client -o yaml \
+            | kubectl apply -f - >/dev/null
+    ) || _rc=$?
+    if [ "$_xtrace" -eq 1 ]; then
+        set -x
+    fi
+    [ "$_rc" -eq 0 ] || fail "could not apply secret $UNSEAL_SECRET (ns $OPENBAO_NS)"
     info "secret $UNSEAL_SECRET synced (ns $OPENBAO_NS)"
 }
 
