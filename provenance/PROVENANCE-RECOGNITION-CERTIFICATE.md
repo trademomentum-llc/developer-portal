@@ -1,19 +1,28 @@
 # Provenance Recognition Certificate
 
-**Certificate ID:** PRC-developer-portal-2026-08-26-r12
+**Certificate ID:** PRC-developer-portal-2026-11-18-r13
 
-**Supersedes:** PRC-developer-portal-2026-08-21-r11 (urllib security
-re-issue: group 5 gained entry 129 -- urllib 4.9.1 resolution override
-pin added 2026-08-26 for GHSA-hq3h-g68c-hp78 (high, credential leak via
-cross-origin redirects; transitive via @backstage/backend-defaults ->
-infinispan ^0.12.0). Component total 198 -> 199; resolution override
-pins 47 -> 48. Also carries the r11-stale PROVENANCE.md change from the
-G5 OpenBao custody-artifact block, committed earlier the same day).
+**Supersedes:** PRC-developer-portal-2026-08-26-r12 (dependency
+re-issue for PR #52, which clears the critical and high Dependabot alerts on
+`backstage/yarn.lock`). Group 5 was regenerated from the installed tree:
+the version cells and evidence line numbers were re-derived, and rows
+130-146 were added. Those rows cover 12 resolution pins added in PR #52
+(proxy-addr, node-forge, compression, source-map-js, @azure/identity,
+isomorphic-git, @backstage/plugin-techdocs-node, zod,
+@backstage/catalog-model, @backstage/cli-module-auth,
+@backstage/cli-module-new, @graphql-tools/utils) and 5 pins that earlier
+changes added without a listing row (browserslist,
+baseline-browser-mapping, mysql2, postcss-selector-parser, handlebars).
+This re-issue also catches up the dependency changes that landed after r12
+without a regeneration (#15-#19, #33, #34, #37-#39, 80ea799). Group 5 goes
+from 129 to 146 entries, the component total from 199 to 216, and the
+resolution override rows from 48 to 65. The r12 Subject table still showed
+the pre-r12 figures (198 total, group 5 at 128); this issue corrects them.
 Chain history: r1-r4 were issued and superseded before the provenance
-package's first commit and exist in no retained history; r5 entered git
-history at commit d85e568, r6 at 82783ee, and r7 at f20cff8; the
+package's first commit and exist in no retained history. r5 entered git
+history at commit d85e568, r6 at 82783ee and r7 at f20cff8. The
 retention-in-git-history rule in the Revocation and update rule section
-has been in force since r5, so r5 through r11 and this r12 are all
+has been in force since r5, so r5 through r12 and this r13 are all
 retained.
 
 ---
@@ -28,7 +37,7 @@ retained.
 
 ## Subject
 
-The third-party works recognized by this certificate are the 198
+The third-party works recognized by this certificate are the 216
 components listed in `provenance/PROVENANCE.md`, grouped as follows:
 
 | Group | Entries |
@@ -37,11 +46,11 @@ components listed in `provenance/PROVENANCE.md`, grouped as follows:
 | 2. Helm Charts and Container Images | 16 |
 | 3. IaC Providers | 5 |
 | 4. Go Tooling and Modules | 22 |
-| 5. Backstage and Node.js | 128 |
+| 5. Backstage and Node.js | 146 |
 | 6. CI/CD Actions and Images | 9 |
 | 7. Schemas and Specifications | 1 |
 | 8. Documentation Tooling | 2 |
-| **Total** | **198** |
+| **Total** | **216** |
 
 The total includes two rows retained with REMOVED markers
 (@backstage/plugin-scaffolder-backend-module-github, group 5 #68,
@@ -55,7 +64,10 @@ U19, U25), one residual caveat carried forward from the closed U17 (the
 ephemeral catthehacker CI job image), and one documented accepted
 residual risk (react-router/react-router-dom 6.30.4, three moderate
 advisories, no fixed 6.x, v7 rejected as unsupported against all
-Backstage peer ranges; accepted 2026-08-18). cert-manager and Argo
+Backstage peer ranges; accepted 2026-08-18). The listing records that
+this risk is superseded: as measured 2026-11-18 the installed version is
+7.18.4, outside the ^6.30.2 Backstage peer range (yarn YN0060). Runtime
+impact is UNVERIFIED. cert-manager and Argo
 Workflows are confirmed live as sibling-openchoreo-managed components
 (v1.19.4 and v3.6.2, both Apache-2.0) but remain outside this repo's
 component scope and are not listed as components.
@@ -89,36 +101,41 @@ is `provenance/PROVENANCE.md`; this table is a summary, not a duplicate.
 | 2. Helm Charts and Container Images | 16 | Apache-2.0, MIT, BSD-3-Clause, PostgreSQL (Cilium userspace Apache-2.0 with eBPF objects dual GPL-2.0-only OR BSD-2-Clause); deployed versions firmed 2026-08-18: Gitea chart gitea-12.5.0 / app 1.25.4, Gatekeeper v3.17.1 (matches pin), Envoy gateway v1.3.1 with envoy distroless-v1.33.0, act_runner 0.3.1 with dind 29.4.0-dind | github.com/fluxcd/flux2; gitea.com/gitea/helm-chart; github.com/SigNoz/signoz; github.com/envoyproxy/gateway |
 | 3. IaC Providers | 5 | MPL-2.0 | github.com/hashicorp/terraform-provider-kubernetes; github.com/alekc/terraform-provider-kubectl |
 | 4. Go Tooling and Modules | 22 | BSD-3-Clause, Apache-2.0, MIT, LGPL-2.1, MIT AND Apache-2.0 (x/net v0.56.0, x/sys v0.46.0, x/text v0.39.0 as of 2026-08-18; govulncheck firmed to v1.7.0, host-installed via go install) | go.dev; github.com/go-yaml/yaml; github.com/open-telemetry/opentelemetry-go |
-| 5. Backstage and Node.js | 129 | Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, ISC, BlueOak-1.0.0, (MPL-2.0 OR Apache-2.0); 48 resolution override pins (@octokit/* pins confirmed load-bearing via @backstage/integration; urllib 4.9.1 pin added 2026-08-26 for GHSA-hq3h-g68c-hp78); vendored Yarn 4.18.0 with npmMinimalAgeGate "7d"; plugin-scaffolder-backend-module-gitea added 2026-08-19 (publish:gitea), plugin-scaffolder-backend-module-github marked REMOVED the same day | github.com/backstage/backstage; github.com/facebook/react; github.com/yarnpkg/berry |
+| 5. Backstage and Node.js | 146 | Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, ISC, BlueOak-1.0.0, (MPL-2.0 OR Apache-2.0), (BSD-3-Clause OR GPL-2.0) (node-forge, first listed 2026-11-18); 65 resolution override rows (74 resolution keys over 69 packages; 2026-11-18 PR #52 pins for proxy-addr, node-forge, compression, source-map-js, @azure/identity, isomorphic-git, techdocs-node 1.15.6, zod 4.6.7, catalog-model, cli-module-auth/new, @graphql-tools/utils 12.1.0, catalog-backend 3.9.2); vendored Yarn 4.18.0 with npmMinimalAgeGate "7d"; plugin-permission-backend-module-allow-all-policy marked REMOVED (de1ac07, 2026-08-18) | github.com/backstage/backstage; github.com/facebook/react; github.com/yarnpkg/berry |
 | 6. CI/CD Actions and Images | 9 | MIT, MPL-2.0, BSD-3-Clause, GPL-2.0-only, Apache-2.0, MPL-2.0 AND MIT, MIT AND BSD-2-Clause AND GPL-2.0-or-later, Zlib; actions SHA-pinned 2026-08-18 (checkout v4.4.0, setup-go v5.6.0, setup-opentofu v1.0.8); codeql-action marked REMOVED 2026-08-21 (org default CodeQL setup owns GitHub-side scanning); Trivy 0.74.0 and OSV-Scanner v2.5.1 digest-pinned (registry-manifest verified); base images floating-tag snapshots | github.com/actions/checkout; hub.docker.com/_/golang; hub.docker.com/_/alpine; hub.docker.com/_/node |
 | 7. Schemas and Specifications | 1 | Apache-2.0 (vendored schema byte-identical to score-spec/spec commit 3ecb17d430c2bbf46d2dfc161fabc7d432d6d1f5) | github.com/score-spec/spec |
 | 8. Documentation Tooling | 2 | BSD-2-Clause, Apache-2.0 | github.com/mkdocs/mkdocs; github.com/backstage/mkdocs-techdocs-core |
 
 ## Integrity
 
-SHA-256 digests computed with `shasum -a 256` at generation time
-(2026-08-26, r12):
+SHA-256 digests computed with `sha256sum` (GNU coreutils; same SHA-256
+output as `shasum -a 256`) after the final content of both files was
+written (2026-11-18, r13):
 
 - `THIRD-PARTY-LICENSES.md`:
-  `7bcf460be9bd1a02f2541b7930090461b3ce7a45ac8795a6cf25415ec5449109`
+  `74c54c4b4db02d29dab0a328b9cc232142d0883bfaf0d1e5ed1cb8d1a4a48288`
 - `provenance/PROVENANCE.md`:
-  `30c3ec968fc9263d6619cbc10c846774b05cea2a09f7f869c827e1556b4b48ec`
+  `72f3594474598a3db09800d7ea30e06aaa40284dd8cec9e404596ababa6e2995`
 
 Any change to either file invalidates the corresponding digest and
 requires this certificate to be regenerated. Verify with:
 
 ```
 shasum -a 256 THIRD-PARTY-LICENSES.md provenance/PROVENANCE.md
+# or: sha256sum THIRD-PARTY-LICENSES.md provenance/PROVENANCE.md
 ```
 
 and compare against the values above.
 
 ## Attestation
 
-- **Date of issuance:** 2026-08-26
+- **Date of issuance:** 2026-11-18 (America/New_York)
 - **Issuer attestation:** Issued by the maintainers of developer-portal
   (Sovereign portfolio) on the date above, from the verified dependency
-  inventory of the repository at that date.
+  inventory of the repository at that date. The r13 inventory was
+  measured on a Linux build host from a fresh clone at PR #52's branch
+  (the `Repository` path above is the maintainers' canonical checkout and
+  was not used for this issue).
 - **Nature of the credential:** This certificate is project-issued
   (self-attested). It contains no external cryptographic signatures and
   no third-party endorsements. Its evidentiary value rests on the
