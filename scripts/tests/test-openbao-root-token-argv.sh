@@ -629,6 +629,8 @@ assert_handoff_file_gone
 pass "handoff_root_token does not leak the token under xtrace"
 
 # --- 9e-g. write/chmod/empty-file faults must not reach kubectl ---
+# Faults are injected with PATH shims (and enable -n for the printf builtin).
+# Injection is mechanism-based and UID-independent; do not use file modes.
 # Record the mktemp path so we can assert the trap deleted the file even
 # when kubectl (which is what normally records --from-file=) is never called.
 install_recording_mktemp() {
@@ -644,20 +646,15 @@ MOCK
     /usr/bin/chmod +x "$BIN/mktemp"
 }
 
-install_unwritable_mktemp() {
-    cat > "$BIN/mktemp" << 'MOCK'
+# $1 = exit status. Stdout is always empty; never prints a secret value.
+# Callers must `enable -n printf` so the builtin is not used.
+install_printf_stub() {
+    local rc="$1"
+    cat > "$BIN/printf" << MOCK
 #!/usr/bin/env bash
-set -euo pipefail
-dir=${KUBECTL_RECORD_DIR:?}
-real=$(PATH=/usr/bin:/bin:/usr/sbin:/sbin type -P mktemp)
-f=$("$real" "$@")
-printf '%s\n' "$f" > "$dir/handoff-token-path"
-# Leave the file non-writable so the subsequent printf redirect fails
-# (same class of fault as writing to /dev/full).
-/usr/bin/chmod a-w "$f"
-printf '%s\n' "$f"
+exit ${rc}
 MOCK
-    /usr/bin/chmod +x "$BIN/mktemp"
+    /usr/bin/chmod +x "$BIN/printf"
 }
 
 remove_command_stubs() {
@@ -682,13 +679,18 @@ assert_fault_cleanup() {
     assert_handoff_file_gone
 }
 
-# 9e. write failure (unwritable temp file): no kubectl, non-zero, file gone
+# 9e. write failure (PATH printf stub exits 1): no kubectl, non-zero, file gone
 reset_records
 rm -f "$RECORD"/handoff-*
 install_handoff_mock
-install_unwritable_mktemp
+install_recording_mktemp
+install_printf_stub 1
 hash -r
-if (handoff_root_token >/dev/null 2>"$TMP/handoff-write-fail.err"); then
+if (
+    enable -n printf
+    hash -r
+    handoff_root_token >/dev/null 2>"$TMP/handoff-write-fail.err"
+); then
     remove_command_stubs
     fail "handoff_root_token should have failed when writing the temp token file failed"
 fi
@@ -715,17 +717,12 @@ remove_command_stubs
 assert_fault_cleanup "$TMP/handoff-chmod-fail.err"
 pass "handoff_root_token chmod failure: kubectl not invoked, non-zero, temp file deleted, token off argv and stderr"
 
-# 9g. zero-byte file (shadowed printf writes nothing): no kubectl, non-zero, file gone
+# 9g. zero-byte file (PATH printf stub exits 0 with no output): no kubectl, non-zero, file gone
 reset_records
 rm -f "$RECORD"/handoff-*
 install_handoff_mock
 install_recording_mktemp
-cat > "$BIN/printf" << 'MOCK'
-#!/usr/bin/env bash
-# Succeed with no output so the redirect leaves a zero-byte file.
-exit 0
-MOCK
-/usr/bin/chmod +x "$BIN/printf"
+install_printf_stub 0
 hash -r
 if (
     enable -n printf
@@ -972,6 +969,7 @@ assert_unseal_file_gone
 pass "sync_unseal_secret does not leak the unseal key under xtrace"
 
 # --- 10e-g. write/chmod/empty-file faults must not reach kubectl ---
+# Same UID-independent PATH shims as 9e-g. Do not use file modes.
 install_recording_mktemp_unseal() {
     cat > "$BIN/mktemp" << 'MOCK'
 #!/usr/bin/env bash
@@ -985,22 +983,6 @@ MOCK
     /usr/bin/chmod +x "$BIN/mktemp"
 }
 
-install_unwritable_mktemp_unseal() {
-    cat > "$BIN/mktemp" << 'MOCK'
-#!/usr/bin/env bash
-set -euo pipefail
-dir=${KUBECTL_RECORD_DIR:?}
-real=$(PATH=/usr/bin:/bin:/usr/sbin:/sbin type -P mktemp)
-f=$("$real" "$@")
-printf '%s\n' "$f" > "$dir/unseal-key-path"
-# Leave the file non-writable so the subsequent printf redirect fails
-# (same class of fault as writing to /dev/full).
-/usr/bin/chmod a-w "$f"
-printf '%s\n' "$f"
-MOCK
-    /usr/bin/chmod +x "$BIN/mktemp"
-}
-
 assert_unseal_fault_cleanup() {
     local err="$1"
     assert_kubectl_not_invoked
@@ -1009,13 +991,18 @@ assert_unseal_fault_cleanup() {
     assert_unseal_file_gone
 }
 
-# 10e. write failure (unwritable temp file)
+# 10e. write failure (PATH printf stub exits 1)
 reset_records
 rm -f "$RECORD"/unseal-*
 install_unseal_mock
-install_unwritable_mktemp_unseal
+install_recording_mktemp_unseal
+install_printf_stub 1
 hash -r
-if (sync_unseal_secret >/dev/null 2>"$TMP/unseal-write-fail.err"); then
+if (
+    enable -n printf
+    hash -r
+    sync_unseal_secret >/dev/null 2>"$TMP/unseal-write-fail.err"
+); then
     remove_command_stubs
     fail "sync_unseal_secret should have failed when writing the temp unseal-key file failed"
 fi
@@ -1042,17 +1029,12 @@ remove_command_stubs
 assert_unseal_fault_cleanup "$TMP/unseal-chmod-fail.err"
 pass "sync_unseal_secret chmod failure: kubectl not invoked, non-zero, temp file deleted, key off argv and stderr"
 
-# 10g. zero-byte file (shadowed printf writes nothing)
+# 10g. zero-byte file (PATH printf stub exits 0 with no output)
 reset_records
 rm -f "$RECORD"/unseal-*
 install_unseal_mock
 install_recording_mktemp_unseal
-cat > "$BIN/printf" << 'MOCK'
-#!/usr/bin/env bash
-# Succeed with no output so the redirect leaves a zero-byte file.
-exit 0
-MOCK
-/usr/bin/chmod +x "$BIN/printf"
+install_printf_stub 0
 hash -r
 if (
     enable -n printf
@@ -1065,6 +1047,5 @@ fi
 remove_command_stubs
 assert_unseal_fault_cleanup "$TMP/unseal-empty-fail.err"
 pass "sync_unseal_secret zero-byte file: kubectl not invoked, non-zero, temp file deleted, key off argv and stderr"
-
 
 printf 'All tests passed\n'
