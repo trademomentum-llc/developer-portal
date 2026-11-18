@@ -17,15 +17,51 @@
 > to trust the snapshot without re-deriving it. Freshness of this file is
 > enforced by scripts/check-handoff-fidelity.sh.
 
-**Last updated:** 2026-11-18 (ET; see 0v)
-**Reason for handoff:** PR #52 dependency and provenance change: the critical
-and high Dependabot alerts on backstage/yarn.lock were cleared on branch
-fix/backstage-yarn-alerts, and the provenance triple was regenerated
-(cert r13). The branch is not merged. Details in 0v.
+**Last updated:** 2026-11-18 (ET; see 0w)
+**Reason for handoff:** PR #53 CI and provenance change: CodeQL advanced
+setup (`.github/workflows/codeql.yml`) on fork branch
+trademomentumllc:ci/codeql-advanced-setup, the Lane D smoke contract
+inverted to require it, and the provenance triple regenerated (cert r14).
+The branch is not merged. Details in 0w.
+**Previous reason (2026-11-18, 0v):** PR #52 dependency and provenance
+change (cert r13); merged as 6a06f65.
 **Previous reason (2026-08-29):** Sandbox-home cleanup executed
 (user-directed): ~/Projects fake-home artifacts merged into real home or
 deleted; keychain Local Items store repatriated; orphaned ssh-agent
 killed. Details in 0u.
+
+---
+
+## 0w. 2026-11-18 addendum (afternoon, America/New_York) -- PR #53 CodeQL advanced setup and provenance change
+
+CI and provenance change on fork branch
+`trademomentumllc:ci/codeql-advanced-setup` (PR #53). NOT merged to main
+at snapshot time. Times are ET (UTC-5). Linux build box, fresh clone.
+
+- BASE: `git merge-base HEAD origin/main` -> `6a06f65` (main, PR #52
+  merge); `git log --format='%h %s' origin/main..HEAD` before this
+  commit -> `674c1f4` (ci: add CodeQL advanced setup), `a17a41d`
+  (test(smoke): assert the advanced CodeQL workflow contract).
+- WORKFLOW: `.github/workflows/codeql.yml`, jobs `Analyze (go|python|
+  javascript-typescript)`, security-extended, go autobuild, others none.
+  Org default setup was turned off by IT at 1:50 PM ET (not by this
+  change); after that the rerun on 674c1f4 measured Analyze x3 SUCCESS
+  (`gh api .../commits/674c1f4.../check-runs`). Before that all three
+  failed with "CodeQL analyses from advanced configurations cannot be
+  processed when the default setup is enabled".
+- SMOKE: `bash scripts/smoke-security.sh` -> rc 0, "44 passed, 0 failed,
+  12 skipped" (cluster lanes skip: no cluster on this host; rr-audit-chain
+  built locally into the gitignored bin/). Inverse proof:
+  `bash scripts/tests/test-smoke-codeql-contract.sh` -> rc 0, case A
+  (committed file) passes and cases B-O (14 tampered copies) each fail
+  with the expected reason.
+- PROVENANCE: group 6 rows 1 (checkout v7.0.1 added) and 9
+  (codeql-action v4.39.3 restored) regenerated; certificate reissued as
+  PRC-developer-portal-2026-11-18-r14. `sha256sum THIRD-PARTY-LICENSES.md
+  provenance/PROVENANCE.md` -> values recorded in the certificate
+  (`sha256sum -c` OK).
+- UNVERIFIED: maintainers' macOS checkout not consulted; remote-sync lane
+  of check-handoff-fidelity.sh fails by design until PR #53 merges.
 
 ---
 

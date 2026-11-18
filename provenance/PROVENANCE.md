@@ -31,6 +31,17 @@ and usage.
   package's package.json `license` field and LICENSE header. Groups 1-4
   and 6-8 were not re-measured in this regeneration and carry their
   earlier verification dates.
+- Regeneration of 2026-11-18 (certificate r14, PR #53): group 6 only.
+  PR #53 adds `.github/workflows/codeql.yml` (CodeQL advanced setup). Row 1
+  gains the actions/checkout v7.0.1 pin used there; row 9
+  (github/codeql-action) is restored from REMOVED to active at v4.39.3.
+  Both pins were re-resolved on 2026-11-18 with `git ls-remote`
+  (checkout `refs/tags/v7.0.1` -> `3d3c42e5aac5ba805825da76410c181273ba90b1`, lightweight;
+  codeql-action `refs/tags/v4.39.3` -> tag object `f3bbb056`, peeled
+  `refs/tags/v4.39.3^{}` -> `33d7b85da1a04171e211befe2c739303b9a4c066`), and both upstream
+  LICENSE files were read at the pinned commits (MIT). Group 6 stays at 9
+  entries and the component total at 216. Groups 1-5 and 7-8 were not
+  re-measured in this regeneration.
 
 ## Authoritative dependency closure
 
@@ -382,7 +393,7 @@ Gitea integration):
 
 | # | Component | Version/pin | Upstream URL | License (SPDX) | Copyright holder | Usage mode | Evidence |
 |---|---|---|---|---|---|---|---|
-| 1 | actions/checkout | pinned SHA 11d5960a326750d5838078e36cf38b85af677262 (v4.4.0, lightweight tag; pinned 2026-08-18, previously the mutable @v4 tag) | https://github.com/actions/checkout | MIT | GitHub, Inc. and contributors (2018) | fetched at install time (CI action) | iac/templates/ci.yaml:13; seed-repos/hello-m2/.gitea/workflows/ci.yaml:13 |
+| 1 | actions/checkout | pinned SHA 3d3c42e5aac5ba805825da76410c181273ba90b1 (v7.0.1, lightweight tag; added 2026-11-18 by PR #53, GitHub CodeQL workflow) and pinned SHA 11d5960a326750d5838078e36cf38b85af677262 (v4.4.0, lightweight tag; pinned 2026-08-18, previously the mutable @v4 tag; Gitea CI templates) | https://github.com/actions/checkout | MIT | GitHub, Inc. and contributors (2018) | fetched at install time (CI action) | .github/workflows/codeql.yml:35 (v7.0.1); iac/templates/ci.yaml:13; seed-repos/hello-m2/.gitea/workflows/ci.yaml:13 (v4.4.0) |
 | 2 | actions/setup-go | pinned SHA 40f1582b2485089dde7abd97c1529aa768e1baff (v5.6.0; pinned 2026-08-18, previously the mutable @v5 tag); installs Go 1.26 | https://github.com/actions/setup-go | MIT | GitHub, Inc. and contributors (2018) | fetched at install time (CI action) | iac/templates/ci.yaml:16-18; seed-repos/hello-m2/.gitea/workflows/ci.yaml:16-18 |
 | 3 | opentofu/setup-opentofu | pinned SHA 9d84900f3238fab8cd84ce47d658d25dd008be2f (v1.0.8; pinned 2026-08-18, previously the mutable @v1 tag); installs OpenTofu 1.9.0 | https://github.com/opentofu/setup-opentofu | MPL-2.0 | OpenTofu Authors (LICENSE records Copyright (c) 2020 HashiCorp, Inc., inherited from forked hashicorp/setup-terraform) | fetched at install time (CI action) | iac/templates/ci.yaml:31; seed-repos/hello-m2/.gitea/workflows/ci.yaml:31 |
 | 4 | golang (Docker Official Image) | tag 1.26-alpine (no digest) | https://hub.docker.com/_/golang | BSD-3-Clause (Go toolchain) | The Go Authors / Google LLC | runtime image (CI build stage) | seed-repos/hello-m2/Dockerfile:1 |
@@ -390,13 +401,15 @@ Gitea integration):
 | 6 | node (Docker Official Image) | tag 24-trixie-slim (no digest; floating tag, snapshot 2026-08-18) | https://hub.docker.com/_/node + https://github.com/nodejs/docker-node | MIT (image build files and Node.js runtime; runtime bundles third-party libraries under their own licenses incl. Apache-2.0, Unicode-3.0, BSD variants); Debian trixie-slim base layer: debootstrap minbase from Debian main only (all packages DFSG-free per the Debian Social Contract), per-package list not enumerated (PARTIAL) | Joyent, Inc. and Node.js contributors; Debian Project (base layer, not enumerated) | runtime image (Backstage backend image base; pulled at docker build time via yarn build-image; upstream Dockerfile FROM debian:trixie-slim, NODE_VERSION=24.19.0) | backstage/packages/backend/Dockerfile:15; backstage/packages/backend/package.json:16 |
 | 7 | Trivy | image aquasec/trivy:0.74.0@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969 (digest verified against the registry manifest for tag 0.74.0, 2026-08-18) | https://github.com/aquasecurity/trivy | Apache-2.0 | Aqua Security (upstream org; stock Apache-2.0 LICENSE, no filled copyright line) | runtime image (CI scanning gates: filesystem and image scans with SARIF artifacts); digest-pinned following the March 2026 Trivy supply-chain compromise (CVE-2026-33634) | seed-repos/hello-m2/.gitea/workflows/ci.yaml:29-45,92-107; iac/templates/ci.yaml:29-45,77-92 |
 | 8 | OSV-Scanner | image ghcr.io/google/osv-scanner:v2.5.1@sha256:8108ae94eadea5a02c9bec6e646909d5b790b44bd62d7f5b7f0b1d6d0ffc7734 (digest verified against the registry manifest for tag v2.5.1, 2026-08-18) | https://github.com/google/osv-scanner | Apache-2.0 | Google | runtime image (CI dependency scan gate; suppression file seed-repos/hello-m2/osv-scanner.toml) | seed-repos/hello-m2/.gitea/workflows/ci.yaml:44; iac/templates/ci.yaml:44; seed-repos/hello-m2/osv-scanner.toml |
-| 9 | CodeQL action (github/codeql-action) (REMOVED 2026-08-21) | was pinned SHA ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd (annotated tag v4.37.7 peeled commit; re-verified via ls-remote 2026-08-18) | https://github.com/github/codeql-action | MIT | GitHub (LICENSE: Copyright (c) 2020 GitHub) | REMOVED: the org's "GitHub recommended" code-security configuration enables CodeQL default setup, which rejects SARIF from an in-repo advanced workflow; code-scanning.yml removed, GitHub-side scanning now owned by the org default setup (GitHub-managed, MIT action remains its upstream; the CodeQL CLI terms note still applies to that managed path) | formerly .github/workflows/code-scanning.yml |
+| 9 | CodeQL action (github/codeql-action) (restored 2026-11-18; was REMOVED 2026-08-21) | pinned SHA 33d7b85da1a04171e211befe2c739303b9a4c066 (v4.39.3, annotated tag object f3bbb05694c2f74569081c28664c0866d64dec21 peeled commit; resolved via ls-remote 2026-11-18); sub-actions init, autobuild, analyze at the same commit; previously pinned ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd (v4.37.7) in the removed code-scanning.yml | https://github.com/github/codeql-action | MIT | GitHub (LICENSE: Copyright (c) 2020 GitHub) | fetched at install time (CI action): CodeQL advanced setup producing the required Analyze (go), Analyze (python), Analyze (javascript-typescript) contexts on main (security-extended; go autobuild, python and javascript-typescript none); replaces the org default setup, which is turned off after PR #53 merges. The CodeQL CLI binaries the action downloads at runtime carry their own custom terms (github/codeql-cli-binaries, no SPDX identifier) | .github/workflows/codeql.yml:40,48,51 |
 
 Base images in this group remain tag-only (no digests); the three actions
 were pinned to commit SHAs and the two scanner images (Trivy, OSV-Scanner)
-are digest-pinned as of 2026-08-18 (see the entries above).
-`.github/workflows/sync-from-gitea.yml` uses no third-party GitHub
-Actions. jq, curl, docker, and git in CI steps are runner-image-provided
+are digest-pinned as of 2026-08-18 (see the entries above). The two
+actions in `.github/workflows/codeql.yml` (checkout v7.0.1, codeql-action
+v4.39.3) are full-SHA pinned as of 2026-11-18. The former
+`.github/workflows/sync-from-gitea.yml` (no third-party GitHub Actions)
+was deleted by PR #42 (2026-11-09). jq, curl, docker, and git in CI steps are runner-image-provided
 binaries with no repo-level pin.
 
 Base-layer detail (snapshot 2026-08-21): since the 2026-08-21 bump, both

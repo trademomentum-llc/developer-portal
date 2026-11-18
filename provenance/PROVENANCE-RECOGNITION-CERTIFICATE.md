@@ -1,28 +1,24 @@
 # Provenance Recognition Certificate
 
-**Certificate ID:** PRC-developer-portal-2026-11-18-r13
+**Certificate ID:** PRC-developer-portal-2026-11-18-r14
 
-**Supersedes:** PRC-developer-portal-2026-08-26-r12 (dependency
-re-issue for PR #52, which clears the critical and high Dependabot alerts on
-`backstage/yarn.lock`). Group 5 was regenerated from the installed tree:
-the version cells and evidence line numbers were re-derived, and rows
-130-146 were added. Those rows cover 12 resolution pins added in PR #52
-(proxy-addr, node-forge, compression, source-map-js, @azure/identity,
-isomorphic-git, @backstage/plugin-techdocs-node, zod,
-@backstage/catalog-model, @backstage/cli-module-auth,
-@backstage/cli-module-new, @graphql-tools/utils) and 5 pins that earlier
-changes added without a listing row (browserslist,
-baseline-browser-mapping, mysql2, postcss-selector-parser, handlebars).
-This re-issue also catches up the dependency changes that landed after r12
-without a regeneration (#15-#19, #33, #34, #37-#39, 80ea799). Group 5 goes
-from 129 to 146 entries, the component total from 199 to 216, and the
-resolution override rows from 48 to 65. The r12 Subject table still showed
-the pre-r12 figures (198 total, group 5 at 128); this issue corrects them.
-Chain history: r1-r4 were issued and superseded before the provenance
-package's first commit and exist in no retained history. r5 entered git
-history at commit d85e568, r6 at 82783ee and r7 at f20cff8. The
+**Supersedes:** PRC-developer-portal-2026-11-18-r13 (dependency
+re-issue for PR #53, which adds the CodeQL advanced setup workflow
+`.github/workflows/codeql.yml`). Group 6 was regenerated: row 1
+(actions/checkout) adds the v7.0.1 pin
+(3d3c42e5aac5ba805825da76410c181273ba90b1) used by that workflow alongside
+the existing v4.4.0 pin in the Gitea CI templates, and row 9
+(github/codeql-action) is restored from REMOVED to active at v4.39.3
+(peeled commit 33d7b85da1a04171e211befe2c739303b9a4c066; init, autobuild
+and analyze sub-actions). Both pins were re-resolved with `git ls-remote`
+and both upstream LICENSE files were read at the pinned commits (MIT) on
+2026-11-18. Group 6 stays at 9 entries and the component total at 216;
+groups 1-5 and 7-8 are unchanged from r13. Chain history: r1-r4 were
+issued and superseded before the provenance package's first commit and
+exist in no retained history. r5 entered git history at commit d85e568,
+r6 at 82783ee and r7 at f20cff8; r13 entered with PR #52 (6a06f65). The
 retention-in-git-history rule in the Revocation and update rule section
-has been in force since r5, so r5 through r12 and this r13 are all
+has been in force since r5, so r5 through r13 and this r14 are all
 retained.
 
 ---
@@ -52,11 +48,12 @@ components listed in `provenance/PROVENANCE.md`, grouped as follows:
 | 8. Documentation Tooling | 2 |
 | **Total** | **216** |
 
-The total includes two rows retained with REMOVED markers
+The total includes one row retained with a REMOVED marker
 (@backstage/plugin-scaffolder-backend-module-github, group 5 #68,
-REMOVED 2026-08-19; github/codeql-action, group 6 #9, REMOVED
-2026-08-21 -- org default CodeQL setup owns GitHub-side scanning):
-a removal is recorded, not erased, per the listing's convention.
+REMOVED 2026-08-19): a removal is recorded, not erased, per the
+listing's convention. github/codeql-action (group 6 #9), REMOVED
+2026-08-21, is restored to active as of 2026-11-18 (r14, PR #53); its
+removal history is kept in the row.
 
 In addition, 3 UNVERIFIED items and honest gaps are recorded in the
 UNVERIFIED subsection of the listing (original U-numbers retained: U7,
@@ -102,7 +99,7 @@ is `provenance/PROVENANCE.md`; this table is a summary, not a duplicate.
 | 3. IaC Providers | 5 | MPL-2.0 | github.com/hashicorp/terraform-provider-kubernetes; github.com/alekc/terraform-provider-kubectl |
 | 4. Go Tooling and Modules | 22 | BSD-3-Clause, Apache-2.0, MIT, LGPL-2.1, MIT AND Apache-2.0 (x/net v0.56.0, x/sys v0.46.0, x/text v0.39.0 as of 2026-08-18; govulncheck firmed to v1.7.0, host-installed via go install) | go.dev; github.com/go-yaml/yaml; github.com/open-telemetry/opentelemetry-go |
 | 5. Backstage and Node.js | 146 | Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, ISC, BlueOak-1.0.0, (MPL-2.0 OR Apache-2.0), (BSD-3-Clause OR GPL-2.0) (node-forge, first listed 2026-11-18); 65 resolution override rows (74 resolution keys over 69 packages; 2026-11-18 PR #52 pins for proxy-addr, node-forge, compression, source-map-js, @azure/identity, isomorphic-git, techdocs-node 1.15.6, zod 4.6.7, catalog-model, cli-module-auth/new, @graphql-tools/utils 12.1.0, catalog-backend 3.9.2); vendored Yarn 4.18.0 with npmMinimalAgeGate "7d"; plugin-permission-backend-module-allow-all-policy marked REMOVED (de1ac07, 2026-08-18) | github.com/backstage/backstage; github.com/facebook/react; github.com/yarnpkg/berry |
-| 6. CI/CD Actions and Images | 9 | MIT, MPL-2.0, BSD-3-Clause, GPL-2.0-only, Apache-2.0, MPL-2.0 AND MIT, MIT AND BSD-2-Clause AND GPL-2.0-or-later, Zlib; actions SHA-pinned 2026-08-18 (checkout v4.4.0, setup-go v5.6.0, setup-opentofu v1.0.8); codeql-action marked REMOVED 2026-08-21 (org default CodeQL setup owns GitHub-side scanning); Trivy 0.74.0 and OSV-Scanner v2.5.1 digest-pinned (registry-manifest verified); base images floating-tag snapshots | github.com/actions/checkout; hub.docker.com/_/golang; hub.docker.com/_/alpine; hub.docker.com/_/node |
+| 6. CI/CD Actions and Images | 9 | MIT, MPL-2.0, BSD-3-Clause, GPL-2.0-only, Apache-2.0, MPL-2.0 AND MIT, MIT AND BSD-2-Clause AND GPL-2.0-or-later, Zlib; actions SHA-pinned 2026-08-18 (checkout v4.4.0, setup-go v5.6.0, setup-opentofu v1.0.8) and 2026-11-18 (checkout v7.0.1 3d3c42e5, codeql-action v4.39.3 33d7b85d, both in .github/workflows/codeql.yml); codeql-action restored from REMOVED to active 2026-11-18 (CodeQL advanced setup, PR #53); Trivy 0.74.0 and OSV-Scanner v2.5.1 digest-pinned (registry-manifest verified); base images floating-tag snapshots | github.com/actions/checkout; github.com/github/codeql-action; hub.docker.com/_/golang; hub.docker.com/_/alpine; hub.docker.com/_/node |
 | 7. Schemas and Specifications | 1 | Apache-2.0 (vendored schema byte-identical to score-spec/spec commit 3ecb17d430c2bbf46d2dfc161fabc7d432d6d1f5) | github.com/score-spec/spec |
 | 8. Documentation Tooling | 2 | BSD-2-Clause, Apache-2.0 | github.com/mkdocs/mkdocs; github.com/backstage/mkdocs-techdocs-core |
 
@@ -110,12 +107,12 @@ is `provenance/PROVENANCE.md`; this table is a summary, not a duplicate.
 
 SHA-256 digests computed with `sha256sum` (GNU coreutils; same SHA-256
 output as `shasum -a 256`) after the final content of both files was
-written (2026-11-18, r13):
+written (2026-11-18, r14):
 
 - `THIRD-PARTY-LICENSES.md`:
-  `74c54c4b4db02d29dab0a328b9cc232142d0883bfaf0d1e5ed1cb8d1a4a48288`
+  `4b3f527f8243afd4359977834268ab6b4e8530b01ccb8db9fa88a7ee0050e72e`
 - `provenance/PROVENANCE.md`:
-  `72f3594474598a3db09800d7ea30e06aaa40284dd8cec9e404596ababa6e2995`
+  `eed5daacdf50a1a316492ab0477a0da06aea0694f490080478cdfeabb49a16ec`
 
 Any change to either file invalidates the corresponding digest and
 requires this certificate to be regenerated. Verify with:
@@ -132,8 +129,8 @@ and compare against the values above.
 - **Date of issuance:** 2026-11-18 (America/New_York)
 - **Issuer attestation:** Issued by the maintainers of developer-portal
   (Sovereign portfolio) on the date above, from the verified dependency
-  inventory of the repository at that date. The r13 inventory was
-  measured on a Linux build host from a fresh clone at PR #52's branch
+  inventory of the repository at that date. The r14 inventory was
+  measured on a Linux build host from a fresh clone at PR #53's branch
   (the `Repository` path above is the maintainers' canonical checkout and
   was not used for this issue).
 - **Nature of the credential:** This certificate is project-issued

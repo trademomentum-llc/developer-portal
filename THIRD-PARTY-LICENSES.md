@@ -739,10 +739,12 @@ their own licenses.
 - **Source:** https://github.com/actions/checkout
 - **License:** MIT
 - **Copyright:** GitHub, Inc. and contributors (2018)
-- **Usage:** Pinned to commit 11d5960a326750d5838078e36cf38b85af677262
-  (v4.4.0, lightweight tag) on 2026-08-18, previously the mutable `@v4`
-  tag, in iac/templates/ci.yaml:13 and
-  seed-repos/hello-m2/.gitea/workflows/ci.yaml:13.
+- **Usage:** Pinned to commit 3d3c42e5aac5ba805825da76410c181273ba90b1
+  (v7.0.1, lightweight tag) in `.github/workflows/codeql.yml:35`, added
+  2026-11-18 by PR #53 (CodeQL advanced setup). Pinned to commit
+  11d5960a326750d5838078e36cf38b85af677262 (v4.4.0, lightweight tag) on
+  2026-08-18, previously the mutable `@v4` tag, in iac/templates/ci.yaml:13
+  and seed-repos/hello-m2/.gitea/workflows/ci.yaml:13.
 
 ### actions/setup-go
 
@@ -857,17 +859,23 @@ their own licenses.
   at runtime carry their own custom terms (github/codeql-cli-binaries, no
   SPDX identifier).
 - **Copyright:** GitHub
-- **Usage:** Pinned to commit ff2f1c621b7c889edc0d3c761ac2e6a3f8cdb0dd
-  (annotated tag v4.37.7 peeled commit; re-verified via ls-remote
-  2026-08-18) in `.github/workflows/code-scanning.yml`. Mirror scope only:
-  that workflow runs only on the GitHub mirror; Gitea Actions runs
-  `.gitea/workflows` only, so it never executes on the forge.
+- **Usage:** Pinned to commit 33d7b85da1a04171e211befe2c739303b9a4c066
+  (v4.39.3, annotated tag object f3bbb056 peeled; resolved via
+  ls-remote 2026-11-18) for the `init`, `autobuild` and `analyze`
+  sub-actions in `.github/workflows/codeql.yml:40,48,51` (CodeQL advanced
+  setup, added 2026-11-18 by PR #53; produces the required
+  `Analyze (go)`, `Analyze (python)` and `Analyze (javascript-typescript)`
+  contexts). The earlier `.github/workflows/code-scanning.yml` pin
+  (ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd, v4.37.7) was removed
+  2026-08-21 while the org default setup owned scanning; default setup is
+  turned off after PR #53 merges.
 
 CI also uses OpenTofu, Infracost, Docker, jq, and git; these are covered in
 the groups above or are runner-image-provided binaries with no repo-level
-pin. `.github/workflows/sync-from-gitea.yml` uses no third-party GitHub
-Actions at all -- only `run:` steps with git against gitea.com and
-github.com, which are external services, not incorporated software. The
+pin. The former `.github/workflows/sync-from-gitea.yml` (deleted by PR #42,
+2026-11-09) used no third-party GitHub Actions -- only `run:` steps with
+git against gitea.com and github.com, which are external services, not
+incorporated software. The
 base-image tags in this group are floating (alpine:3.20,
 golang:1.26-alpine, node:24-trixie-slim); the package enumerations above
 are a snapshot of 2026-08-18 and drift as tags move -- digest pinning
