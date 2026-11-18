@@ -235,10 +235,38 @@ seed_platform_secrets() {
 
 # D-07: the ClusterSecretStore openbao-kv reads its token from this Secret;
 # after bootstrap it must hold the generated root token, not the literal root.
+# The token is written to a 0600 temp file (umask 077) and passed with
+# --from-file, never --from-literal, so it does not appear in kubectl argv,
+# xtrace, or logs. A trap on EXIT/INT/TERM removes the file.
 handoff_root_token() {
-    kubectl -n "$ESO_NS" create secret generic "$ESO_SECRET" \
-        --from-literal=token="$ROOT_TOKEN" --dry-run=client -o yaml \
-        | kubectl apply -f - >/dev/null
+    local _xtrace=0 _rc=0
+    case "$-" in
+        *x*) _xtrace=1 ;;
+    esac
+    # Disable xtrace before any expansion of ROOT_TOKEN.
+    set +x
+    if [ -z "${ROOT_TOKEN:-}" ]; then
+        if [ "$_xtrace" -eq 1 ]; then
+            set -x
+        fi
+        fail "handoff_root_token: ROOT_TOKEN is empty"
+    fi
+    (
+        set +x
+        set -euo pipefail
+        umask 077
+        tmp=$(mktemp) || exit 1
+        trap 'rm -f -- "$tmp"' EXIT INT TERM
+        printf '%s' "$ROOT_TOKEN" > "$tmp"
+        chmod 600 "$tmp"
+        kubectl -n "$ESO_NS" create secret generic "$ESO_SECRET" \
+            --from-file=token="$tmp" --dry-run=client -o yaml \
+            | kubectl apply -f - >/dev/null
+    ) || _rc=$?
+    if [ "$_xtrace" -eq 1 ]; then
+        set -x
+    fi
+    [ "$_rc" -eq 0 ] || fail "could not apply secret $ESO_SECRET (ns $ESO_NS)"
     info "secret $ESO_SECRET (ns $ESO_NS) now holds the generated root token"
 }
 

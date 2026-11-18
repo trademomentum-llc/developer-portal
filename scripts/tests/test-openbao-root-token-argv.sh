@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # scripts/tests/test-openbao-root-token-argv.sh
 #
-# Prove that the OpenBao root token is delivered over kubectl exec stdin and
-# never appears in kubectl argv. Uses a mock kubectl that records argv and
-# stdin, and a runtime-generated fake token (not a real credential). The
-# token value is never printed.
+# Prove that the OpenBao root token never appears in kubectl argv. Covers
+# kubectl exec stdin handoff and handoff_root_token's --from-file temp file
+# (mode 0600, removed on success and failure). Uses a mock kubectl that
+# records argv and stdin, and a runtime-generated fake token (not a real
+# credential). The token value is never printed.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -395,5 +396,236 @@ if grep -n 'env VAULT_TOKEN=' \
     fail "scripts still pass VAULT_TOKEN on a command line"
 fi
 pass "no env VAULT_TOKEN= remains in the updated scripts"
+
+if grep -n -- '--from-literal=token=' "$ROOT/scripts/bootstrap-openbao-persistent.sh"; then
+    fail "handoff_root_token still uses --from-literal=token="
+fi
+pass "no --from-literal=token= remains in bootstrap"
+
+# --- 9. handoff_root_token: --from-file temp, mode 600, deleted, content ok ---
+install_handoff_mock() {
+    cat > "$BIN/kubectl" << 'MOCK'
+#!/usr/bin/env bash
+# Record argv/stdin. For `create secret --from-file=token=PATH`, record the
+# path, mode, and file content (never printed). Emit a dry-run Secret yaml
+# on stdout for the apply pipe. For `apply`, honor KUBECTL_APPLY_FAIL.
+set -euo pipefail
+dir=${KUBECTL_RECORD_DIR:?}
+n=1
+if [ -f "$dir/counter" ]; then
+    n=$(($(cat "$dir/counter") + 1))
+fi
+printf '%s\n' "$n" > "$dir/counter"
+
+{
+    printf '%s\n' "$#"
+    for a in "$@"; do
+        printf '%s\n' "${#a}"
+        printf '%s\n' "$a"
+    done
+} > "$dir/call-$n.argv"
+
+: > "$dir/call-$n.argv-joined"
+for a in "$@"; do
+    printf '%s\0' "$a" >> "$dir/call-$n.argv-joined"
+done
+
+cat > "$dir/call-$n.stdin"
+
+from_file=""
+ns=""
+name=""
+prev=""
+for a in "$@"; do
+    case "$a" in
+        --from-file=token=*)
+            from_file="${a#--from-file=token=}"
+            ;;
+        --from-literal=*)
+            printf 'from-literal\n' >> "$dir/handoff-from-literal"
+            ;;
+        -n|--namespace)
+            prev=ns
+            ;;
+        --namespace=*)
+            ns="${a#--namespace=}"
+            ;;
+        *)
+            if [ "$prev" = "ns" ]; then
+                ns="$a"
+                prev=""
+            elif [ "$prev" = "generic" ]; then
+                name="$a"
+                prev=""
+            fi
+            if [ "$a" = "generic" ]; then
+                prev=generic
+            fi
+            ;;
+    esac
+done
+
+is_create=0
+is_apply=0
+for a in "$@"; do
+    [ "$a" = "create" ] && is_create=1
+    [ "$a" = "apply" ] && is_apply=1
+done
+
+if [ "$is_create" = 1 ]; then
+    if [ -n "$from_file" ]; then
+        printf '%s\n' "$from_file" > "$dir/handoff-token-path"
+        if [ -e "$from_file" ]; then
+            stat -c '%a' "$from_file" > "$dir/handoff-token-mode"
+            cp -a "$from_file" "$dir/handoff-token-content"
+        else
+            printf 'missing\n' > "$dir/handoff-token-mode"
+        fi
+    fi
+    if [ "${KUBECTL_CREATE_FAIL:-0}" = "1" ]; then
+        exit 1
+    fi
+    [ -n "$from_file" ] && [ -e "$from_file" ] || exit 1
+    b64=$(base64 -w0 < "$from_file")
+    printf '%s\n' "apiVersion: v1" "kind: Secret"
+    printf '%s\n' "metadata:"
+    printf '  name: %s\n' "${name:-openbao-root-token}"
+    printf '  namespace: %s\n' "${ns:-external-secrets}"
+    printf '%s\n' "type: Opaque" "data:"
+    printf '  token: %s\n' "$b64"
+    exit 0
+fi
+
+if [ "$is_apply" = 1 ]; then
+    cp "$dir/call-$n.stdin" "$dir/handoff-apply-yaml"
+    if [ "${KUBECTL_APPLY_FAIL:-0}" = "1" ]; then
+        exit 1
+    fi
+    exit 0
+fi
+
+exit 0
+MOCK
+    chmod +x "$BIN/kubectl"
+}
+
+assert_handoff_file_gone() {
+    local path
+    [ -s "$RECORD/handoff-token-path" ] || fail "kubectl create did not record a --from-file path"
+    path=$(cat "$RECORD/handoff-token-path")
+    if [ -e "$path" ]; then
+        fail "temp token file was not removed"
+    fi
+}
+
+assert_handoff_mode_600() {
+    [ -s "$RECORD/handoff-token-mode" ] || fail "kubectl create did not record the temp file mode"
+    [ "$(cat "$RECORD/handoff-token-mode")" = "600" ] || fail "temp token file was not mode 600 when kubectl ran"
+}
+
+assert_handoff_content() {
+    [ -f "$RECORD/handoff-token-content" ] || fail "kubectl create did not record the temp file content"
+    python_check "$RECORD/handoff-token-content" exact
+}
+
+assert_apply_secret_content() {
+    [ -f "$RECORD/handoff-apply-yaml" ] || fail "kubectl apply did not receive yaml stdin"
+    FAKE_TOKEN="$FAKE_TOKEN" APPLY_YAML="$RECORD/handoff-apply-yaml" python3 - << 'PYCHECK'
+import os, sys, base64, re
+from pathlib import Path
+token = os.environ["FAKE_TOKEN"].encode()
+raw = Path(os.environ["APPLY_YAML"]).read_bytes()
+text = raw.decode()
+m = re.search(r"(?m)^\s*token:\s*([A-Za-z0-9+/=]+)\s*$", text)
+if not m:
+    sys.exit("apply yaml has no data.token")
+try:
+    decoded = base64.b64decode(m.group(1), validate=True)
+except Exception:
+    sys.exit("apply yaml token was not valid base64")
+if decoded != token:
+    sys.exit("apply yaml token does not match the fake token (%d vs %d bytes)" % (len(decoded), len(token)))
+if token in raw:
+    sys.exit("apply yaml contains the raw token")
+PYCHECK
+}
+
+# Restore helpers (bootstrap's fail/info overwrite the test versions when sourced).
+fail() { printf 'FAIL: %s\n' "$*" >&2; exit 1; }
+pass() { printf 'PASS: %s\n' "$*"; }
+
+export ROOT_TOKEN="$FAKE_TOKEN"
+export ESO_NS="${ESO_NS:-external-secrets}"
+export ESO_SECRET="${ESO_SECRET:-openbao-root-token}"
+
+# 9a. success: mode 600, content correct, file deleted, token off argv
+reset_records
+rm -f "$RECORD"/handoff-*
+install_handoff_mock
+handoff_root_token >/dev/null
+assert_no_token_in_argv
+if [ -f "$RECORD/handoff-from-literal" ]; then
+    fail "kubectl was invoked with --from-literal"
+fi
+assert_handoff_mode_600
+assert_handoff_content
+assert_apply_secret_content
+assert_handoff_file_gone
+# create must have used --from-file=token= (and -o yaml / --dry-run=client)
+if ! grep -F -q -- '--from-file=token=' "$RECORD"/call-*.argv; then
+    fail "kubectl create was not invoked with --from-file=token="
+fi
+if ! grep -F -q -- '--dry-run=client' "$RECORD"/call-*.argv; then
+    fail "kubectl create dropped --dry-run=client"
+fi
+pass "handoff_root_token success: mode 600, secret content correct, file deleted, token off argv"
+
+# 9b. apply failure: temp file still deleted
+# Run in a subshell: bootstrap fail() exits, which must not abort this test script.
+reset_records
+rm -f "$RECORD"/handoff-*
+install_handoff_mock
+if (KUBECTL_APPLY_FAIL=1 handoff_root_token >/dev/null 2>"$TMP/handoff-apply-fail.err"); then
+    fail "handoff_root_token should have failed when kubectl apply failed"
+fi
+assert_no_token_in_argv
+assert_handoff_mode_600
+assert_handoff_content
+assert_handoff_file_gone
+python_check "$TMP/handoff-apply-fail.err" absent
+pass "handoff_root_token apply failure: temp file deleted, token off argv and stderr"
+
+# 9c. create failure: temp file still deleted
+reset_records
+rm -f "$RECORD"/handoff-*
+install_handoff_mock
+if (KUBECTL_CREATE_FAIL=1 handoff_root_token >/dev/null 2>"$TMP/handoff-create-fail.err"); then
+    fail "handoff_root_token should have failed when kubectl create failed"
+fi
+assert_no_token_in_argv
+assert_handoff_mode_600
+assert_handoff_content
+assert_handoff_file_gone
+python_check "$TMP/handoff-create-fail.err" absent
+pass "handoff_root_token create failure: temp file deleted, token off argv and stderr"
+
+# 9d. xtrace does not leak the token
+reset_records
+rm -f "$RECORD"/handoff-*
+install_handoff_mock
+# Run in a subshell with xtrace; handoff_root_token must disable it before writing the token.
+set +e
+(
+    set -x
+    handoff_root_token
+) >"$TMP/handoff-xtrace.out" 2>"$TMP/handoff-xtrace.err"
+xrc=$?
+set -e
+[ "$xrc" -eq 0 ] || fail "handoff_root_token failed under xtrace"
+python_check "$TMP/handoff-xtrace.out" absent
+python_check "$TMP/handoff-xtrace.err" absent
+assert_no_token_in_argv
+assert_handoff_file_gone
+pass "handoff_root_token does not leak the token under xtrace"
 
 printf 'All tests passed\n'
