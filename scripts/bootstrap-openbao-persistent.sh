@@ -96,10 +96,49 @@ init_or_recover() {
     fi
 }
 
+# The unseal key is written to a 0600 temp file (umask 077) and passed with
+# --from-file, never --from-literal, so it does not appear in kubectl argv,
+# xtrace, or logs. A trap on EXIT/INT/TERM removes the file.
 sync_unseal_secret() {
-    kubectl -n "$OPENBAO_NS" create secret generic "$UNSEAL_SECRET" \
-        --from-literal=key="$UNSEAL_KEY" --dry-run=client -o yaml \
-        | kubectl apply -f - >/dev/null
+    # Disable xtrace before any key reference; restore on every return.
+    { local _openbao_x=$-; set +x; } 2>/dev/null
+    trap '[[ ${_openbao_x:-} == *x* ]] && set -x' RETURN
+    local _rc=0 _had_e=0
+    if [ -z "${UNSEAL_KEY:-}" ]; then
+        fail "sync_unseal_secret: UNSEAL_KEY is empty"
+    fi
+    # Do not put the subshell on the left of || — bash then ignores errexit
+    # inside it, so a failed printf/chmod could still reach kubectl and
+    # replace the unseal Secret with a zero-byte key. Capture status after
+    # the subshell instead, and fail each step with an explicit || exit 1.
+    case "$-" in
+        *e*) _had_e=1 ;;
+    esac
+    set +e
+    (
+        set +x
+        set -euo pipefail
+        umask 077
+        tmp=$(mktemp) || exit 1
+        trap 'rm -f -- "$tmp"' EXIT INT TERM
+        printf '%s' "$UNSEAL_KEY" > "$tmp" || exit 1
+        chmod 600 "$tmp" || exit 1
+        if ! [ -s "$tmp" ]; then
+            printf 'sync_unseal_secret: temp unseal-key file is empty\n' >&2
+            exit 1
+        fi
+        _got=$(wc -c < "$tmp" | tr -d '[:space:]') || exit 1
+        if [ "$_got" -ne "${#UNSEAL_KEY}" ]; then
+            printf 'sync_unseal_secret: temp unseal-key file size mismatch\n' >&2
+            exit 1
+        fi
+        kubectl -n "$OPENBAO_NS" create secret generic "$UNSEAL_SECRET" \
+            --from-file=key="$tmp" --dry-run=client -o yaml \
+            | kubectl apply -f - >/dev/null || exit 1
+    )
+    _rc=$?
+    [ "$_had_e" -eq 1 ] && set -e
+    [ "$_rc" -eq 0 ] || fail "could not apply secret $UNSEAL_SECRET (ns $OPENBAO_NS)"
     info "secret $UNSEAL_SECRET synced (ns $OPENBAO_NS)"
 }
 
