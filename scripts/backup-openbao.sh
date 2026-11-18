@@ -8,6 +8,10 @@
 # recorded out-of-scope follow-up).
 set -euo pipefail
 
+_BACKUP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=scripts/lib/openbao-exec-bao.sh
+source "$_BACKUP_ROOT/scripts/lib/openbao-exec-bao.sh"
+
 OPENBAO_POD=${OPENBAO_POD:-openbao-0}
 OPENBAO_NS=${OPENBAO_NS:-openbao}
 CUSTODY_DIR=${OPENBAO_CUSTODY_DIR:-"$HOME/.rational-reserve/openbao"}
@@ -19,6 +23,7 @@ fail() { printf "\033[1;31m[openbao-backup ERROR]\033[0m %s\n" "$*" >&2; exit 1;
 
 [ -r "$CUSTODY_DIR/root-token" ] || fail "missing $CUSTODY_DIR/root-token (run bootstrap first)"
 ROOT_TOKEN=$(cat "$CUSTODY_DIR/root-token")
+export ROOT_TOKEN
 
 umask 077
 mkdir -p "$BACKUP_DIR"
@@ -28,8 +33,8 @@ TS=$(date -u +%Y%m%d-%H%M%S)
 SNAP="$BACKUP_DIR/openbao-$TS.snap"
 POD_TMP=/tmp/openbao-snapshot.snap
 
-kubectl -n "$OPENBAO_NS" exec "$OPENBAO_POD" -- env VAULT_TOKEN="$ROOT_TOKEN" \
-    bao operator raft snapshot save "$POD_TMP" >/dev/null || fail "raft snapshot save failed"
+# Root token is delivered over kubectl exec stdin, never argv.
+openbao_exec_bao operator raft snapshot save "$POD_TMP" >/dev/null || fail "raft snapshot save failed"
 kubectl -n "$OPENBAO_NS" exec "$OPENBAO_POD" -- cat "$POD_TMP" > "$SNAP" || fail "snapshot stream failed"
 kubectl -n "$OPENBAO_NS" exec "$OPENBAO_POD" -- rm -f "$POD_TMP" >/dev/null
 [ -s "$SNAP" ] || fail "snapshot $SNAP is empty"
