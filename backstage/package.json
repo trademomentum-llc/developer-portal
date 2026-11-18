@@ -71,7 +71,7 @@
     "brace-expansion": "2.1.7",
     "fast-uri": "4.1.5",
     "postcss": "8.5.25",
-    "basic-ftp": "6.2.1",
+    "basic-ftp": "6.2.4",
     "js-cookie": "3.0.8",
     "multer": "2.5.0",
     "http-proxy-middleware": "2.0.10",
