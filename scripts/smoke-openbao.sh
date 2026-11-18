@@ -12,6 +12,8 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 source "${ROOT}/scripts/lib/smoke-json.sh"
+# shellcheck source=scripts/lib/openbao-exec-bao.sh
+source "${ROOT}/scripts/lib/openbao-exec-bao.sh"
 smoke_json_parse_args "$@"
 smoke_json_begin openbao
 
@@ -35,7 +37,8 @@ for arg in ${SMOKE_JSON_ARGS[@]+"${SMOKE_JSON_ARGS[@]}"}; do
 done
 
 exec_bao() {
-    kubectl -n "$OPENBAO_NS" exec "$OPENBAO_POD" -- env VAULT_TOKEN="$OPENBAO_TOKEN" bao "$@"
+    # Root token is delivered over kubectl exec stdin, never argv.
+    openbao_exec_bao "$@"
 }
 
 M2_KEYS="

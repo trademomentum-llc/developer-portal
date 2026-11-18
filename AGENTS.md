@@ -106,6 +106,8 @@ tofu plan
 
 Unseal-key and root-token custody: `~/.rational-reserve/openbao/` (dir 700, files 600). If `openbao-0` is deleted, the sidecar auto-unseals from Secret `openbao-unseal-key`; secrets must survive without reseeding (that is the FR-4 lane).
 
+OpenSearch admin password (`secret/opensearch-password`): never a literal in this repo. `bootstrap-openbao-persistent.sh` resolves it from `OPENSEARCH_ADMIN_PASSWORD`, else the file at `OPENSEARCH_ADMIN_PASSWORD_FILE` (default `~/.rational-reserve/openbao/opensearch-admin-password`), else generates a random value into that file (mode 600). `OPENBAO_REQUIRE_EXPLICIT_SECRETS=1` makes it fail fast instead of generating. See `.env.example`. All 13 seeded values reach `bao kv put` via stdin (`value=-`), never argv; never echo or log them. OpenSearch must be configured with the same value. `put_if_absent` never overwrites, so rotating an existing cluster is a deliberate `bao kv put`. `.gitleaks.toml` rule `openbao-kv-password-literal` blocks any literal written to a KV `*password` path.
+
 Do not invent a "clean slate" path. If an install script fails mid-way, the blockers documented in `TODO.md` are the canonical remediation list.
 
 ### Member provisioning and org secrets (FR-13/FR-14)
