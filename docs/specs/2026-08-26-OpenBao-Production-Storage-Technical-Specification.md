@@ -147,7 +147,8 @@ bao kv put secret/observer-oauth-client-secret value="openchoreo-observer-resour
 bao kv put secret/rca-oauth-client-secret value="openchoreo-rca-agent-secret"
 # OpenSearch (observability)
 bao kv put secret/opensearch-username value="admin"
-bao kv put secret/opensearch-password value="ThisIsTheOpenSearchPassword1"
+bao kv put secret/opensearch-password value="${OPENSEARCH_ADMIN_PASSWORD:?set via env or custody file}"
+# Upstream OpenChoreo default intentionally NOT reproduced (secret-scanning alert #1). Supplied at runtime: env OPENSEARCH_ADMIN_PASSWORD -> OPENSEARCH_ADMIN_PASSWORD_FILE -> generated custody file; see scripts/bootstrap-openbao-persistent.sh and .env.example.
 ```
 
 **Count clarification (carried to section 11):** DES-001 and REQ-derived notes
@@ -520,7 +521,8 @@ seed_platform_secrets() {
     put_if_absent secret/observer-oauth-client-secret "openchoreo-observer-resource-reader-client-secret"
     put_if_absent secret/rca-oauth-client-secret "openchoreo-rca-agent-secret"
     put_if_absent secret/opensearch-username "admin"
-    put_if_absent secret/opensearch-password "ThisIsTheOpenSearchPassword1"
+    put_if_absent secret/opensearch-password "${OPENSEARCH_ADMIN_PASSWORD:?set via env or custody file}"
+    # Upstream OpenChoreo default intentionally NOT reproduced (secret-scanning alert #1). Supplied at runtime: env OPENSEARCH_ADMIN_PASSWORD -> OPENSEARCH_ADMIN_PASSWORD_FILE -> generated custody file; see scripts/bootstrap-openbao-persistent.sh and .env.example.
 }
 
 # D-07: the ClusterSecretStore openbao-kv reads its token from this Secret;
