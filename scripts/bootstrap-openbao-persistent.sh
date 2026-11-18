@@ -100,16 +100,11 @@ init_or_recover() {
 # --from-file, never --from-literal, so it does not appear in kubectl argv,
 # xtrace, or logs. A trap on EXIT/INT/TERM removes the file.
 sync_unseal_secret() {
-    local _xtrace=0 _rc=0
-    case "$-" in
-        *x*) _xtrace=1 ;;
-    esac
-    # Disable xtrace before any expansion of UNSEAL_KEY.
-    set +x
+    # Disable xtrace before any key reference; restore on every return.
+    { local _openbao_x=$-; set +x; } 2>/dev/null
+    trap '[[ ${_openbao_x:-} == *x* ]] && set -x' RETURN
+    local _rc=0
     if [ -z "${UNSEAL_KEY:-}" ]; then
-        if [ "$_xtrace" -eq 1 ]; then
-            set -x
-        fi
         fail "sync_unseal_secret: UNSEAL_KEY is empty"
     fi
     (
@@ -124,9 +119,6 @@ sync_unseal_secret() {
             --from-file=key="$tmp" --dry-run=client -o yaml \
             | kubectl apply -f - >/dev/null
     ) || _rc=$?
-    if [ "$_xtrace" -eq 1 ]; then
-        set -x
-    fi
     [ "$_rc" -eq 0 ] || fail "could not apply secret $UNSEAL_SECRET (ns $OPENBAO_NS)"
     info "secret $UNSEAL_SECRET synced (ns $OPENBAO_NS)"
 }
@@ -267,16 +259,11 @@ seed_platform_secrets() {
 # --from-file, never --from-literal, so it does not appear in kubectl argv,
 # xtrace, or logs. A trap on EXIT/INT/TERM removes the file.
 handoff_root_token() {
-    local _xtrace=0 _rc=0
-    case "$-" in
-        *x*) _xtrace=1 ;;
-    esac
-    # Disable xtrace before any expansion of ROOT_TOKEN.
-    set +x
+    # Disable xtrace before any token reference; restore on every return.
+    { local _openbao_x=$-; set +x; } 2>/dev/null
+    trap '[[ ${_openbao_x:-} == *x* ]] && set -x' RETURN
+    local _rc=0
     if [ -z "${ROOT_TOKEN:-}" ]; then
-        if [ "$_xtrace" -eq 1 ]; then
-            set -x
-        fi
         fail "handoff_root_token: ROOT_TOKEN is empty"
     fi
     (
@@ -291,9 +278,6 @@ handoff_root_token() {
             --from-file=token="$tmp" --dry-run=client -o yaml \
             | kubectl apply -f - >/dev/null
     ) || _rc=$?
-    if [ "$_xtrace" -eq 1 ]; then
-        set -x
-    fi
     [ "$_rc" -eq 0 ] || fail "could not apply secret $ESO_SECRET (ns $ESO_NS)"
     info "secret $ESO_SECRET (ns $ESO_NS) now holds the generated root token"
 }
