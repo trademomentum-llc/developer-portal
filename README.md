@@ -29,6 +29,10 @@ Resumes from the last completed task. Use `--fresh` to start over.
 | OpenChoreo API | http://localhost:9090 | Port-forwarded from k3d-openchoreo |
 | k3d cluster | -- | Name: k3d-openchoreo (shared) |
 
+## Secrets
+
+Platform secrets are seeded into OpenBao by `scripts/bootstrap-openbao-persistent.sh`. The OpenSearch admin password is not stored in the repo: set `OPENSEARCH_ADMIN_PASSWORD`, or point `OPENSEARCH_ADMIN_PASSWORD_FILE` at a file; otherwise a random value is generated into `~/.rational-reserve/openbao/opensearch-admin-password` (mode 600). Set `OPENBAO_REQUIRE_EXPLICIT_SECRETS=1` to fail fast instead of generating. Copy `.env.example` to `.env` (gitignored) for local values. OpenSearch must be configured with the same value.
+
 ## Teardown
 
 ```

@@ -5,9 +5,36 @@
 # findings (source maps and minified bundles); exclude them repo-wide.
 title = "developer-portal gitleaks config"
 
+# Keep the full upstream default ruleset. Without this, a config file that
+# defines its own [[rules]] (or none at all) REPLACES the defaults, and a
+# config with only an [allowlist] loads zero rules -- scans then "pass" while
+# detecting nothing.
+[extend]
+useDefault = true
+
 [allowlist]
 description = "Generated build output, not hand-written content"
 paths = [
   '''backstage/packages/app/dist''',
   '''backstage/packages/backend/dist''',
 ]
+
+# Secret-scanning alert #1 class: a literal value written to an OpenBao/Vault
+# KV path ending in "password" (e.g. secret/opensearch-password). Values must
+# come from the environment, a custody file or stdin -- never a literal.
+# Matches `put_if_absent secret/x-password "lit"`, `... <<<"lit"` and
+# `bao kv put secret/x-password value="lit"`; a value starting with `$`
+# (variable / ${VAR:?..} placeholder) does not match.
+[[rules]]
+id = "openbao-kv-password-literal"
+description = "Literal value seeded into an OpenBao/Vault KV *password path"
+regex = '''secret/[A-Za-z0-9_-]*password["']?\s*(?:value=|<<<)?\s*["']([^$"'\s][^"'\s]*)["']'''
+secretGroup = 1
+keywords = ["password"]
+
+# Narrow allowlist: only the exact, obviously fake sample-app placeholder
+# carried verbatim from the retired dev-mode postStart.
+[[rules.allowlists]]
+description = "Documented sample-app dev placeholder (not a credential)"
+regexTarget = "secret"
+regexes = ['''^dev-password$''']
