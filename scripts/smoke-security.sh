@@ -288,12 +288,15 @@ else
     fail "Certificates in envoy-gateway not Ready within 120s"
 fi
 
-# D4: FR-10 config files exist and parse. dependabot.yml is required;
-# code-scanning.yml must NOT exist: GitHub-side CodeQL is provided by the
-# org "GitHub recommended" security configuration (default setup), which
-# rejects SARIF from an in-repo advanced workflow -- the two cannot
-# coexist, so the file was removed 2026-08-21 (see spec section 10
-# amendment). The dynamic CodeQL workflow is green on every push.
+# D4: FR-10 config files exist and parse. dependabot.yml is required.
+# GitHub-side CodeQL is owned by the in-repo advanced workflow
+# .github/workflows/codeql.yml (PR #53, 2026-11-18; replaces the org
+# default setup, which is turned off after merge). The workflow contract
+# below is the inverse of the 2026-08-21 "no in-repo workflow" check: the
+# required contexts Analyze (go|python|javascript-typescript) on main must
+# come from this file, so its absence or drift fails the suite. The legacy
+# code-scanning.yml name must not reappear (two CodeQL workflows would
+# upload competing SARIF for the same categories).
 f="${REPO_ROOT}/.github/dependabot.yml"
 if [ ! -f "${f}" ]; then
     fail ".github/dependabot.yml missing"
@@ -308,9 +311,61 @@ else
     fi
 fi
 if [ -f "${REPO_ROOT}/.github/workflows/code-scanning.yml" ]; then
-    fail "code-scanning.yml present -- conflicts with the org default CodeQL setup (remove it; see spec section 10 amendment)"
+    fail "legacy code-scanning.yml present -- CodeQL is owned by .github/workflows/codeql.yml (remove the duplicate)"
 else
-    pass "no in-repo advanced CodeQL workflow (org default setup owns GitHub-side scanning)"
+    pass "no legacy code-scanning.yml alongside the advanced CodeQL workflow"
+fi
+CODEQL_WF="${CODEQL_WORKFLOW:-${REPO_ROOT}/.github/workflows/codeql.yml}"
+codeql_wf_contract() {
+    # Prints one "fail|<reason>" line per broken clause; no output = intact.
+    local wf=$1
+    if [ ! -f "${wf}" ]; then
+        echo "fail|advanced CodeQL workflow missing (${wf#"${REPO_ROOT}"/})"
+        return 0
+    fi
+    yaml_ok "${wf}" && rc=0 || rc=$?
+    [ "${rc}" -eq 1 ] && echo "fail|codeql.yml does not parse as YAML"
+    grep -qE '^on:' "${wf}" || echo "fail|codeql.yml has no on: block"
+    for trig in pull_request push schedule; do
+        grep -qE "^[[:space:]]+${trig}:" "${wf}" || echo "fail|codeql.yml missing trigger ${trig}"
+    done
+    grep -qE '^[[:space:]]+-[[:space:]]+cron:[[:space:]]+"?[0-9*]' "${wf}" || echo "fail|codeql.yml schedule has no cron"
+    grep -qE '^[[:space:]]+name:[[:space:]]+Analyze \(\$\{\{ matrix\.language \}\}\)[[:space:]]*$' "${wf}" \
+        || echo "fail|job name does not render as 'Analyze (\${{ matrix.language }})'"
+    local pair
+    for pair in go:autobuild python:none javascript-typescript:none; do
+        awk -v lang="${pair%%:*}" -v mode="${pair#*:}" '
+            $0 ~ "^[[:space:]]+-[[:space:]]+language:[[:space:]]+" lang "[[:space:]]*$" { want=1; next }
+            want && $0 ~ "^[[:space:]]+build-mode:[[:space:]]+" mode "[[:space:]]*$" { ok=1 }
+            { want=0 }
+            END { exit ok ? 0 : 1 }' "${wf}" \
+            || echo "fail|matrix entry ${pair%%:*} with build-mode ${pair#*:} missing"
+    done
+    grep -qE '^[[:space:]]+queries:[[:space:]]+security-extended[[:space:]]*$' "${wf}" || echo "fail|init queries is not security-extended"
+    grep -qE '^[[:space:]]+category:[[:space:]]+"/language:\$\{\{ ?matrix\.language ?\}\}"' "${wf}" || echo "fail|analyze category is not /language:\${{ matrix.language }}"
+    local perm
+    for perm in 'contents: read' 'security-events: write' 'actions: read'; do
+        grep -qE "^[[:space:]]{6}${perm}[[:space:]]*$" "${wf}" || echo "fail|job permissions missing '${perm}'"
+    done
+    grep -E '^[[:space:]]+[a-z-]+:[[:space:]]+write' "${wf}" | grep -qvE 'security-events:[[:space:]]+write' \
+        && echo "fail|codeql.yml grants a write permission other than security-events"
+    grep -qE '^permissions:[[:space:]]*(write-all|read-all)' "${wf}" && echo "fail|codeql.yml uses a blanket permissions scope"
+    for step in init analyze; do
+        grep -qE "uses:[[:space:]]+github/codeql-action/${step}@[0-9a-f]{40}([[:space:]]|$)" "${wf}" \
+            || echo "fail|github/codeql-action/${step} missing or not full-SHA pinned"
+    done
+    grep -qE 'uses:[[:space:]]+actions/checkout@[0-9a-f]{40}([[:space:]]|$)' "${wf}" || echo "fail|actions/checkout missing or not full-SHA pinned"
+    local bad
+    bad=$(grep -oE 'uses:[[:space:]]+[^[:space:]]+' "${wf}" | sed -E 's/^uses:[[:space:]]+//' | grep -vE '@[0-9a-f]{40}$' || true)
+    [ -n "${bad}" ] && echo "fail|codeql.yml uses not full-SHA pinned: $(echo "${bad}" | tr '\n' ' ')"
+    grep -qE '^[[:space:]]+upload:[[:space:]]+(never|false)' "${wf}" && echo "fail|codeql.yml disables SARIF upload (required contexts would not reflect GitHub-side results)"
+    return 0
+}
+codeql_out=$(codeql_wf_contract "${CODEQL_WF}")
+if [ -z "${codeql_out}" ]; then
+    pass "advanced CodeQL workflow contract intact (Analyze go/autobuild, python/none, javascript-typescript/none; security-extended; SHA-pinned; least-privilege permissions)"
+else
+    while IFS='|' read -r _ reason; do fail "${reason}"; done <<< "${codeql_out}"
 fi
 
 # D5: dependabot.yml covers every go.mod root (enumeration per spec 10.2;
