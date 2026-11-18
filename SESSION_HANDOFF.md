@@ -17,10 +17,124 @@
 > to trust the snapshot without re-deriving it. Freshness of this file is
 > enforced by scripts/check-handoff-fidelity.sh.
 
-**Last updated:** 2026-08-29
-**Reason for handoff:** Sandbox-home cleanup executed (user-directed):
-~/Projects fake-home artifacts merged into real home or deleted; keychain
-Local Items store repatriated; orphaned ssh-agent killed. Details in 0u.
+**Last updated:** 2026-11-18 (ET; see 0v)
+**Reason for handoff:** PR #52 dependency and provenance change: the critical
+and high Dependabot alerts on backstage/yarn.lock were cleared on branch
+fix/backstage-yarn-alerts, and the provenance triple was regenerated
+(cert r13). The branch is not merged. Details in 0v.
+**Previous reason (2026-08-29):** Sandbox-home cleanup executed
+(user-directed): ~/Projects fake-home artifacts merged into real home or
+deleted; keychain Local Items store repatriated; orphaned ssh-agent
+killed. Details in 0u.
+
+---
+
+## 0v. 2026-11-18 addendum (afternoon, America/New_York) -- PR #52 dependency and provenance change
+
+Dependency and provenance change on branch `fix/backstage-yarn-alerts`
+(PR #52, an in-org branch, not a fork). NOT merged to main at snapshot
+time. Every claim below gives the command and the measured result.
+Times are ET (UTC-5). The host was a Linux build box with a fresh clone,
+not the maintainers' macOS checkout.
+
+- BRANCH STATE: `git log -4 --format='%h %p %an %cd %s'` measured at
+  12:55 ET:
+  - 68188e6: the dependency fix, by trademomentumllc, at 12:35.
+  - b11281e: "Merge branch 'main'", by Trade Momentum LLC, at 12:38.
+    This is an update-branch merge that someone else made.
+  - 73acdc2: the provenance regeneration, at 12:55.
+  - `git diff --quiet 68188e6c b11281e8 -- backstage`: rc 0, so the main
+    merge did not change `backstage/`. It changed only
+    `seed-repos/hello-m2/go.mod` and `go.sum`, per `git diff --stat`.
+- MAIN NOT YET UPDATED: `git ls-remote origin refs/heads/main` returned
+  6a976c23ee3094d88688ba389b4fe9399f146595 at 12:53 ET. This branch is
+  not on main, so `scripts/check-handoff-fidelity.sh` FAILs its
+  remote-sync lane by design until PR #52 merges (see the last bullet).
+- DEPENDENCY CHANGE (68188e6):
+  - It adds yarn `resolutions` pins and bumps
+    `@backstage/plugin-catalog-backend` from ^3.5.0 to ^3.9.2. All
+    changes stay in-major except two:
+    - @azure/msal-node 5.1.2 -> 7.2.1, pulled in by @azure/identity
+      4.14.1.
+    - @graphql-tools/utils 8.x -> 12.1.0, under mockttp 3.17.1.
+  - The full table is in the PR #52 body and in provenance/PROVENANCE.md,
+    group 5, rows 130-146.
+  - Command: `node .yarn/releases/yarn-4.18.0.cjs npm audit --all
+    --recursive --json`, run in `backstage/`.
+  - Base main 390dd465, measured 12:29 ET: rc 1, with 2 critical,
+    34 high, 66 moderate and 13 low advisory rows.
+  - Branch, measured 12:53 ET: rc 1, with 0 critical, 0 high,
+    49 moderate and 5 low.
+- BUILD (branch, 12:53 ET, Node v24.22.1, Yarn 4.18.0 from the vendored
+  release):
+  - `yarn install --immutable`: rc 0.
+  - `yarn tsc`: rc 0.
+  - `yarn build:all`: rc 0.
+  - Base main also gave rc 0 for both tsc and build:all at about
+    12:30 ET.
+- TESTS:
+  - `CI=1 yarn test` on the branch gave rc 1: App.test.tsx failed with
+    "this._moduleMocker.clearMocksOnScope is not a function", and the
+    namespace-predictor suite passed 5/5.
+  - On the base copy, App.test.tsx failed with the same error, so that
+    failure was already there.
+  - The base namespace-predictor failure (spawnSync /bin/sh ENOENT) came
+    from running the base copy outside the repo tree.
+  - Whether this jest mismatch reproduces on the maintainers' macOS
+    checkout is UNVERIFIED.
+- GITHUB ALERTS:
+  - `gh api repos/trademomentum-llc/developer-portal/dependabot/alerts?state=open`
+    measured 12:53 ET: 83 open, made up of 2 critical, 31 high,
+    38 medium and 12 low. Earlier, at 12:27 ET, it was 84 (39 medium).
+    The drop of one medium matches the seed-repos go.mod bump (#46)
+    reaching main. Whether that is the cause is UNVERIFIED.
+  - After merge, the expected count for `backstage/yarn.lock` is 27 open:
+    0 critical, 0 high, 22 medium and 5 low. This comes from a semver
+    check of each alert's vulnerable range against the branch lockfile.
+    Dependabot's own post-merge count is UNVERIFIED until it rescans
+    main.
+- PROVENANCE TRIPLE (73acdc2):
+  - Group 5 of provenance/PROVENANCE.md was regenerated: its count went
+    from 129 to 146 and the total from 199 to 216. Command: awk row
+    count on `^## 5.`, which returned 146.
+  - THIRD-PARTY-LICENSES.md was updated with the same version cells,
+    17 new pin rows and one new license expression,
+    (BSD-3-Clause OR GPL-2.0) for node-forge.
+  - The certificate was re-issued as PRC-developer-portal-2026-11-18-r13.
+    `sha256sum THIRD-PARTY-LICENSES.md provenance/PROVENANCE.md` measured
+    12:55 ET:
+    - 74c54c4b4db02d29dab0a328b9cc232142d0883bfaf0d1e5ed1cb8d1a4a48288
+      for THIRD-PARTY-LICENSES.md
+    - 72f3594474598a3db09800d7ea30e06aaa40284dd8cec9e404596ababa6e2995
+      for provenance/PROVENANCE.md
+    These equal the r13 Integrity block.
+  - The repo has no generator script: `rg -n -i 'generat' scripts` found
+    no provenance or license generator, and there is no Makefile.
+    Regeneration used a box-side helper that is not committed.
+  - Groups 1-4 and 6-8 were not re-measured; their earlier dates are
+    still in force (UNVERIFIED for 2026-11-18).
+- REACT-ROUTER RISK STATE CHANGED (found during regeneration):
+  - The pins and installed version are now 7.18.4, measured through
+    node_modules package.json at 12:54 ET. Before, they were 6.30.4.
+  - `yarn install` reports YN0060 against the ^6.30.2 peer range of
+    @backstage/core-components.
+  - This state came from an earlier change (#34), not from PR #52.
+  - Runtime impact: UNVERIFIED. No Backstage boot was run.
+- NOT DONE / OPEN:
+  - Backstage release-line bump: not done. 1.55+ moves catalog-backend to
+    4.x and techdocs-node to 2.x, and 1.57.1 is inside the 7-day
+    npmMinimalAgeGate.
+  - The 22 medium and 5 low yarn alerts were not addressed.
+  - No dismissals.
+  - Dependabot #41 (npm_and_yarn group) was still OPEN at 12:35 ET
+    (`gh pr view 41 --json state`).
+- HANDOFF FIDELITY:
+  - `scripts/check-handoff-fidelity.sh --offline` on the working tree
+    with this addendum gave rc 0: freshness PASS 2026-11-18, remote-sync
+    SKIP.
+  - The full run (online) gave rc 1: freshness PASS, remote-sync FAIL
+    (origin main != HEAD), which is expected until merge.
+  - The verbatim output is in the PR #52 body.
 
 ---
 
