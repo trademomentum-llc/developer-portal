@@ -13,6 +13,8 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=scripts/lib/openbao-exec-bao.sh
+source "$ROOT/scripts/lib/openbao-exec-bao.sh"
 
 OPENBAO_POD=${OPENBAO_POD:-openbao-0}
 OPENBAO_NS=${OPENBAO_NS:-openbao}
@@ -45,8 +47,10 @@ bao_raw() {
 }
 
 # bao invocations authenticated with the current root token.
+# The token is delivered over kubectl exec stdin, never argv (see
+# scripts/lib/openbao-exec-bao.sh).
 bao_auth() {
-    kubectl -n "$OPENBAO_NS" exec "$OPENBAO_POD" -- env VAULT_TOKEN="$ROOT_TOKEN" bao "$@"
+    openbao_exec_bao "$@"
 }
 
 # bao operator init -status: exit 0 initialized, 2 uninitialized; both mean
@@ -134,18 +138,19 @@ ensure_mounts() {
 # minus the dev-mode token export. All writes are idempotent against Raft.
 apply_durable_config() {
     bao_auth auth enable kubernetes >/dev/null 2>&1 || true
-    # $KUBERNETES_PORT_443_TCP_ADDR expands IN THE POD (single-quoted sh -c).
-    kubectl -n "$OPENBAO_NS" exec "$OPENBAO_POD" -- env VAULT_TOKEN="$ROOT_TOKEN" sh -c \
+    # $KUBERNETES_PORT_443_TCP_ADDR expands IN THE POD (eval'd there).
+    # shellcheck disable=SC2016
+    openbao_exec_pod_sh \
         'bao write auth/kubernetes/config kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443"' >/dev/null
 
-    kubectl -n "$OPENBAO_NS" exec -i "$OPENBAO_POD" -- env VAULT_TOKEN="$ROOT_TOKEN" \
-        bao policy write openchoreo-secret-reader-policy - >/dev/null <<'POLICY'
+    openbao_exec_bao_stdin \
+        policy write openchoreo-secret-reader-policy - >/dev/null <<'POLICY'
 path "secret/data/*" { capabilities = ["read"] }
 path "secret/metadata/*" { capabilities = ["list", "read"] }
 POLICY
 
-    kubectl -n "$OPENBAO_NS" exec -i "$OPENBAO_POD" -- env VAULT_TOKEN="$ROOT_TOKEN" \
-        bao policy write openchoreo-secret-writer-policy - >/dev/null <<'POLICY'
+    openbao_exec_bao_stdin \
+        policy write openchoreo-secret-writer-policy - >/dev/null <<'POLICY'
 path "secret/data/*" { capabilities = ["create", "read", "update", "delete"] }
 path "secret/metadata/*" { capabilities = ["create", "read", "update", "delete", "list"] }
 POLICY
@@ -162,18 +167,19 @@ POLICY
 }
 
 # put_if_absent <kv-path>  -- the value is read from STDIN, never argv.
-# It reaches bao over the kubectl exec stdin stream (`value=-`), so it never
-# appears in the argv of kubectl or bao (ps, audit logs, shell traces).
-# printf is a bash builtin, so feeding it does not fork a process either.
-# Existing values are preserved (no overwrite); rotation is deliberate.
+# The root token (first line) and the value (remaining bytes) reach the pod
+# over the kubectl exec stdin stream; bao reads the value via `value=-`.
+# Neither the token nor the value appears in kubectl or bao argv (ps, audit
+# logs, shell traces). printf is a bash builtin, so feeding it does not fork
+# a process either. Existing values are preserved (no overwrite); rotation
+# is deliberate.
 put_if_absent() {
     local path="$1" value
     value=$(cat)
     [ -n "$value" ] || fail "put_if_absent $path: empty value on stdin"
     if ! bao_auth kv get "$path" >/dev/null 2>&1; then
         printf '%s' "$value" \
-            | kubectl -n "$OPENBAO_NS" exec -i "$OPENBAO_POD" -- env VAULT_TOKEN="$ROOT_TOKEN" \
-                bao kv put "$path" value=- >/dev/null \
+            | openbao_exec_bao_stdin kv put "$path" value=- >/dev/null \
             || fail "bao kv put $path failed"
     fi
 }
@@ -252,4 +258,6 @@ main() {
     info "bootstrap complete"
 }
 
-main "$@"
+if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    main "$@"
+fi

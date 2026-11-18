@@ -10,6 +10,10 @@
 # against a fresh backend.
 set -euo pipefail
 
+_SEED_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=scripts/lib/openbao-exec-bao.sh
+source "$_SEED_ROOT/scripts/lib/openbao-exec-bao.sh"
+
 OPENBAO_POD=${OPENBAO_POD:-openbao-0}
 OPENBAO_NS=${OPENBAO_NS:-openbao}
 CUSTODY_DIR=${OPENBAO_CUSTODY_DIR:-"$HOME/.rational-reserve/openbao"}
@@ -21,7 +25,8 @@ GITEA_RUNNER_SECRET_NS=${GITEA_RUNNER_SECRET_NS:-gitea-runners}
 GITEA_RUNNER_SECRET_NAME=${GITEA_RUNNER_SECRET_NAME:-gitea-runner-token}
 
 exec_bao() {
-    kubectl -n "$OPENBAO_NS" exec "$OPENBAO_POD" -- env VAULT_TOKEN="$OPENBAO_TOKEN" bao "$@"
+    # Root token is delivered over kubectl exec stdin, never argv.
+    openbao_exec_bao "$@"
 }
 
 read_existing_runner_token() {
