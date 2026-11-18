@@ -540,7 +540,7 @@ parentheses.
 | @jest/environment-jsdom-abstract | ^30.0.0 (30.3.0) | MIT | Meta Platforms, Inc. and affiliates |
 | @playwright/test | ^1.32.3 (1.59.1) | Apache-2.0 | Microsoft Corporation |
 | @types/jest | ^30.0.0 (30.0.0) | MIT | DefinitelyTyped contributors |
-| jest | ^30.2.0 (30.3.0) | MIT | Meta Platforms, Inc. and affiliates |
+| jest | ^30.4.2 (30.4.2) | MIT | Meta Platforms, Inc. and affiliates |
 | jsdom | ^27.1.0 (27.4.0) | MIT | Elijah Insua, Domenic Denicola, et al. |
 | node-gyp | ^10.0.0 (10.3.1) | MIT | Nathan Rajlich / Node.js contributors |
 | prettier | ^2.3.2 (2.8.8) | MIT | James Long and contributors |
@@ -556,7 +556,7 @@ Runtime dependencies of the frontend, plus its test tooling.
 | @backstage/core-plugin-api | ^1.12.4 (1.12.4) | Apache-2.0 | The Backstage Authors |
 | @backstage/frontend-defaults | ^0.5.0 (0.5.0) | Apache-2.0 | The Backstage Authors |
 | @backstage/frontend-plugin-api | ^0.15.1 (0.15.1) | Apache-2.0 | The Backstage Authors |
-| @backstage/integration-react | ^1.2.16 (1.2.16) | Apache-2.0 | The Backstage Authors |
+| @backstage/integration-react | ^1.2.20 (1.2.20) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-api-docs | ^0.13.5 (0.13.5) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-app-react | ^0.2.1 (0.2.1) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-app-visualizer | ^0.2.1 (0.2.1) | Apache-2.0 | The Backstage Authors |
@@ -565,7 +565,7 @@ Runtime dependencies of the frontend, plus its test tooling.
 | @backstage/plugin-catalog-import | ^0.13.11 (0.13.11) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-kubernetes | ^0.12.17 (0.12.17) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-notifications | ^0.5.15 (0.5.15) | Apache-2.0 | The Backstage Authors |
-| @backstage/plugin-org | ^0.7.0 (0.7.0) | Apache-2.0 | The Backstage Authors |
+| @backstage/plugin-org | 0.7.6 (0.7.6) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-scaffolder | ^1.36.1 (1.36.1) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-search | ^1.7.0 (1.7.0) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-signals | ^0.0.29 (0.0.29) | Apache-2.0 | The Backstage Authors |
@@ -577,11 +577,11 @@ Runtime dependencies of the frontend, plus its test tooling.
 | @material-ui/icons | ^4.9.1 (4.11.3) | MIT | Call-Em-All (Material-UI Team) |
 | react | ^18.0.2 (18.3.1) | MIT | Facebook, Inc. and its affiliates (Meta) |
 | react-dom | ^18.0.2 (18.3.1) | MIT | Facebook, Inc. and its affiliates (Meta) |
-| react-router | ^6.30.4, resolution pin 6.30.4 (6.30.4) | MIT | Remix Software |
-| react-router-dom | ^6.30.4, resolution pin 6.30.4 (6.30.4) | MIT | Remix Software |
+| react-router | ^8.4.0, resolution pin 7.18.4 (7.18.4) | MIT | Remix Software |
+| react-router-dom | ^7.18.4, resolution pin 7.18.4 (7.18.4) | MIT | Remix Software |
 | @backstage/frontend-test-utils (dev) | ^0.5.1 (0.5.1) | Apache-2.0 | The Backstage Authors |
 | @testing-library/dom (dev) | ^9.0.0 (9.3.4) | MIT | Kent C. Dodds and contributors |
-| @testing-library/jest-dom (dev) | ^6.0.0 (6.9.1) | MIT | Testing Library contributors |
+| @testing-library/jest-dom (dev) | ^7.0.1 (7.0.1) | MIT | Testing Library contributors |
 | @testing-library/react (dev) | ^14.0.0 (14.3.1) | MIT | Kent C. Dodds and contributors |
 | @testing-library/user-event (dev) | ^14.0.0 (14.6.1) | MIT | Testing Library contributors |
 | @types/react-dom (dev) | `*`, resolution pin ^18 (18.3.7) | MIT | DefinitelyTyped contributors |
@@ -593,25 +593,25 @@ Runtime dependencies of the Backstage backend.
 
 | Package | Range (installed) | License | Copyright |
 |---|---|---|---|
-| @backstage/backend-defaults | ^0.16.0 (0.16.0) | Apache-2.0 | The Backstage Authors |
+| @backstage/backend-defaults | ^0.18.0 (0.18.1) | Apache-2.0 | The Backstage Authors |
 | @backstage/config | ^1.3.6 (1.3.6) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-app-backend | ^0.5.12 (0.5.12) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-auth-backend | ^0.29.2 (0.29.2) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-auth-backend-module-github-provider | ^0.5.1 (0.5.1) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-auth-backend-module-guest-provider | ^0.2.17 (0.2.17) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-auth-node | ^0.6.14 (0.6.14) | Apache-2.0 | The Backstage Authors |
-| @backstage/plugin-catalog-backend | ^3.5.0 (3.5.0) | Apache-2.0 | The Backstage Authors |
+| @backstage/plugin-catalog-backend | ^3.9.2 (3.9.2; was ^3.5.0 until 2026-11-18, PR #52; plus descriptor-scoped resolution pin @npm:^3.5.0 -> 3.9.2 at backstage/package.json:125) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-catalog-backend-module-gitea | ^0.1.10 (0.1.10) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-catalog-backend-module-logs | ^0.1.20 (0.1.20) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-catalog-backend-module-scaffolder-entity-model | ^0.2.18 (0.2.18) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-kubernetes-backend | ^0.21.2 (0.21.2) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-notifications-backend | ^0.6.3 (0.6.3) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-permission-backend | ^0.7.10 (0.7.10) | Apache-2.0 | The Backstage Authors |
-| @backstage/plugin-permission-backend-module-allow-all-policy | ^0.2.17 (0.2.17) | Apache-2.0 | The Backstage Authors |
+| @backstage/plugin-permission-backend-module-allow-all-policy (REMOVED 2026-08-18) | was ^0.2.17 (0.2.17) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-permission-common | ^0.9.7 (0.9.7) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-permission-node | ^0.10.11 (0.10.11) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-proxy-backend | ^0.6.11 (0.6.11) | Apache-2.0 | The Backstage Authors |
-| @backstage/plugin-scaffolder-backend | ^3.2.0 (3.3.0) | Apache-2.0 | The Backstage Authors |
+| @backstage/plugin-scaffolder-backend | ^4.2.0 (4.2.1) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-scaffolder-backend-module-github | REMOVED 2026-08-19 (was ^0.9.7, installed 0.9.7; dead dependency -- declared but never registered since June; replaced by the Gitea module below; gone from package.json and yarn.lock) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-scaffolder-backend-module-notifications | ^0.1.20 (0.1.20) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-search-backend | ^2.1.0 (2.1.0) | Apache-2.0 | The Backstage Authors |
@@ -620,7 +620,7 @@ Runtime dependencies of the Backstage backend.
 | @backstage/plugin-search-backend-module-techdocs | ^0.4.12 (0.4.12) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-search-backend-node | ^1.4.2 (1.4.2) | Apache-2.0 | The Backstage Authors |
 | @backstage/plugin-signals-backend | ^0.3.13 (0.3.13) | Apache-2.0 | The Backstage Authors |
-| @backstage/plugin-techdocs-backend | ^2.1.6 (2.1.6) | Apache-2.0 | The Backstage Authors |
+| @backstage/plugin-techdocs-backend | ^2.2.2 (2.2.2) | Apache-2.0 | The Backstage Authors |
 | better-sqlite3 | ^12.0.0 (12.8.0) | MIT (bundles SQLite, public domain) | Joshua Wise |
 | pg (node-postgres) | ^8.11.3 (8.20.0) | MIT | Brian Carlson |
 | @backstage/plugin-catalog-common | ^1.1.8 (1.1.8) | Apache-2.0 | The Backstage Authors |
@@ -641,20 +641,22 @@ all workspaces. The packages below appear only as resolution pins (they are
 transitive-only dependencies); `react-router`, `react-router-dom`, and
 `@types/react-dom` also carry resolution pins and are listed in the app
 table above. Copyright holders are taken from the installed tarball
-LICENSE headers (verified 2026-08-18).
+LICENSE headers (verified 2026-08-18; rows for pins added or first
+listed on 2026-11-18, PR #52, were taken from the installed package.json
+`license` field and LICENSE header on that date).
 
 | Package | Pin (installed) | License | Copyright |
 |---|---|---|---|
 | @types/react | ^18 (18.3.28) | MIT | DefinitelyTyped contributors |
-| @grpc/grpc-js | ^1.14.4 (1.14.4) | Apache-2.0 | Google Inc. |
+| @grpc/grpc-js | 1.14.5 (1.14.5) | Apache-2.0 | Google Inc. |
 | @babel/core | ^7.29.1 (7.29.7) | MIT | The Babel Team |
 | @protobufjs/utf8 | ^1.1.1 (1.1.2) | BSD-3-Clause | Daniel Wirtz (protobufjs) |
 | ws | ^8.21.0 (8.21.0) | MIT | Einar Otto Stangvik |
-| axios | ^1.13.5 (1.19.0) | MIT | Matt Zabriskie and collaborators |
-| undici | ^7.29.0 (7.29.0) | MIT | Node.js contributors |
+| axios | 1.20.0 (1.20.0) | MIT | Matt Zabriskie and collaborators |
+| undici | 7.30.2 (7.30.2) | MIT | Node.js contributors |
 | lodash | 4.18.1 | MIT | John-David Dalton / Lodash contributors |
 | protobufjs | 7.6.5 | BSD-3-Clause | Daniel Wirtz |
-| shell-quote | 1.10.0 | MIT | James Halliday |
+| shell-quote | 1.12.0 | MIT | James Halliday |
 | websocket-driver | 0.7.5 | Apache-2.0 | James Coglan |
 | form-data | 4.0.6 | MIT | Felix Geisendoerfer and contributors |
 | minimatch | 9.0.9 (single installed copy and single pin at package.json:89; the dead descriptor-scoped pins were removed in the 2026-08-18 remediation) | ISC | Isaac Z. Schlueter |
@@ -662,28 +664,28 @@ LICENSE headers (verified 2026-08-18).
 | tar | 7.5.22 | BlueOak-1.0.0 | Isaac Z. Schlueter |
 | linkify-it | 5.0.2 (re-pinned from 6.1.0 on 2026-08-20; markdown-it 14.2.0 types require the ^5.0.1 line for yarn build:all) | MIT | Vitaly Puzrin (2015) |
 | fast-xml-builder | 1.3.0 | MIT | Natural Intelligence (2026); author Amit Gupta |
-| brace-expansion | 5.0.9 | MIT | Julian Gruber; TypeScript port Isaac Z. Schlueter |
-| fast-uri | 4.1.2 | BSD-3-Clause | Vincent Le Goff |
+| brace-expansion | 2.1.7 | MIT | Julian Gruber; TypeScript port Isaac Z. Schlueter |
+| fast-uri | 4.1.5 | BSD-3-Clause | Vincent Le Goff |
 | postcss | 8.5.25 | MIT | Andrey Sitnik |
-| basic-ftp | 6.0.2 | MIT | Patrick Juchli |
+| basic-ftp | 6.2.1 | MIT | Patrick Juchli |
 | js-cookie | 3.0.8 | MIT | Klaus Hartl |
-| multer | 2.2.0 | MIT | Hage Yaapa, Jaret Pfluger, et al. |
+| multer | 2.5.0 | MIT | Hage Yaapa, Jaret Pfluger, et al. |
 | http-proxy-middleware | 2.0.10 | MIT | Steven Chim |
-| dompurify | 3.4.13 | (MPL-2.0 OR Apache-2.0) | Mario Heiderich, Cure53 |
-| follow-redirects | 1.16.0 | MIT | Ruben Verborgh and contributors |
-| qs | 6.15.3 | BSD-3-Clause | Jordan Harband |
+| dompurify | 3.4.17 | (MPL-2.0 OR Apache-2.0) | Mario Heiderich, Cure53 |
+| follow-redirects | 1.16.3 | MIT | Ruben Verborgh and contributors |
+| qs | 6.16.0 | BSD-3-Clause | Jordan Harband |
 | uuid | 11.1.1 | MIT | Robert Kieffer and other contributors (2010-2020) |
-| svgo | 3.3.4 | MIT | Kir Belevich and contributors |
+| svgo | 3.3.5 | MIT | Kir Belevich and contributors |
 | koa | 2.16.4 | MIT | Koa contributors ((c) 2019) |
-| adm-zip | 0.6.0 | MIT | Nasca Iacob (cthackers) |
-| js-yaml | 4.3.1 | MIT | Vladimir Zapparov and contributors |
+| adm-zip | 0.6.1 | MIT | Nasca Iacob (cthackers) |
+| js-yaml | 4.3.2 | MIT | Vladimir Zapparov and contributors |
 | webpack-dev-server | 5.2.6 | MIT | Tobias Koppers (webpack contributors) |
 | prismjs | 1.30.0 | MIT | Lea Verou and contributors |
-| body-parser | 1.20.6 | MIT | Douglas Christopher Wilson, Jonathan Ong, et al. |
+| body-parser | 1.20.9 | MIT | Douglas Christopher Wilson, Jonathan Ong, et al. |
 | fast-xml-parser | 5.7.0 | MIT | Amit Gupta (NaturalIntelligence) |
-| markdown-it | 14.2.0 | MIT | Vitaly Puzrin, Alex Kocharin ((c) 2014) |
-| launch-editor | 2.14.1 | MIT | Evan You |
-| ip-address | 10.3.1 | MIT | Beau Gunderson |
+| markdown-it | 14.3.3 | MIT | Vitaly Puzrin, Alex Kocharin ((c) 2014) |
+| launch-editor | 2.14.2 | MIT | Evan You |
+| ip-address | 10.5.1 | MIT | Beau Gunderson |
 | nanoid | 3.3.18 (pin added 2026-08-18) | MIT | Andrey Sitnik |
 | file-type | 21.3.2 (pin added 2026-08-18; ESM-only, and the only dependent never imports it) | MIT | Sindre Sorhus |
 | typescript-json-schema | 0.68.0 (pin added 2026-08-18; drops vm2, eliminating it from the tree) | BSD-3-Clause | Yousef El-Dardiry and Dominik Moritz |
@@ -693,6 +695,23 @@ LICENSE headers (verified 2026-08-18).
 | @tootallnate/once | 2.0.1 | MIT | Nathan Rajlich |
 | esbuild | 0.28.1 | MIT | Evan Wallace ((c) 2020) |
 | urllib | 4.9.1 (pin added 2026-08-26 for GHSA-hq3h-g68c-hp78; transitive via infinispan ^0.12.0) | MIT | fengmk2 and other contributors ((c) 2011-2014) |
+| proxy-addr | 2.0.8 (pin added 2026-11-18, PR #52; critical GHSA-jqcg-44mw-7w3h) | MIT | Douglas Christopher Wilson (LICENSE: (c) 2014-2016) |
+| node-forge | 1.4.3 (pin added 2026-11-18, PR #52; 8 high advisories <=1.4.0) | (BSD-3-Clause OR GPL-2.0) | Digital Bazaar, Inc. (LICENSE: (c) 2010) |
+| compression | 1.8.2 (pin added 2026-11-18, PR #52; GHSA-vc2v-76pw-4v95) | MIT | Jonathan Ong, Douglas Christopher Wilson (LICENSE: (c) 2014) |
+| source-map-js | 1.2.2 (pin added 2026-11-18, PR #52; GHSA-68fv-2mgg-jv7q) | BSD-3-Clause | Mozilla Foundation and contributors (LICENSE: (c) 2009-2011); fork by Valentin Semirulnik |
+| @azure/identity | 4.14.1 (pin added 2026-11-18, PR #52; pulls @azure/msal-node ^7.1.0, installed 7.2.1, MIT, Copyright (c) 2020 Microsoft -- a 5 -> 7 major for msal-node, GHSA-xcx6-jx8p-x3h5) | MIT | Microsoft Corporation |
+| isomorphic-git | 1.38.7 (descriptor-scoped pin isomorphic-git@npm:^1.23.0, added 2026-11-18, PR #52; GHSA-9qw7-j9xw-fv9c) | MIT | the isomorphic-git authors (LICENSE.md: 2017-2023) |
+| @backstage/plugin-techdocs-node | 1.15.6 (descriptor-scoped pins for ^1.14.4 and ^1.15.2, added 2026-11-18, PR #52; seven high advisories; stays on the 1.x major) | Apache-2.0 | The Backstage Authors |
+| zod | 4.6.7 (descriptor-scoped pins for ^4.0.0 and ^3.25.76 OR ^4.0.0 (the yarn descriptor joins the two ranges with a double pipe, written as OR here so the table renders), added 2026-11-18, PR #52; GHSA-mrhx-c7xc-m3w5; zod 3.25.76 no longer in yarn.lock) | MIT | Colin McDonnell (LICENSE: (c) 2025) |
+| @backstage/catalog-model (descriptor-scoped) | 1.10.2 for ^1.9.0 (pin added 2026-11-18, PR #52; drops a zod ^3.25.76 consumer) | Apache-2.0 | The Backstage Authors |
+| @backstage/cli-module-auth | 0.1.5 for ^0.1.0 (pin added 2026-11-18, PR #52; drops a zod ^3.25.76 consumer) | Apache-2.0 | The Backstage Authors |
+| @backstage/cli-module-new | 0.1.8 for ^0.1.0 (pin added 2026-11-18, PR #52; drops a zod ^3.25.76 consumer) | Apache-2.0 | The Backstage Authors |
+| @graphql-tools/utils | 12.1.0 (pin added 2026-11-18, PR #52; GHSA-7mx3-vvmw-hjmv and GHSA-c4qx-w738-7hr3; forced 8 -> 12 major under mockttp 3.17.1) | MIT | The Guild / graphql-tools contributors (no LICENSE file in tarball; package.json license field MIT; author Dotan Simha) |
+| browserslist | 4.28.7 (pin present in backstage/package.json before 2026-11-18; first listed in this regeneration) | MIT | Andrey Sitnik and other contributors (LICENSE: 2014) |
+| baseline-browser-mapping | 2.11.0 (pin present before 2026-11-18; first listed in this regeneration) | Apache-2.0 | web-platform-dx contributors (Apache-2.0 LICENSE.txt; no author field) |
+| mysql2 | 3.23.1 (pin present before 2026-11-18; first listed in this regeneration) | MIT | Andrey Sidorov and contributors (License: 2016) |
+| postcss-selector-parser | 6.1.3 for ^6.0.4/^6.0.5/^6.0.9 and 7.1.3 for ^7.0.0 (descriptor-scoped pins present before 2026-11-18; first listed in this regeneration) | MIT | Ben Briggs and contributors (LICENSE-MIT) |
+| handlebars | 4.7.10 (pin added by #39, 93bf9da, 2026-11-07; first listed in this regeneration) | MIT | Yehuda Katz (LICENSE: 2011-2019) |
 
 Runtime-fetched third-party artifacts adjacent to this scope (not in yarn):
 Playwright downloads browser binaries at `yarn test:e2e` time (per the
@@ -927,3 +946,8 @@ Documented accepted risks (not unverified items):
   v7 was rejected as an unsupported major against all Backstage peer
   declarations. Remediation path: upstream Backstage shipping
   v7-compatible peer ranges. Accepted as a residual risk 2026-08-18.
+  SUPERSEDED STATE (measured 2026-11-18): an earlier change (#34,
+  250d7c0) moved the app to react-router ^8.4.0 / react-router-dom
+  ^7.18.4, and the resolution pins are now 7.18.4 (installed 7.18.4).
+  `yarn install` reports YN0060 against the ^6.30.2 peer range of
+  @backstage/core-components. Runtime impact: UNVERIFIED.

@@ -18,6 +18,19 @@ and usage.
 - License and copyright verification for this generation (2026-08-18) was
   performed against upstream LICENSE files, registry metadata, the
   installed `backstage/node_modules` tree, and the local Go module cache.
+- Regeneration of 2026-11-18 (certificate r13, PR #52): group 5 only.
+  Every group 5 version cell and package.json evidence line number was
+  re-derived from `backstage/package.json`, `backstage/packages/*/package.json`
+  and the installed `backstage/node_modules` tree after `yarn install`
+  against the PR #52 lockfile (Yarn 4.18.0, Node v24.22.1, Linux build
+  host). This also catches up dependency changes that landed between r12
+  and r13 without a regeneration (#15-#19, #33, #34, #37-#39 and
+  80ea799). New rows 130-146 cover the resolution pins added in PR #52
+  plus five pins that earlier changes added without a listing row.
+  License and holder fields for the new rows come from each installed
+  package's package.json `license` field and LICENSE header. Groups 1-4
+  and 6-8 were not re-measured in this regeneration and carry their
+  earlier verification dates.
 
 ## Authoritative dependency closure
 
@@ -152,7 +165,7 @@ per-repo from the module cache at the exact pinned versions (2026-08-18).
 | 21 | google.golang.org/grpc (indirect) | v1.83.0 | https://github.com/grpc/grpc-go | Apache-2.0 | gRPC authors / Google LLC (CNCF) | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:28 |
 | 22 | google.golang.org/protobuf (indirect) | v1.36.11 | https://github.com/protocolbuffers/protobuf-go | BSD-3-Clause | The Go Authors (2018) / Google LLC | build dependency (hello-m2, indirect) | seed-repos/hello-m2/go.mod:29 |
 
-## 5. Backstage and Node.js (129 entries)
+## 5. Backstage and Node.js (146 entries)
 
 `backstage/` was scaffolded with `@backstage/create-app` and tracks the
 Backstage release line 1.49.1. Scaffold-originating files are Apache-2.0;
@@ -181,15 +194,15 @@ version in parentheses):
 
 | # | Component | Version/pin | Upstream URL | License (SPDX) | Copyright holder | Usage mode | Evidence |
 |---|---|---|---|---|---|---|---|
-| 4 | @backstage/cli | ^0.36.0 (0.36.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | build dependency | backstage/package.json:39; packages/app/package.json:18; packages/backend/package.json:53 |
+| 4 | @backstage/cli | ^0.36.0 (0.36.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | build dependency | backstage/package.json:39; packages/app/package.json:27; packages/backend/package.json:54 |
 | 5 | @backstage/cli-defaults | ^0.1.0 (0.1.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | build dependency | backstage/package.json:40 |
 | 6 | @backstage/e2e-test-utils | ^0.1.2 (0.1.2) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | build dependency (e2e) | backstage/package.json:41 |
 | 7 | @jest/environment-jsdom-abstract | ^30.0.0 (30.3.0) | https://github.com/jestjs/jest | MIT | Meta Platforms, Inc. and affiliates | build dependency (test) | backstage/package.json:42 |
-| 8 | @playwright/test | ^1.32.3 (1.59.1) | https://github.com/microsoft/playwright | Apache-2.0 | Microsoft Corporation | build dependency (e2e) | backstage/package.json:43; packages/app/package.json:49 |
+| 8 | @playwright/test | ^1.32.3 (1.59.1) | https://github.com/microsoft/playwright | Apache-2.0 | Microsoft Corporation | build dependency (e2e) | backstage/package.json:43; packages/app/package.json:58 |
 | 9 | @types/jest | ^30.0.0 (30.0.0) | https://github.com/DefinitelyTyped/DefinitelyTyped | MIT | DefinitelyTyped contributors | build dependency (types) | backstage/package.json:44 |
-| 10 | jest | ^30.2.0 (30.3.0) | https://github.com/jestjs/jest | MIT | Meta Platforms, Inc. and affiliates | build dependency (test) | backstage/package.json:45 |
+| 10 | jest | ^30.4.2 (30.4.2) | https://github.com/jestjs/jest | MIT | Meta Platforms, Inc. and affiliates | build dependency (test) | backstage/package.json:45 |
 | 11 | jsdom | ^27.1.0 (27.4.0) | https://github.com/jsdom/jsdom | MIT | Elijah Insua, Domenic Denicola, et al. | build dependency (test) | backstage/package.json:46 |
-| 12 | node-gyp | ^10.0.0 (10.3.1) | https://github.com/nodejs/node-gyp | MIT | Nathan Rajlich / Node.js contributors | build dependency (native builds) | backstage/package.json:47; packages/backend/package.json:49 |
+| 12 | node-gyp | ^10.0.0 (10.3.1) | https://github.com/nodejs/node-gyp | MIT | Nathan Rajlich / Node.js contributors | build dependency (native builds) | backstage/package.json:47; packages/backend/package.json:50 |
 | 13 | prettier | ^2.3.2 (2.8.8) | https://github.com/prettier/prettier | MIT | James Long and contributors | build dependency (formatting) | backstage/package.json:48 |
 | 14 | typescript | ~5.8.0 (5.8.3) | https://github.com/microsoft/TypeScript | Apache-2.0 | Microsoft Corp. | build dependency (language toolchain) | backstage/package.json:49 |
 
@@ -207,81 +220,84 @@ tooling):
 
 | # | Component | Version/pin | Upstream URL | License (SPDX) | Copyright holder | Usage mode | Evidence |
 |---|---|---|---|---|---|---|---|
-| 15 | @backstage/core-components | ^0.18.8 (0.18.8) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:19 |
-| 16 | @backstage/core-plugin-api | ^1.12.4 (1.12.4) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:20 |
-| 17 | @backstage/frontend-defaults | ^0.5.0 (0.5.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:21 |
-| 18 | @backstage/frontend-plugin-api | ^0.15.1 (0.15.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:22 |
-| 19 | @backstage/integration-react | ^1.2.16 (1.2.16) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:23 |
-| 20 | @backstage/plugin-api-docs | ^0.13.5 (0.13.5) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:24 |
-| 21 | @backstage/plugin-app-react | ^0.2.1 (0.2.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:25 |
-| 22 | @backstage/plugin-app-visualizer | ^0.2.1 (0.2.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:26 |
-| 23 | @backstage/plugin-catalog | ^2.0.1 (2.0.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:27 |
-| 24 | @backstage/plugin-catalog-graph | ^0.6.0 (0.6.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:28 |
-| 25 | @backstage/plugin-catalog-import | ^0.13.11 (0.13.11) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:29 |
-| 26 | @backstage/plugin-kubernetes | ^0.12.17 (0.12.17) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:30 |
-| 27 | @backstage/plugin-notifications | ^0.5.15 (0.5.15) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:31 |
-| 28 | @backstage/plugin-org | ^0.7.0 (0.7.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:32 |
-| 29 | @backstage/plugin-scaffolder | ^1.36.1 (1.36.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:33 |
-| 30 | @backstage/plugin-search | ^1.7.0 (1.7.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:34 |
-| 31 | @backstage/plugin-signals | ^0.0.29 (0.0.29) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:35 |
-| 32 | @backstage/plugin-techdocs | ^1.17.2 (1.17.2) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:36 |
-| 33 | @backstage/plugin-techdocs-module-addons-contrib | ^1.1.34 (1.1.34) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:37 |
-| 34 | @backstage/plugin-user-settings | ^0.9.1 (0.9.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:38 |
-| 35 | @backstage/ui | ^0.13.1 (0.13.2) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:39 |
-| 36 | @material-ui/core | ^4.12.2 (4.12.4) | https://github.com/mui/material-ui | MIT | Call-Em-All (Material-UI Team) | runtime dependency | packages/app/package.json:40 |
-| 37 | @material-ui/icons | ^4.9.1 (4.11.3) | https://github.com/mui/material-ui | MIT | Call-Em-All (Material-UI Team) | runtime dependency | packages/app/package.json:41 |
-| 38 | react | ^18.0.2 (18.3.1) | https://github.com/facebook/react | MIT | Facebook, Inc. and its affiliates (Meta) | runtime dependency | packages/app/package.json:42 |
-| 39 | react-dom | ^18.0.2 (18.3.1) | https://github.com/facebook/react | MIT | Facebook, Inc. and its affiliates (Meta) | runtime dependency | packages/app/package.json:43 |
-| 40 | react-router | ^6.30.4; resolution pin 6.30.4 (6.30.4) | https://github.com/remix-run/react-router | MIT | Remix Software | runtime dependency | packages/app/package.json:44; backstage/package.json:60 |
-| 41 | react-router-dom | ^6.30.4; resolution pin 6.30.4 (6.30.4) | https://github.com/remix-run/react-router | MIT | Remix Software | runtime dependency | packages/app/package.json:45; backstage/package.json:61 |
-| 42 | @backstage/frontend-test-utils (dev) | ^0.5.1 (0.5.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | build dependency (test) | packages/app/package.json:48 |
-| 43 | @testing-library/dom (dev) | ^9.0.0 (9.3.4) | https://github.com/testing-library/dom-testing-library | MIT | Kent C. Dodds and contributors | build dependency (test) | packages/app/package.json:50 |
-| 44 | @testing-library/jest-dom (dev) | ^6.0.0 (6.9.1) | https://github.com/testing-library/jest-dom | MIT | Testing Library contributors | build dependency (test) | packages/app/package.json:51 |
-| 45 | @testing-library/react (dev) | ^14.0.0 (14.3.1) | https://github.com/testing-library/react-testing-library | MIT | Kent C. Dodds and contributors | build dependency (test) | packages/app/package.json:52 |
-| 46 | @testing-library/user-event (dev) | ^14.0.0 (14.6.1) | https://github.com/testing-library/user-event | MIT | Testing Library contributors | build dependency (test) | packages/app/package.json:53 |
-| 47 | @types/react-dom (dev) | *; resolution pin ^18 (18.3.7) | https://github.com/DefinitelyTyped/DefinitelyTyped | MIT | DefinitelyTyped contributors | build dependency (types) | packages/app/package.json:54; backstage/package.json:53 |
-| 48 | cross-env (dev) | ^7.0.0 (7.0.3) | https://github.com/kentcdodds/cross-env | MIT | Kent C. Dodds | build dependency | packages/app/package.json:55 |
+| 15 | @backstage/core-components | ^0.18.8 (0.18.8) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:28 |
+| 16 | @backstage/core-plugin-api | ^1.12.4 (1.12.4) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:29 |
+| 17 | @backstage/frontend-defaults | ^0.5.0 (0.5.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:30 |
+| 18 | @backstage/frontend-plugin-api | ^0.15.1 (0.15.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:31 |
+| 19 | @backstage/integration-react | ^1.2.20 (1.2.20) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:32 |
+| 20 | @backstage/plugin-api-docs | ^0.13.5 (0.13.5) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:33 |
+| 21 | @backstage/plugin-app-react | ^0.2.1 (0.2.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:34 |
+| 22 | @backstage/plugin-app-visualizer | ^0.2.1 (0.2.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:35 |
+| 23 | @backstage/plugin-catalog | ^2.0.1 (2.0.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:36 |
+| 24 | @backstage/plugin-catalog-graph | ^0.6.0 (0.6.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:37 |
+| 25 | @backstage/plugin-catalog-import | ^0.13.11 (0.13.11) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:38 |
+| 26 | @backstage/plugin-kubernetes | ^0.12.17 (0.12.17) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:39 |
+| 27 | @backstage/plugin-notifications | ^0.5.15 (0.5.15) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:40 |
+| 28 | @backstage/plugin-org | 0.7.6 (0.7.6) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:41 |
+| 29 | @backstage/plugin-scaffolder | ^1.36.1 (1.36.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:42 |
+| 30 | @backstage/plugin-search | ^1.7.0 (1.7.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:43 |
+| 31 | @backstage/plugin-signals | ^0.0.29 (0.0.29) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:44 |
+| 32 | @backstage/plugin-techdocs | ^1.17.2 (1.17.2) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:45 |
+| 33 | @backstage/plugin-techdocs-module-addons-contrib | ^1.1.34 (1.1.34) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:46 |
+| 34 | @backstage/plugin-user-settings | ^0.9.1 (0.9.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:47 |
+| 35 | @backstage/ui | ^0.13.1 (0.13.2) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/app/package.json:48 |
+| 36 | @material-ui/core | ^4.12.2 (4.12.4) | https://github.com/mui/material-ui | MIT | Call-Em-All (Material-UI Team) | runtime dependency | packages/app/package.json:49 |
+| 37 | @material-ui/icons | ^4.9.1 (4.11.3) | https://github.com/mui/material-ui | MIT | Call-Em-All (Material-UI Team) | runtime dependency | packages/app/package.json:50 |
+| 38 | react | ^18.0.2 (18.3.1) | https://github.com/facebook/react | MIT | Facebook, Inc. and its affiliates (Meta) | runtime dependency | packages/app/package.json:51 |
+| 39 | react-dom | ^18.0.2 (18.3.1) | https://github.com/facebook/react | MIT | Facebook, Inc. and its affiliates (Meta) | runtime dependency | packages/app/package.json:52 |
+| 40 | react-router | ^8.4.0; resolution pin 7.18.4 (7.18.4) | https://github.com/remix-run/react-router | MIT | Remix Software | runtime dependency | packages/app/package.json:53; backstage/package.json:60 |
+| 41 | react-router-dom | ^7.18.4; resolution pin 7.18.4 (7.18.4) | https://github.com/remix-run/react-router | MIT | Remix Software | runtime dependency | packages/app/package.json:54; backstage/package.json:61 |
+| 42 | @backstage/frontend-test-utils (dev) | ^0.5.1 (0.5.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | build dependency (test) | packages/app/package.json:57 |
+| 43 | @testing-library/dom (dev) | ^9.0.0 (9.3.4) | https://github.com/testing-library/dom-testing-library | MIT | Kent C. Dodds and contributors | build dependency (test) | packages/app/package.json:59 |
+| 44 | @testing-library/jest-dom (dev) | ^7.0.1 (7.0.1) | https://github.com/testing-library/jest-dom | MIT | Testing Library contributors | build dependency (test) | packages/app/package.json:60 |
+| 45 | @testing-library/react (dev) | ^14.0.0 (14.3.1) | https://github.com/testing-library/react-testing-library | MIT | Kent C. Dodds and contributors | build dependency (test) | packages/app/package.json:61 |
+| 46 | @testing-library/user-event (dev) | ^14.0.0 (14.6.1) | https://github.com/testing-library/user-event | MIT | Testing Library contributors | build dependency (test) | packages/app/package.json:62 |
+| 47 | @types/react-dom (dev) | *; resolution pin ^18 (18.3.7) | https://github.com/DefinitelyTyped/DefinitelyTyped | MIT | DefinitelyTyped contributors | build dependency (types) | packages/app/package.json:63; backstage/package.json:53 |
+| 48 | cross-env (dev) | ^7.0.0 (7.0.3) | https://github.com/kentcdodds/cross-env | MIT | Kent C. Dodds | build dependency | packages/app/package.json:64 |
 
 Backend workspace dependencies (30 entries; backend runtime):
 
 | # | Component | Version/pin | Upstream URL | License (SPDX) | Copyright holder | Usage mode | Evidence |
 |---|---|---|---|---|---|---|---|
-| 49 | @backstage/backend-defaults | ^0.16.0 (0.16.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:19 |
+| 49 | @backstage/backend-defaults | ^0.18.0 (0.18.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:19 |
 | 50 | @backstage/config | ^1.3.6 (1.3.6) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:20 |
 | 51 | @backstage/plugin-app-backend | ^0.5.12 (0.5.12) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:21 |
 | 52 | @backstage/plugin-auth-backend | ^0.29.2 (0.29.2) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:22 |
 | 53 | @backstage/plugin-auth-backend-module-github-provider | ^0.5.1 (0.5.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency (declared, not wired in index.ts) | packages/backend/package.json:23 |
 | 54 | @backstage/plugin-auth-backend-module-guest-provider | ^0.2.17 (0.2.17) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:24 |
 | 55 | @backstage/plugin-auth-node | ^0.6.14 (0.6.14) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency (basis of custom giteaAuth module) | packages/backend/package.json:25 |
-| 56 | @backstage/plugin-catalog-backend | ^3.5.0 (3.5.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:26 |
+| 56 | @backstage/plugin-catalog-backend | ^3.9.2 (3.9.2; was ^3.5.0 (3.5.0) until 2026-11-18, PR #52; plus descriptor-scoped resolution pin @npm:^3.5.0 -> 3.9.2 for plugin-catalog-backend-module-logs) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:26; backstage/package.json:125 |
 | 57 | @backstage/plugin-catalog-backend-module-gitea | ^0.1.10 (0.1.10) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency (Gitea catalog integration) | packages/backend/package.json:27 |
 | 58 | @backstage/plugin-catalog-backend-module-logs | ^0.1.20 (0.1.20) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:28 |
 | 59 | @backstage/plugin-catalog-backend-module-scaffolder-entity-model | ^0.2.18 (0.2.18) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:29 |
-| 60 | @backstage/plugin-kubernetes-backend | ^0.21.2 (0.21.2) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:30 |
-| 61 | @backstage/plugin-notifications-backend | ^0.6.3 (0.6.3) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:31 |
-| 62 | @backstage/plugin-permission-backend | ^0.7.10 (0.7.10) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:32 |
-| 63 | @backstage/plugin-permission-backend-module-allow-all-policy | ^0.2.17 (0.2.17) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:33 |
-| 64 | @backstage/plugin-permission-common | ^0.9.7 (0.9.7) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:34 |
-| 65 | @backstage/plugin-permission-node | ^0.10.11 (0.10.11) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:35 |
-| 66 | @backstage/plugin-proxy-backend | ^0.6.11 (0.6.11) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:36 |
-| 67 | @backstage/plugin-scaffolder-backend | ^3.2.0 (3.3.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:37 |
+| 60 | @backstage/plugin-kubernetes-backend | ^0.21.2 (0.21.2) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:31 |
+| 61 | @backstage/plugin-notifications-backend | ^0.6.3 (0.6.3) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:33 |
+| 62 | @backstage/plugin-permission-backend | ^0.7.10 (0.7.10) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:34 |
+| 63 | @backstage/plugin-permission-backend-module-allow-all-policy (REMOVED 2026-08-18) | was ^0.2.17 (0.2.17) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | REMOVED: dropped from packages/backend/package.json by de1ac07 (2026-08-18, Wave-0 RBAC policy module); absent from yarn.lock (grep count 0, measured 2026-11-18) | formerly packages/backend/package.json:33 |
+| 64 | @backstage/plugin-permission-common | ^0.9.7 (0.9.7) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:35 |
+| 65 | @backstage/plugin-permission-node | ^0.10.11 (0.10.11) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:36 |
+| 66 | @backstage/plugin-proxy-backend | ^0.6.11 (0.6.11) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:37 |
+| 67 | @backstage/plugin-scaffolder-backend | ^4.2.0 (4.2.1) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:38 |
 | 68 | @backstage/plugin-scaffolder-backend-module-github (REMOVED 2026-08-19) | was ^0.9.7 (0.9.7) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | REMOVED: dead dependency -- declared but never registered since June; the Gitea module (entry #81) replaces it; gone from both package.json and yarn.lock (verified 2026-08-19) | formerly packages/backend/package.json:38 |
-| 69 | @backstage/plugin-scaffolder-backend-module-notifications | ^0.1.20 (0.1.20) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:39 |
-| 70 | @backstage/plugin-search-backend | ^2.1.0 (2.1.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:40 |
-| 71 | @backstage/plugin-search-backend-module-catalog | ^0.3.13 (0.3.13) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:41 |
-| 72 | @backstage/plugin-search-backend-module-pg | ^0.5.53 (0.5.53) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:42 |
-| 73 | @backstage/plugin-search-backend-module-techdocs | ^0.4.12 (0.4.12) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:43 |
-| 74 | @backstage/plugin-search-backend-node | ^1.4.2 (1.4.2) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:44 |
-| 75 | @backstage/plugin-signals-backend | ^0.3.13 (0.3.13) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:45 |
-| 76 | @backstage/plugin-techdocs-backend | ^2.1.6 (2.1.6) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:46 |
-| 77 | better-sqlite3 | ^12.0.0 (12.8.0) | https://github.com/WiseLibs/better-sqlite3 | MIT (bundles SQLite, public domain) | Joshua Wise | runtime dependency (dev database, app-config.yaml:43-45) | packages/backend/package.json:48 |
-| 78 | pg (node-postgres) | ^8.11.3 (8.20.0) | https://github.com/brianc/node-postgres | MIT | Brian Carlson | runtime dependency (production database, app-config.production.yaml:19-26) | packages/backend/package.json:50 |
+| 69 | @backstage/plugin-scaffolder-backend-module-notifications | ^0.1.20 (0.1.20) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:40 |
+| 70 | @backstage/plugin-search-backend | ^2.1.0 (2.1.0) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:41 |
+| 71 | @backstage/plugin-search-backend-module-catalog | ^0.3.13 (0.3.13) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:42 |
+| 72 | @backstage/plugin-search-backend-module-pg | ^0.5.53 (0.5.53) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:43 |
+| 73 | @backstage/plugin-search-backend-module-techdocs | ^0.4.12 (0.4.12) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:44 |
+| 74 | @backstage/plugin-search-backend-node | ^1.4.2 (1.4.2) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:45 |
+| 75 | @backstage/plugin-signals-backend | ^0.3.13 (0.3.13) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:46 |
+| 76 | @backstage/plugin-techdocs-backend | ^2.2.2 (2.2.2) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency | packages/backend/package.json:47 |
+| 77 | better-sqlite3 | ^12.0.0 (12.8.0) | https://github.com/WiseLibs/better-sqlite3 | MIT (bundles SQLite, public domain) | Joshua Wise | runtime dependency (dev database, app-config.yaml:43-45) | packages/backend/package.json:49 |
+| 78 | pg (node-postgres) | ^8.11.3 (8.20.0) | https://github.com/brianc/node-postgres | MIT | Brian Carlson | runtime dependency (production database, app-config.production.yaml:19-26) | packages/backend/package.json:51 |
 | 79 | @backstage/plugin-catalog-common | ^1.1.8 (1.1.8) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency (direct backend dependency since 2026-08-18; previously transitive/app-side) | packages/backend/package.json:30 |
 | 80 | @backstage/plugin-kubernetes-common | ^0.9.10 (0.9.10) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency (direct backend dependency since 2026-08-18; previously transitive/app-side) | packages/backend/package.json:32 |
 | 81 | @backstage/plugin-scaffolder-backend-module-gitea | ^0.2.19 (0.2.23) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency (direct since 2026-08-19; provides the publish:gitea scaffolder action, registered at packages/backend/src/index.ts:17-19) | packages/backend/package.json:39; backstage/examples/template/template.yaml |
 
-Resolution override pins (48 entries; security-override layer in
-backstage/package.json:51-102 applying repo-wide to all workspaces;
+Resolution override pins (65 entries; security-override layer in
+backstage/package.json:51-126 applying repo-wide to all workspaces;
+74 resolution keys covering 69 packages as of 2026-11-18, of which
+react-router, react-router-dom, @types/react-dom and
+@backstage/plugin-catalog-backend are listed in the app/backend tables;
 transitive-only packages. react-router, react-router-dom, and
 @types/react-dom also carry resolution pins and are listed in the app
 table above. Copyright holders are taken from the installed tarball
@@ -297,15 +313,15 @@ Gitea integration):
 | # | Component | Version/pin | Upstream URL | License (SPDX) | Copyright holder | Usage mode | Evidence |
 |---|---|---|---|---|---|---|---|
 | 82 | @types/react | ^18 (18.3.28) | https://github.com/DefinitelyTyped/DefinitelyTyped | MIT | DefinitelyTyped contributors | build dependency (resolution override) | backstage/package.json:52 |
-| 83 | @grpc/grpc-js | ^1.14.4 (1.14.4) | https://github.com/grpc/grpc-node | Apache-2.0 | Google Inc. | runtime dependency (resolution override) | backstage/package.json:54 |
+| 83 | @grpc/grpc-js | 1.14.5 (1.14.5) | https://github.com/grpc/grpc-node | Apache-2.0 | Google Inc. | runtime dependency (resolution override) | backstage/package.json:54 |
 | 84 | @babel/core | ^7.29.1 (7.29.7) | https://github.com/babel/babel | MIT | The Babel Team | build dependency (resolution override) | backstage/package.json:55 |
 | 85 | @protobufjs/utf8 | ^1.1.1 (1.1.2) | https://github.com/protobufjs/protobuf.js | BSD-3-Clause | Daniel Wirtz (protobufjs) | runtime dependency (resolution override) | backstage/package.json:56 |
 | 86 | ws | ^8.21.0 (8.21.0) | https://github.com/websockets/ws | MIT | Einar Otto Stangvik | runtime dependency (resolution override) | backstage/package.json:57 |
-| 87 | axios | ^1.13.5 (1.19.0) | https://github.com/axios/axios | MIT | Matt Zabriskie and collaborators | runtime dependency (resolution override) | backstage/package.json:58 |
-| 88 | undici | ^7.29.0 (7.29.0) | https://github.com/nodejs/undici | MIT | Node.js contributors | runtime dependency (resolution override) | backstage/package.json:59 |
+| 87 | axios | 1.20.0 (1.20.0) | https://github.com/axios/axios | MIT | Matt Zabriskie and collaborators | runtime dependency (resolution override) | backstage/package.json:58 |
+| 88 | undici | 7.30.2 (7.30.2) | https://github.com/nodejs/undici | MIT | Node.js contributors | runtime dependency (resolution override) | backstage/package.json:59 |
 | 89 | lodash | 4.18.1 | https://github.com/lodash/lodash | MIT | John-David Dalton / Lodash contributors | runtime dependency (resolution override) | backstage/package.json:62 |
 | 90 | protobufjs | 7.6.5 | https://github.com/protobufjs/protobuf.js | BSD-3-Clause | Daniel Wirtz | runtime dependency (resolution override) | backstage/package.json:63 |
-| 91 | shell-quote | 1.10.0 | https://github.com/ljharb/shell-quote | MIT | James Halliday | build dependency (resolution override) | backstage/package.json:64 |
+| 91 | shell-quote | 1.12.0 | https://github.com/ljharb/shell-quote | MIT | James Halliday | build dependency (resolution override) | backstage/package.json:64 |
 | 92 | websocket-driver | 0.7.5 | https://github.com/faye/websocket-driver-node | Apache-2.0 | James Coglan | runtime dependency (resolution override) | backstage/package.json:65 |
 | 93 | form-data | 4.0.6 | https://github.com/form-data/form-data | MIT | Felix Geisendoerfer and contributors | runtime dependency (resolution override) | backstage/package.json:66 |
 | 94 | minimatch | 9.0.9 (exactly one installed copy; exactly one yarn.lock resolution) | https://github.com/isaacs/minimatch | ISC | Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:89; the descriptor-scoped pins formerly at :67-70 were dead config and were removed in the 2026-08-18 remediation |
@@ -313,28 +329,28 @@ Gitea integration):
 | 96 | tar | 7.5.22 | https://github.com/isaacs/node-tar | BlueOak-1.0.0 | Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:68 |
 | 97 | linkify-it | 5.0.2 | https://github.com/markdown-it/linkify-it | MIT | Vitaly Puzrin (2015) | runtime dependency (resolution override; re-pinned from 6.1.0 on 2026-08-20 -- markdown-it 14.2.0 type declarations break yarn build:all against v6; 5.0.2 satisfies its ^5.0.1 range, audit clean) | backstage/package.json:69 |
 | 98 | fast-xml-builder | 1.3.0 | https://github.com/NaturalIntelligence/fast-xml-builder | MIT | Natural Intelligence (2026); author Amit Gupta | runtime dependency (resolution override) | backstage/package.json:70 |
-| 99 | brace-expansion | 5.0.9 | https://github.com/juliangruber/brace-expansion | MIT | Julian Gruber; TypeScript port Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:71 |
-| 100 | fast-uri | 4.1.2 | https://github.com/fastify/fast-uri | BSD-3-Clause | Vincent Le Goff | runtime dependency (resolution override) | backstage/package.json:72 |
+| 99 | brace-expansion | 2.1.7 | https://github.com/juliangruber/brace-expansion | MIT | Julian Gruber; TypeScript port Isaac Z. Schlueter | build dependency (resolution override) | backstage/package.json:71 |
+| 100 | fast-uri | 4.1.5 | https://github.com/fastify/fast-uri | BSD-3-Clause | Vincent Le Goff | runtime dependency (resolution override) | backstage/package.json:72 |
 | 101 | postcss | 8.5.25 | https://github.com/postcss/postcss | MIT | Andrey Sitnik | build dependency (resolution override) | backstage/package.json:73 |
-| 102 | basic-ftp | 6.0.2 | https://github.com/patrickjuchli/basic-ftp | MIT | Patrick Juchli | runtime dependency (resolution override) | backstage/package.json:74 |
+| 102 | basic-ftp | 6.2.1 | https://github.com/patrickjuchli/basic-ftp | MIT | Patrick Juchli | runtime dependency (resolution override) | backstage/package.json:74 |
 | 103 | js-cookie | 3.0.8 | https://github.com/js-cookie/js-cookie | MIT | Klaus Hartl | runtime dependency (resolution override) | backstage/package.json:75 |
-| 104 | multer | 2.2.0 | https://github.com/expressjs/multer | MIT | Hage Yaapa, Jaret Pfluger, et al. | runtime dependency (resolution override) | backstage/package.json:76 |
+| 104 | multer | 2.5.0 | https://github.com/expressjs/multer | MIT | Hage Yaapa, Jaret Pfluger, et al. | runtime dependency (resolution override) | backstage/package.json:76 |
 | 105 | http-proxy-middleware | 2.0.10 | https://github.com/chimurai/http-proxy-middleware | MIT | Steven Chim | build dependency (resolution override) | backstage/package.json:77 |
-| 106 | dompurify | 3.4.13 | https://github.com/cure53/DOMPurify | (MPL-2.0 OR Apache-2.0) | Mario Heiderich, Cure53 | runtime dependency (resolution override) | backstage/package.json:78 |
-| 107 | follow-redirects | 1.16.0 | https://github.com/follow-redirects/follow-redirects | MIT | Ruben Verborgh and contributors | runtime dependency (resolution override) | backstage/package.json:79 |
-| 108 | qs | 6.15.3 | https://github.com/ljharb/qs | BSD-3-Clause | Jordan Harband | runtime dependency (resolution override) | backstage/package.json:80 |
+| 106 | dompurify | 3.4.17 | https://github.com/cure53/DOMPurify | (MPL-2.0 OR Apache-2.0) | Mario Heiderich, Cure53 | runtime dependency (resolution override) | backstage/package.json:78 |
+| 107 | follow-redirects | 1.16.3 | https://github.com/follow-redirects/follow-redirects | MIT | Ruben Verborgh and contributors | runtime dependency (resolution override) | backstage/package.json:79 |
+| 108 | qs | 6.16.0 | https://github.com/ljharb/qs | BSD-3-Clause | Jordan Harband | runtime dependency (resolution override) | backstage/package.json:80 |
 | 109 | uuid | 11.1.1 | https://github.com/uuidjs/uuid | MIT | Robert Kieffer and other contributors (2010-2020) | runtime dependency (resolution override) | backstage/package.json:81 |
-| 110 | svgo | 3.3.4 | https://github.com/svg/svgo | MIT | Kir Belevich and contributors | build dependency (resolution override) | backstage/package.json:82 |
+| 110 | svgo | 3.3.5 | https://github.com/svg/svgo | MIT | Kir Belevich and contributors | build dependency (resolution override) | backstage/package.json:82 |
 | 111 | koa | 2.16.4 | https://github.com/koajs/koa | MIT | Koa contributors (LICENSE: (c) 2019 Koa contributors) | runtime dependency (resolution override) | backstage/package.json:83 |
-| 112 | adm-zip | 0.6.0 | https://github.com/cthackers/adm-zip | MIT | Nasca Iacob (cthackers) | build dependency (resolution override) | backstage/package.json:84 |
-| 113 | js-yaml | 4.3.1 | https://github.com/nodeca/js-yaml | MIT | Vladimir Zapparov and contributors | runtime dependency (resolution override) | backstage/package.json:85 |
+| 112 | adm-zip | 0.6.1 | https://github.com/cthackers/adm-zip | MIT | Nasca Iacob (cthackers) | build dependency (resolution override) | backstage/package.json:84 |
+| 113 | js-yaml | 4.3.2 | https://github.com/nodeca/js-yaml | MIT | Vladimir Zapparov and contributors | runtime dependency (resolution override) | backstage/package.json:85 |
 | 114 | webpack-dev-server | 5.2.6 | https://github.com/webpack/webpack-dev-server | MIT | Tobias Koppers (webpack contributors) | build dependency (resolution override) | backstage/package.json:86 |
 | 115 | prismjs | 1.30.0 | https://github.com/PrismJS/prism | MIT | Lea Verou and contributors | runtime dependency (resolution override) | backstage/package.json:87 |
-| 116 | body-parser | 1.20.6 | https://github.com/expressjs/body-parser | MIT | Douglas Christopher Wilson, Jonathan Ong, et al. | runtime dependency (resolution override) | backstage/package.json:88 |
+| 116 | body-parser | 1.20.9 | https://github.com/expressjs/body-parser | MIT | Douglas Christopher Wilson, Jonathan Ong, et al. | runtime dependency (resolution override) | backstage/package.json:88 |
 | 117 | fast-xml-parser | 5.7.0 | https://github.com/NaturalIntelligence/fast-xml-parser | MIT | Amit Gupta (NaturalIntelligence) | runtime dependency (resolution override) | backstage/package.json:90 |
-| 118 | markdown-it | 14.2.0 | https://github.com/markdown-it/markdown-it | MIT | Vitaly Puzrin, Alex Kocharin (LICENSE: (c) 2014) | runtime dependency (resolution override) | backstage/package.json:91 |
-| 119 | launch-editor | 2.14.1 | https://github.com/yyx990803/launch-editor | MIT | Evan You | build dependency (resolution override) | backstage/package.json:92 |
-| 120 | ip-address | 10.3.1 | https://github.com/beaugunderson/ip-address | MIT | Beau Gunderson | runtime dependency (resolution override) | backstage/package.json:93 |
+| 118 | markdown-it | 14.3.3 | https://github.com/markdown-it/markdown-it | MIT | Vitaly Puzrin, Alex Kocharin (LICENSE: (c) 2014) | runtime dependency (resolution override) | backstage/package.json:91 |
+| 119 | launch-editor | 2.14.2 | https://github.com/yyx990803/launch-editor | MIT | Evan You | build dependency (resolution override) | backstage/package.json:92 |
+| 120 | ip-address | 10.5.1 | https://github.com/beaugunderson/ip-address | MIT | Beau Gunderson | runtime dependency (resolution override) | backstage/package.json:93 |
 | 121 | nanoid | 3.3.18 (pin added 2026-08-18) | https://github.com/ai/nanoid | MIT | Andrey Sitnik | runtime dependency (resolution override) | backstage/package.json:94 |
 | 122 | file-type | 21.3.2 (pin added 2026-08-18; ESM-only, and the only dependent never imports it) | https://github.com/sindresorhus/file-type | MIT | Sindre Sorhus | build dependency (resolution override) | backstage/package.json:95 |
 | 123 | typescript-json-schema | 0.68.0 (pin added 2026-08-18; this pin drops vm2, so vm2 is eliminated from the tree -- it was never a listed entry) | https://github.com/YousefED/typescript-json-schema | BSD-3-Clause | Yousef El-Dardiry and Dominik Moritz | build dependency (resolution override) | backstage/package.json:96 |
@@ -344,6 +360,23 @@ Gitea integration):
 | 127 | @tootallnate/once | 2.0.1 | https://github.com/TooTallNate/once | MIT | Nathan Rajlich | build dependency (resolution override) | backstage/package.json:100 |
 | 128 | esbuild | 0.28.1 | https://github.com/evanw/esbuild | MIT | Evan Wallace (LICENSE: (c) 2020 Evan Wallace) | build dependency (resolution override) | backstage/package.json:101 |
 | 129 | urllib | 4.9.1 | https://github.com/node-modules/urllib | MIT | fengmk2 and other contributors (LICENSE: Copyright (c) 2011-2014) | runtime dependency (resolution override; pinned 2026-08-26 for GHSA-hq3h-g68c-hp78, transitive via infinispan ^0.12.0) | backstage/package.json:102 |
+| 130 | proxy-addr | 2.0.8 (pin added 2026-11-18, PR #52; critical GHSA-jqcg-44mw-7w3h) | https://github.com/pillarjs/proxy-addr | MIT | Douglas Christopher Wilson (LICENSE: (c) 2014-2016) | runtime dependency (resolution override; transitive via express 4) | backstage/package.json:111 |
+| 131 | node-forge | 1.4.3 (pin added 2026-11-18, PR #52; 8 high advisories <=1.4.0) | https://github.com/digitalbazaar/forge | (BSD-3-Clause OR GPL-2.0) | Digital Bazaar, Inc. (LICENSE: (c) 2010) | runtime dependency (resolution override; transitive via @backstage/backend-defaults) | backstage/package.json:112 |
+| 132 | compression | 1.8.2 (pin added 2026-11-18, PR #52; GHSA-vc2v-76pw-4v95) | https://github.com/expressjs/compression | MIT | Jonathan Ong, Douglas Christopher Wilson (LICENSE: (c) 2014) | runtime dependency (resolution override; transitive via @backstage/backend-defaults) | backstage/package.json:113 |
+| 133 | source-map-js | 1.2.2 (pin added 2026-11-18, PR #52; GHSA-68fv-2mgg-jv7q) | https://github.com/7rulnik/source-map-js | BSD-3-Clause | Mozilla Foundation and contributors (LICENSE: (c) 2009-2011); fork by Valentin Semirulnik | build dependency (resolution override; transitive via postcss) | backstage/package.json:114 |
+| 134 | @azure/identity | 4.14.1 (pin added 2026-11-18, PR #52; pulls @azure/msal-node ^7.1.0, installed 7.2.1, MIT, Copyright (c) 2020 Microsoft -- a 5 -> 7 major for msal-node, GHSA-xcx6-jx8p-x3h5) | https://github.com/Azure/azure-sdk-for-js | MIT | Microsoft Corporation | runtime dependency (resolution override; transitive via @backstage/integration, backend-defaults, kubernetes-backend, techdocs-node) | backstage/package.json:115 |
+| 135 | isomorphic-git | 1.38.7 (descriptor-scoped pin isomorphic-git@npm:^1.23.0, added 2026-11-18, PR #52; GHSA-9qw7-j9xw-fv9c) | https://github.com/isomorphic-git/isomorphic-git | MIT | the isomorphic-git authors (LICENSE.md: 2017-2023) | runtime dependency (resolution override; transitive via @backstage/plugin-scaffolder-node) | backstage/package.json:116 |
+| 136 | @backstage/plugin-techdocs-node | 1.15.6 (descriptor-scoped pins for ^1.14.4 and ^1.15.2, added 2026-11-18, PR #52; seven high advisories; stays on the 1.x major) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency (resolution override; transitive via plugin-techdocs-backend and plugin-search-backend-module-techdocs) | backstage/package.json:117; backstage/package.json:118 |
+| 137 | zod | 4.6.7 (descriptor-scoped pins for ^4.0.0 and ^3.25.76 OR ^4.0.0 (the yarn descriptor joins the two ranges with a double pipe, written as OR here so the table renders), added 2026-11-18, PR #52; GHSA-mrhx-c7xc-m3w5; zod 3.25.76 no longer in yarn.lock) | https://github.com/colinhacks/zod | MIT | Colin McDonnell (LICENSE: (c) 2025) | runtime dependency (resolution override; transitive via @backstage/*) | backstage/package.json:119; backstage/package.json:120 |
+| 138 | @backstage/catalog-model (descriptor-scoped) | 1.10.2 for ^1.9.0 (pin added 2026-11-18, PR #52; drops a zod ^3.25.76 consumer) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | runtime dependency (resolution override) | backstage/package.json:121 |
+| 139 | @backstage/cli-module-auth | 0.1.5 for ^0.1.0 (pin added 2026-11-18, PR #52; drops a zod ^3.25.76 consumer) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | build dependency (resolution override; via @backstage/cli-defaults) | backstage/package.json:122 |
+| 140 | @backstage/cli-module-new | 0.1.8 for ^0.1.0 (pin added 2026-11-18, PR #52; drops a zod ^3.25.76 consumer) | https://github.com/backstage/backstage | Apache-2.0 | The Backstage Authors | build dependency (resolution override; via @backstage/cli-defaults) | backstage/package.json:123 |
+| 141 | @graphql-tools/utils | 12.1.0 (pin added 2026-11-18, PR #52; GHSA-7mx3-vvmw-hjmv and GHSA-c4qx-w738-7hr3; forced 8 -> 12 major under mockttp 3.17.1) | https://github.com/ardatan/graphql-tools | MIT | The Guild / graphql-tools contributors (no LICENSE file in tarball; package.json license field MIT; author Dotan Simha) | runtime dependency (resolution override; transitive via mockttp <- @backstage/backend-openapi-utils) | backstage/package.json:124 |
+| 142 | browserslist | 4.28.7 (pin present in backstage/package.json before 2026-11-18; first listed in this regeneration) | https://github.com/browserslist/browserslist | MIT | Andrey Sitnik and other contributors (LICENSE: 2014) | build dependency (resolution override) | backstage/package.json:103 |
+| 143 | baseline-browser-mapping | 2.11.0 (pin present before 2026-11-18; first listed in this regeneration) | https://github.com/web-platform-dx/baseline-browser-mapping | Apache-2.0 | web-platform-dx contributors (Apache-2.0 LICENSE.txt; no author field) | build dependency (resolution override) | backstage/package.json:104 |
+| 144 | mysql2 | 3.23.1 (pin present before 2026-11-18; first listed in this regeneration) | https://github.com/sidorares/node-mysql2 | MIT | Andrey Sidorov and contributors (License: 2016) | runtime dependency (resolution override) | backstage/package.json:105 |
+| 145 | postcss-selector-parser | 6.1.3 for ^6.0.4/^6.0.5/^6.0.9 and 7.1.3 for ^7.0.0 (descriptor-scoped pins present before 2026-11-18; first listed in this regeneration) | https://github.com/postcss/postcss-selector-parser | MIT | Ben Briggs and contributors (LICENSE-MIT) | build dependency (resolution override) | backstage/package.json:106; backstage/package.json:107; backstage/package.json:108; backstage/package.json:109 |
+| 146 | handlebars | 4.7.10 (pin added by #39, 93bf9da, 2026-11-07; first listed in this regeneration) | https://github.com/handlebars-lang/handlebars.js | MIT | Yehuda Katz (LICENSE: 2011-2019) | runtime dependency (resolution override) | backstage/package.json:110 |
 
 ## 6. CI/CD Actions and Images (9 entries)
 
@@ -391,7 +424,8 @@ pinning would close this.
 TechDocs generator image (pulled at docs build time; recorded here as
 prose, not counted as a listed entry): spotify/techdocs default tag
 v1.2.8 (TechdocsGenerator.defaultDockerImage in installed
-@backstage/plugin-techdocs-node 1.14.4; backstage/app-config.yaml:82-83
+@backstage/plugin-techdocs-node 1.15.6 as re-measured 2026-11-18, was
+1.14.4; backstage/app-config.yaml:82-83
 sets runIn: docker with no dockerImage override), built from
 github.com/backstage/techdocs-container (main), Apache-2.0, Copyright
 2020 Spotify AB. The image is FROM python:3.14-alpine and bundles the
@@ -461,7 +495,7 @@ while a CI job is in flight (zero matches in a full-cluster scan
 | # | Item | What is UNVERIFIED | What IS verified | Evidence / notes |
 |---|---|---|---|---|
 | U7 | OpenChoreo mirror in namespace-predictor (listed entry, group 4 #4) | the exact mirrored upstream commit revision (none recorded in-file; sibling checkout verified absent on this machine, 2026-08-18) | holder and license confirmed via upstream SPDX headers (Copyright 2025 The OpenChoreo Authors, Apache-2.0) in fetched name.go and namespace_handler.go; both cited upstream paths exist; algorithm re-diffed against upstream main 2026-08-18 and still behavior-identical (upstream refactored to an extraHashInput-capable generateK8sName; the mirrored subset is unaffected) | tools/namespace-predictor/main.go:18,32,43-45,83-88; note: the main.go:18 comment "kubernetes.name.go" was a typo for internal/dataplane/kubernetes/name.go; corrected 2026-08-18 in a comment-only edit (tools/namespace-predictor/main.go:18, kubernetes.name.go -> kubernetes/name.go) |
-| U19 | spotify/techdocs generator image | per-component licenses inside the image (Python, Alpine packages, OpenJDK, PlantUML, graphviz) not enumerated | default tag v1.2.8 verified (TechdocsGenerator.defaultDockerImage in installed @backstage/plugin-techdocs-node 1.14.4 and upstream; no dockerImage override in app-config); built from github.com/backstage/techdocs-container (main), Apache-2.0, Copyright 2020 Spotify AB; image is FROM python:3.14-alpine and bundles PlantUML v1.2026.2 jar and pip mkdocs-techdocs-core==1.7.0; Docker Hub tag v1.2.8 exists (pushed 2026-01-19) | backstage/app-config.yaml:82-83 |
+| U19 | spotify/techdocs generator image | per-component licenses inside the image (Python, Alpine packages, OpenJDK, PlantUML, graphviz) not enumerated | default tag v1.2.8 verified (TechdocsGenerator.defaultDockerImage in installed @backstage/plugin-techdocs-node 1.15.6 (re-measured 2026-11-18: dist still defaults to spotify/techdocs:v1.2.8) and upstream; no dockerImage override in app-config); built from github.com/backstage/techdocs-container (main), Apache-2.0, Copyright 2020 Spotify AB; image is FROM python:3.14-alpine and bundles PlantUML v1.2026.2 jar and pip mkdocs-techdocs-core==1.7.0; Docker Hub tag v1.2.8 exists (pushed 2026-01-19) | backstage/app-config.yaml:82-83 |
 | U25 | node:24-trixie-slim Debian base layer (listed entry, group 6 #6) | exact per-package list and license names of the deployed layer (daemon down, pull disallowed) | upstream Dockerfile is FROM debian:trixie-slim (NODE_VERSION=24.19.0); debian:trixie-slim is debootstrap minbase built from Debian main only, so every package is DFSG-free per the Debian Social Contract (clauses 1 and 5, debian.org/social_contract); per-package license texts are mechanically extractable at /usr/share/doc/<pkg>/copyright per Debian Policy 12.5; current trixie-slim = 13.6-slim (snapshot trixie-20260803) | backstage/packages/backend/Dockerfile:15 |
 
 ## Accepted residual risks (documented, not unverified)
@@ -476,6 +510,15 @@ while a CI job is in flight (zero matches in a full-cluster scan
   unsupported major against all Backstage peer declarations. Remediation
   path: upstream Backstage shipping v7-compatible peer ranges. Recorded
   as an accepted residual risk 2026-08-18.
+  SUPERSEDED STATE (measured 2026-11-18): an earlier change (#34,
+  250d7c0) moved the app to react-router ^8.4.0 / react-router-dom
+  ^7.18.4, and the resolution pins at backstage/package.json:60-61 are now
+  7.18.4. The installed version is 7.18.4, and `yarn install` reports
+  YN0060 that react-router-dom 7.18.4 does not satisfy the ^6.30.2 peer
+  range of @backstage/core-components. The 6.30.4 advisories therefore
+  no longer apply to the installed tree; the v7 peer-range risk above is
+  now live. Runtime impact: UNVERIFIED (no Backstage boot was run for
+  this regeneration).
 
 ## First-party works (for completeness, not third-party)
 
