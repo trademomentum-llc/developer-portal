@@ -242,22 +242,41 @@ handoff_root_token() {
     # Disable xtrace before any token reference; restore on every return.
     { local _openbao_x=$-; set +x; } 2>/dev/null
     trap '[[ ${_openbao_x:-} == *x* ]] && set -x' RETURN
-    local _rc=0
+    local _rc=0 _had_e=0
     if [ -z "${ROOT_TOKEN:-}" ]; then
         fail "handoff_root_token: ROOT_TOKEN is empty"
     fi
+    # Do not put the subshell on the left of || — bash then ignores errexit
+    # inside it, so a failed printf/chmod could still reach kubectl and
+    # install an empty or truncated token. Capture status after the subshell
+    # instead, and fail each step with an explicit || exit 1.
+    case "$-" in
+        *e*) _had_e=1 ;;
+    esac
+    set +e
     (
         set +x
         set -euo pipefail
         umask 077
         tmp=$(mktemp) || exit 1
         trap 'rm -f -- "$tmp"' EXIT INT TERM
-        printf '%s' "$ROOT_TOKEN" > "$tmp"
-        chmod 600 "$tmp"
+        printf '%s' "$ROOT_TOKEN" > "$tmp" || exit 1
+        chmod 600 "$tmp" || exit 1
+        if ! [ -s "$tmp" ]; then
+            printf 'handoff_root_token: temp token file is empty\n' >&2
+            exit 1
+        fi
+        _got=$(wc -c < "$tmp" | tr -d '[:space:]') || exit 1
+        if [ "$_got" -ne "${#ROOT_TOKEN}" ]; then
+            printf 'handoff_root_token: temp token file size mismatch\n' >&2
+            exit 1
+        fi
         kubectl -n "$ESO_NS" create secret generic "$ESO_SECRET" \
             --from-file=token="$tmp" --dry-run=client -o yaml \
-            | kubectl apply -f - >/dev/null
-    ) || _rc=$?
+            | kubectl apply -f - >/dev/null || exit 1
+    )
+    _rc=$?
+    [ "$_had_e" -eq 1 ] && set -e
     [ "$_rc" -eq 0 ] || fail "could not apply secret $ESO_SECRET (ns $ESO_NS)"
     info "secret $ESO_SECRET (ns $ESO_NS) now holds the generated root token"
 }

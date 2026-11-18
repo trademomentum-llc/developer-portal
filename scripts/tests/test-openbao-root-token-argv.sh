@@ -198,7 +198,7 @@ pass "openbao_exec_pod_sh delivers the token only on stdin"
 # --- 4. bootstrap helpers (sourced; main must not run) ---
 reset_records
 # shellcheck source=scripts/bootstrap-openbao-persistent.sh
-source "$ROOT/scripts/bootstrap-openbao-persistent.sh"
+source "${OPENBAO_BOOTSTRAP_SCRIPT:-$ROOT/scripts/bootstrap-openbao-persistent.sh}"
 # If main ran, it would have called wait_for_api and more kubectl; we reset
 # after source in case of accidental calls -- main is guarded.
 reset_records
@@ -627,5 +627,116 @@ python_check "$TMP/handoff-xtrace.err" absent
 assert_no_token_in_argv
 assert_handoff_file_gone
 pass "handoff_root_token does not leak the token under xtrace"
+
+# --- 9e-g. write/chmod/empty-file faults must not reach kubectl ---
+# Record the mktemp path so we can assert the trap deleted the file even
+# when kubectl (which is what normally records --from-file=) is never called.
+install_recording_mktemp() {
+    cat > "$BIN/mktemp" << 'MOCK'
+#!/usr/bin/env bash
+set -euo pipefail
+dir=${KUBECTL_RECORD_DIR:?}
+real=$(PATH=/usr/bin:/bin:/usr/sbin:/sbin type -P mktemp)
+f=$("$real" "$@")
+printf '%s\n' "$f" > "$dir/handoff-token-path"
+printf '%s\n' "$f"
+MOCK
+    /usr/bin/chmod +x "$BIN/mktemp"
+}
+
+install_unwritable_mktemp() {
+    cat > "$BIN/mktemp" << 'MOCK'
+#!/usr/bin/env bash
+set -euo pipefail
+dir=${KUBECTL_RECORD_DIR:?}
+real=$(PATH=/usr/bin:/bin:/usr/sbin:/sbin type -P mktemp)
+f=$("$real" "$@")
+printf '%s\n' "$f" > "$dir/handoff-token-path"
+# Leave the file non-writable so the subsequent printf redirect fails
+# (same class of fault as writing to /dev/full).
+/usr/bin/chmod a-w "$f"
+printf '%s\n' "$f"
+MOCK
+    /usr/bin/chmod +x "$BIN/mktemp"
+}
+
+remove_command_stubs() {
+    rm -f "$BIN/mktemp" "$BIN/chmod" "$BIN/printf"
+}
+
+assert_kubectl_not_invoked() {
+    local matches
+    shopt -s nullglob
+    matches=("$RECORD"/call-*)
+    shopt -u nullglob
+    if [ -f "$RECORD/counter" ] || [ "${#matches[@]}" -gt 0 ]; then
+        fail "kubectl was invoked after a temp-file fault"
+    fi
+}
+
+assert_fault_cleanup() {
+    local err="$1"
+    assert_kubectl_not_invoked
+    assert_no_token_in_argv
+    python_check "$err" absent
+    assert_handoff_file_gone
+}
+
+# 9e. write failure (unwritable temp file): no kubectl, non-zero, file gone
+reset_records
+rm -f "$RECORD"/handoff-*
+install_handoff_mock
+install_unwritable_mktemp
+hash -r
+if (handoff_root_token >/dev/null 2>"$TMP/handoff-write-fail.err"); then
+    remove_command_stubs
+    fail "handoff_root_token should have failed when writing the temp token file failed"
+fi
+remove_command_stubs
+assert_fault_cleanup "$TMP/handoff-write-fail.err"
+pass "handoff_root_token write failure: kubectl not invoked, non-zero, temp file deleted, token off argv and stderr"
+
+# 9f. chmod failure (stubbed chmod): no kubectl, non-zero, file gone
+reset_records
+rm -f "$RECORD"/handoff-*
+install_handoff_mock
+install_recording_mktemp
+cat > "$BIN/chmod" << 'MOCK'
+#!/usr/bin/env bash
+exit 1
+MOCK
+/usr/bin/chmod +x "$BIN/chmod"
+hash -r
+if (handoff_root_token >/dev/null 2>"$TMP/handoff-chmod-fail.err"); then
+    remove_command_stubs
+    fail "handoff_root_token should have failed when chmod failed"
+fi
+remove_command_stubs
+assert_fault_cleanup "$TMP/handoff-chmod-fail.err"
+pass "handoff_root_token chmod failure: kubectl not invoked, non-zero, temp file deleted, token off argv and stderr"
+
+# 9g. zero-byte file (shadowed printf writes nothing): no kubectl, non-zero, file gone
+reset_records
+rm -f "$RECORD"/handoff-*
+install_handoff_mock
+install_recording_mktemp
+cat > "$BIN/printf" << 'MOCK'
+#!/usr/bin/env bash
+# Succeed with no output so the redirect leaves a zero-byte file.
+exit 0
+MOCK
+/usr/bin/chmod +x "$BIN/printf"
+hash -r
+if (
+    enable -n printf
+    hash -r
+    handoff_root_token >/dev/null 2>"$TMP/handoff-empty-fail.err"
+); then
+    remove_command_stubs
+    fail "handoff_root_token should have failed when the temp token file was empty"
+fi
+remove_command_stubs
+assert_fault_cleanup "$TMP/handoff-empty-fail.err"
+pass "handoff_root_token zero-byte file: kubectl not invoked, non-zero, temp file deleted, token off argv and stderr"
 
 printf 'All tests passed\n'
